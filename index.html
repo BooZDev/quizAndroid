@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kotlin Basics Quiz - Lesson 1</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <span class="kotlin-logo">K</span>
+                <h1>Kotlin Basics Quiz</h1>
+            </div>
+            <p class="subtitle">Lesson 1: Kotlin Fundamentals</p>
+        </header>
+
+        <!-- Start Screen -->
+        <div id="start-screen" class="screen active">
+            <div class="card welcome-card">
+                <h2>🎯 Chào mừng đến với bài kiểm tra Kotlin!</h2>
+                <p>Bài kiểm tra này bao gồm các chủ đề:</p>
+                <ul class="topic-list">
+                    <li>📌 Operators (Toán tử)</li>
+                    <li>📌 Data Types (Kiểu dữ liệu)</li>
+                    <li>📌 Variables (Biến)</li>
+                    <li>📌 Conditionals (Điều kiện)</li>
+                    <li>📌 Lists & Arrays (Danh sách & Mảng)</li>
+                    <li>📌 Null Safety (An toàn null)</li>
+                </ul>
+                
+                <div class="settings">
+                    <h3>Cài đặt bài kiểm tra:</h3>
+                    <div class="setting-group">
+                        <label for="question-count">Số câu hỏi:</label>
+                        <select id="question-count">
+                            <option value="10">10 câu</option>
+                            <option value="20" selected>20 câu</option>
+                            <option value="30">30 câu</option>
+                            <option value="all">Tất cả</option>
+                        </select>
+                    </div>
+                    <div class="setting-group">
+                        <label for="question-type">Loại câu hỏi:</label>
+                        <select id="question-type">
+                            <option value="all" selected>Tất cả loại</option>
+                            <option value="multiple-choice">Trắc nghiệm</option>
+                            <option value="fill-blank">Điền vào chỗ trống</option>
+                            <option value="code-completion">Hoàn thành code</option>
+                            <option value="error-detection">Phát hiện lỗi</option>
+                            <option value="output-prediction">Dự đoán output</option>
+                        </select>
+                    </div>
+                    <div class="setting-group">
+                        <label for="topic-filter">Chủ đề:</label>
+                        <select id="topic-filter">
+                            <option value="all" selected>Tất cả chủ đề</option>
+                            <option value="operators">Operators</option>
+                            <option value="data-types">Data Types</option>
+                            <option value="variables">Variables</option>
+                            <option value="conditionals">Conditionals</option>
+                            <option value="lists-arrays">Lists & Arrays</option>
+                            <option value="null-safety">Null Safety</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button id="start-btn" class="btn btn-primary">
+                    <span>Bắt đầu kiểm tra</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="screen">
+            <div class="quiz-header">
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div id="progress-fill" class="progress-fill"></div>
+                    </div>
+                    <span id="progress-text" class="progress-text">1/20</span>
+                </div>
+                <div class="timer" id="timer">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 6v6l4 2"/>
+                    </svg>
+                    <span id="timer-text">00:00</span>
+                </div>
+                <div class="score-display">
+                    <span>Điểm: </span>
+                    <span id="current-score">0</span>
+                </div>
+            </div>
+
+            <div class="question-card" id="question-card">
+                <div class="question-meta">
+                    <span class="question-type-badge" id="question-type-badge">Trắc nghiệm</span>
+                    <span class="question-topic-badge" id="question-topic-badge">Operators</span>
+                    <span class="question-difficulty" id="question-difficulty">⭐</span>
+                </div>
+                
+                <div class="question-content" id="question-content">
+                    <!-- Question will be inserted here -->
+                </div>
+
+                <div class="code-block" id="code-block" style="display: none;">
+                    <pre><code id="code-content"></code></pre>
+                </div>
+
+                <div class="answers-container" id="answers-container">
+                    <!-- Answers will be inserted here -->
+                </div>
+
+                <div class="fill-blank-container" id="fill-blank-container" style="display: none;">
+                    <input type="text" id="fill-blank-input" class="fill-blank-input" placeholder="Nhập câu trả lời...">
+                </div>
+
+                <div class="feedback" id="feedback" style="display: none;">
+                    <div class="feedback-icon" id="feedback-icon"></div>
+                    <div class="feedback-text" id="feedback-text"></div>
+                    <div class="explanation" id="explanation"></div>
+                </div>
+            </div>
+
+            <div class="quiz-actions">
+                <button id="check-btn" class="btn btn-primary">Kiểm tra</button>
+                <button id="next-btn" class="btn btn-secondary" style="display: none;">Câu tiếp theo</button>
+                <button id="hint-btn" class="btn btn-hint">💡 Gợi ý</button>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="screen">
+            <div class="card result-card">
+                <div class="result-header">
+                    <div class="result-icon" id="result-icon">🎉</div>
+                    <h2 id="result-title">Hoàn thành!</h2>
+                </div>
+                
+                <div class="result-stats">
+                    <div class="stat-item">
+                        <span class="stat-value" id="final-score">0</span>
+                        <span class="stat-label">Điểm số</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="correct-count">0</span>
+                        <span class="stat-label">Câu đúng</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="total-time">00:00</span>
+                        <span class="stat-label">Thời gian</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="accuracy">0%</span>
+                        <span class="stat-label">Độ chính xác</span>
+                    </div>
+                </div>
+
+                <div class="result-breakdown">
+                    <h3>Phân tích theo chủ đề:</h3>
+                    <div id="topic-breakdown" class="topic-breakdown">
+                        <!-- Topic breakdown will be inserted here -->
+                    </div>
+                </div>
+
+                <div class="result-actions">
+                    <button id="review-btn" class="btn btn-secondary">📋 Xem lại đáp án</button>
+                    <button id="retry-btn" class="btn btn-primary">🔄 Làm lại</button>
+                    <button id="home-btn" class="btn btn-secondary">🏠 Về trang chủ</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Review Screen -->
+        <div id="review-screen" class="screen">
+            <div class="review-header">
+                <h2>📋 Xem lại đáp án</h2>
+                <button id="back-to-result" class="btn btn-secondary">← Quay lại</button>
+            </div>
+            <div id="review-container" class="review-container">
+                <!-- Review items will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="questions.js"></script>
+    <script src="app-modular.js"></script>
+</body>
+</html>
