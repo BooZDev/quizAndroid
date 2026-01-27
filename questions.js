@@ -80,7 +80,7 @@ const questions = [
         difficulty: 2,
         question: "Hoàn thành code để gọi phương thức nhân trên số nguyên:",
         code: "val result = 2.___(3)",
-        codeWithBlank: "val result = 2.<span class='blank'>???</span>(3)",
+        codeWithBlank: "val result = 2.???(3)",
         options: ["multiply", "times", "mult", "product"],
         correct: 1,
         explanation: "Kotlin cho phép gọi phương thức trên số như object. <code>2.times(3)</code> tương đương <code>2 * 3 = 6</code>"
@@ -92,7 +92,7 @@ const questions = [
         difficulty: 2,
         question: "Phương thức nào dùng để chia hai số trong Kotlin?",
         code: "val result = 2.4.___(2)",
-        codeWithBlank: "val result = 2.4.<span class='blank'>???</span>(2)",
+        codeWithBlank: "val result = 2.4.???(2)",
         options: ["divide", "div", "split", "quot"],
         correct: 1,
         explanation: "<code>div()</code> là phương thức chia. <code>2.4.div(2) = 1.2</code>"
@@ -193,7 +193,7 @@ const questions = [
         difficulty: 2,
         question: "Hoàn thành code để chuyển Int sang Byte:",
         code: "val i: Int = 6\nprintln(i.___())",
-        codeWithBlank: "val i: Int = 6\nprintln(i.<span class='blank'>???</span>())",
+        codeWithBlank: "val i: Int = 6\nprintln(i.???())",
         options: ["toByte", "asByte", "convertByte", "byte"],
         correct: 0,
         explanation: "Dùng <code>.toByte()</code> để chuyển đổi Int sang Byte."
@@ -265,7 +265,7 @@ const questions = [
         difficulty: 2,
         question: "Hoàn thành string template:",
         code: "val name = \"Kotlin\"\nprintln(\"Hello, ___name\")",
-        codeWithBlank: "val name = \"Kotlin\"\nprintln(\"Hello, <span class='blank'>???</span>name\")",
+        codeWithBlank: "val name = \"Kotlin\"\nprintln(\"Hello, ???name\")",
         options: ["#", "$", "@", "&"],
         correct: 1,
         explanation: "Dùng <code>$</code> để chèn biến vào string. <code>\"Hello, $name\"</code> => \"Hello, Kotlin\""
@@ -331,7 +331,7 @@ const questions = [
         difficulty: 1,
         question: "Khai báo biến width kiểu Int với giá trị 12:",
         code: "___ width: Int = 12",
-        codeWithBlank: "<span class='blank'>???</span> width: Int = 12",
+        codeWithBlank: "??? width: Int = 12",
         options: ["let", "var", "int", "const"],
         correct: 1,
         explanation: "Dùng <code>var</code> hoặc <code>val</code> để khai báo biến."
@@ -402,7 +402,7 @@ const questions = [
         difficulty: 2,
         question: "Hoàn thành câu lệnh when:",
         code: "___(results) {\n  0 -> println(\"No results\")\n  else -> println(\"Has results\")\n}",
-        codeWithBlank: "<span class='blank'>???</span>(results) {\n  0 -> println(\"No results\")\n  else -> println(\"Has results\")\n}",
+        codeWithBlank: "???(results) {\n  0 -> println(\"No results\")\n  else -> println(\"Has results\")\n}",
         options: ["switch", "when", "if", "case"],
         correct: 1,
         explanation: "<code>when</code> là cấu trúc điều kiện mạnh mẽ trong Kotlin."
@@ -434,7 +434,7 @@ const questions = [
         difficulty: 2,
         question: "Kiểm tra số có nằm trong range:",
         code: "if (x ___ 1..100) println(\"Valid\")",
-        codeWithBlank: "if (x <span class='blank'>???</span> 1..100) println(\"Valid\")",
+        codeWithBlank: "if (x ??? 1..100) println(\"Valid\")",
         options: ["in", "within", "between", "inside"],
         correct: 0,
         explanation: "Dùng từ khóa <code>in</code> để kiểm tra phần tử có trong range hay collection."
@@ -476,7 +476,7 @@ const questions = [
         difficulty: 2,
         question: "Vòng lặp for với index và element:",
         code: "for ((index, element) in list.___()) {\n  println(\"$index: $element\")\n}",
-        codeWithBlank: "for ((index, element) in list.<span class='blank'>???</span>()) {\n  println(\"$index: $element\")\n}",
+        codeWithBlank: "for ((index, element) in list.???()) {\n  println(\"$index: $element\")\n}",
         options: ["enumerate", "withIndex", "indexed", "entries"],
         correct: 1,
         explanation: "<code>withIndex()</code> trả về IndexedValue chứa cả index và element."
@@ -498,7 +498,7 @@ const questions = [
         difficulty: 1,
         question: "Lặp 5 lần:",
         code: "___(5) {\n  println(\"Hello\")\n}",
-        codeWithBlank: "<span class='blank'>???</span>(5) {\n  println(\"Hello\")\n}",
+        codeWithBlank: "???(5) {\n  println(\"Hello\")\n}",
         options: ["loop", "repeat", "times", "iterate"],
         correct: 1,
         explanation: "<code>repeat(n)</code> là hàm Kotlin lặp n lần, đơn giản và dễ đọc."
@@ -532,7 +532,7 @@ const questions = [
         difficulty: 1,
         question: "Tạo array với các phần tử:",
         code: "val pets = ___(\"dog\", \"cat\", \"bird\")",
-        codeWithBlank: "val pets = <span class='blank'>???</span>(\"dog\", \"cat\", \"bird\")",
+        codeWithBlank: "val pets = ???(\"dog\", \"cat\", \"bird\")",
         options: ["newArray", "arrayOf", "Array", "createArray"],
         correct: 1,
         explanation: "<code>arrayOf()</code> tạo array với các phần tử được chỉ định."
@@ -559,7 +559,7 @@ const questions = [
         difficulty: 2,
         question: "Tạo array chỉ chứa số nguyên:",
         code: "val numbers = ___(1, 2, 3)",
-        codeWithBlank: "val numbers = <span class='blank'>???</span>(1, 2, 3)",
+        codeWithBlank: "val numbers = ???(1, 2, 3)",
         options: ["arrayOf", "intArrayOf", "IntArray", "numbersOf"],
         correct: 1,
         explanation: "<code>intArrayOf()</code> tạo IntArray - array primitive int, hiệu quả hơn."
@@ -667,7 +667,7 @@ const questions = [
         difficulty: 1,
         question: "Khai báo biến có thể nhận null:",
         code: "var name: String___ = null",
-        codeWithBlank: "var name: String<span class='blank'>???</span> = null",
+        codeWithBlank: "var name: String??? = null",
         options: ["?", "!", "null", "*"],
         correct: 0,
         explanation: "<code>?</code> sau kiểu dữ liệu cho phép biến nhận giá trị null."
@@ -744,7 +744,7 @@ const questions = [
         difficulty: 2,
         question: "Gọi method dec() an toàn trên nullable variable:",
         code: "var count: Int? = 5\ncount = count___dec()",
-        codeWithBlank: "var count: Int? = 5\ncount = count<span class='blank'>???</span>dec()",
+        codeWithBlank: "var count: Int? = 5\ncount = count???dec()",
         options: [".?", "?.", "!.", "?."],
         correct: 3,
         explanation: "<code>?.</code> (safe call) gọi method chỉ khi không null."
@@ -756,7 +756,7 @@ const questions = [
         difficulty: 2,
         question: "Gán giá trị mặc định khi null:",
         code: "val result = nullableValue ___ defaultValue",
-        codeWithBlank: "val result = nullableValue <span class='blank'>???</span> defaultValue",
+        codeWithBlank: "val result = nullableValue ??? defaultValue",
         options: ["||", "??", "?:", "or"],
         correct: 2,
         explanation: "Elvis operator <code>?:</code> trả về vế trái nếu không null, ngược lại trả về vế phải."
@@ -842,7 +842,7 @@ const questions = [
         difficulty: 2,
         question: "Tính biểu thức trong string template:",
         code: "val a = 5\nval b = 3\nprintln(\"Sum: ___\")",
-        codeWithBlank: "val a = 5\nval b = 3\nprintln(\"Sum: <span class='blank'>???</span>\")",
+        codeWithBlank: "val a = 5\nval b = 3\nprintln(\"Sum: ???\")",
         options: ["$a + $b", "${a + b}", "$sum(a,b)", "$(a + b)"],
         correct: 1,
         explanation: "Biểu thức trong string template đặt trong <code>${expression}</code>."
@@ -879,7 +879,7 @@ const questions = [
         difficulty: 2,
         question: "Xóa phần tử khỏi mutable list:",
         code: "val list = mutableListOf(\"a\", \"b\", \"c\")\nlist.___(\"b\")",
-        codeWithBlank: "val list = mutableListOf(\"a\", \"b\", \"c\")\nlist.<span class='blank'>???</span>(\"b\")",
+        codeWithBlank: "val list = mutableListOf(\"a\", \"b\", \"c\")\nlist.???(\"b\")",
         options: ["delete", "remove", "drop", "erase"],
         correct: 1,
         explanation: "<code>remove()</code> xóa phần tử đầu tiên matching khỏi MutableList."
@@ -926,7 +926,7 @@ const questions = [
         difficulty: 2,
         question: "Khai báo số hexadecimal:",
         code: "val hex = ___FF",
-        codeWithBlank: "val hex = <span class='blank'>???</span>FF",
+        codeWithBlank: "val hex = ???FF",
         options: ["#", "0x", "h", "\\x"],
         correct: 1,
         explanation: "Hexadecimal dùng prefix <code>0x</code>. VD: <code>0xFF = 255</code>"
@@ -938,7 +938,7 @@ const questions = [
         difficulty: 2,
         question: "Khai báo số binary:",
         code: "val binary = ___1010",
-        codeWithBlank: "val binary = <span class='blank'>???</span>1010",
+        codeWithBlank: "val binary = ???1010",
         options: ["0b", "b", "#b", "bin"],
         correct: 0,
         explanation: "Binary literal dùng prefix <code>0b</code>. VD: <code>0b1010 = 10</code>"
@@ -1000,7 +1000,7 @@ const questions = [
         difficulty: 1,
         question: "Điền toán tử để tính phần dư của 17 chia cho 5:",
         code: "val remainder = 17 ___ 5",
-        codeWithBlank: "val remainder = 17 <span class='blank'>???</span> 5",
+        codeWithBlank: "val remainder = 17 ??? 5",
         answer: ["%"],
         explanation: "Toán tử <code>%</code> (modulo) tính phần dư. <code>17 % 5 = 2</code>"
     },
@@ -1011,7 +1011,7 @@ const questions = [
         difficulty: 1,
         question: "Điền từ khóa để khai báo hằng số không thể thay đổi:",
         code: "___ PI = 3.14159",
-        codeWithBlank: "<span class='blank'>???</span> PI = 3.14159",
+        codeWithBlank: "??? PI = 3.14159",
         answer: ["val"],
         explanation: "<code>val</code> khai báo biến immutable (không thể gán lại)."
     },
@@ -1022,7 +1022,7 @@ const questions = [
         difficulty: 2,
         question: "Điền ký tự để khai báo biến nullable:",
         code: "var name: String___ = null",
-        codeWithBlank: "var name: String<span class='blank'>???</span> = null",
+        codeWithBlank: "var name: String??? = null",
         answer: ["?"],
         explanation: "<code>?</code> sau kiểu cho phép biến chứa null."
     },
@@ -1033,7 +1033,7 @@ const questions = [
         difficulty: 2,
         question: "Điền từ khóa để kiểm tra x có trong khoảng 1 đến 10:",
         code: "if (x ___ 1..10) println(\"OK\")",
-        codeWithBlank: "if (x <span class='blank'>???</span> 1..10) println(\"OK\")",
+        codeWithBlank: "if (x ??? 1..10) println(\"OK\")",
         answer: ["in"],
         explanation: "Từ khóa <code>in</code> kiểm tra phần tử có trong range/collection."
     }
