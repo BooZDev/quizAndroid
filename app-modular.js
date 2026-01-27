@@ -259,19 +259,6 @@ class KotlinQuiz {
 
         // Simple syntax highlighting
         let highlighted = code
-            // Strings FIRST
-            .replace(/"([^"\\]*(\\.[^"\\]*)*)"/g, '<span class="string">$&</span>')
-            // Comments (tương đối an toàn)
-            .replace(/(^|\s)(\/\/.*)/gm, '$1<span class="comment">$2</span>')
-            // Keywords
-            .replace(/\b(val|var|fun|if|else|when|for|while|do|return|in|is|as|class|object|interface|this|super|import|package)\b/g, '<span class="keyword">$1</span>')
-            // Types
-            .replace(/\b(Int|String|Double|Float|Long|Short|Byte|Boolean|Char|Array|List|MutableList|Any|Unit)\b/g, '<span class="type">$1</span>')
-            // Numbers
-            .replace(/\b(\d+\.?\d*[fFL]?)\b/g, '<span class="number">$1</span>')
-            // Functions
-            .replace(/\b(println|print|listOf|arrayOf|mutableListOf|intArrayOf|repeat)\b/g, '<span class="function">$1</span>');
-
 
         return highlighted;
     }
