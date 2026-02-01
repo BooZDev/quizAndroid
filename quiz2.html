@@ -1,0 +1,3713 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Android Quiz - Câu Hỏi Mở Rộng</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(
+          135deg,
+          #1a1a2e 0%,
+          #16213e 50%,
+          #0f3460 100%
+        );
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 950px;
+        margin: 0 auto;
+      }
+
+      .header {
+        text-align: center;
+        color: white;
+        margin-bottom: 30px;
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: none;
+      }
+
+      .header p {
+        font-size: 1.1rem;
+        opacity: 0.8;
+      }
+
+      .quiz-container {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+      }
+
+      .progress-bar {
+        width: 100%;
+        height: 8px;
+        background: #e0e0e0;
+        border-radius: 4px;
+        margin-bottom: 20px;
+        overflow: hidden;
+      }
+
+      .progress {
+        height: 100%;
+        background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+        border-radius: 4px;
+        transition: width 0.3s ease;
+      }
+
+      .question-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #f0f0f0;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .question-number {
+        font-size: 0.95rem;
+        color: #7b2cbf;
+        font-weight: bold;
+      }
+
+      .score-display {
+        font-size: 0.95rem;
+        color: #28a745;
+        font-weight: bold;
+      }
+
+      .category-tag {
+        background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+        color: white;
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+      }
+
+      .question-text {
+        font-size: 1.15rem;
+        color: #333;
+        margin-bottom: 25px;
+        line-height: 1.7;
+      }
+
+      .code-block {
+        background: #1e1e1e;
+        color: #d4d4d4;
+        padding: 15px;
+        border-radius: 10px;
+        margin: 15px 0;
+        font-family: "Consolas", "Courier New", monospace;
+        font-size: 0.85rem;
+        overflow-x: auto;
+        white-space: pre-wrap;
+        border-left: 4px solid #7b2cbf;
+      }
+
+      .options {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .option {
+        padding: 14px 18px;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .option:hover {
+        border-color: #7b2cbf;
+        background: #f8f4ff;
+        transform: translateX(5px);
+      }
+
+      .option.selected {
+        border-color: #7b2cbf;
+        background: #f0e6ff;
+      }
+
+      .option.correct {
+        border-color: #28a745;
+        background: #d4edda;
+        animation: pulse-green 0.5s;
+      }
+
+      .option.incorrect {
+        border-color: #dc3545;
+        background: #f8d7da;
+        animation: shake 0.5s;
+      }
+
+      .option.show-correct {
+        border-color: #28a745;
+        background: #d4edda;
+      }
+
+      @keyframes pulse-green {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.02);
+        }
+      }
+
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(-5px);
+        }
+        75% {
+          transform: translateX(5px);
+        }
+      }
+
+      .option-letter {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #e0e0e0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #666;
+        flex-shrink: 0;
+        font-size: 0.9rem;
+      }
+
+      .option.selected .option-letter {
+        background: #7b2cbf;
+        color: white;
+      }
+
+      .option.correct .option-letter {
+        background: #28a745;
+        color: white;
+      }
+
+      .option.incorrect .option-letter {
+        background: #dc3545;
+        color: white;
+      }
+
+      .option-text {
+        flex: 1;
+        line-height: 1.5;
+        font-size: 0.95rem;
+      }
+
+      .buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 25px;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        padding: 12px 28px;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        font-size: 0.95rem;
+        font-weight: bold;
+        transition: all 0.3s ease;
+      }
+
+      .btn-primary {
+        background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(123, 44, 191, 0.4);
+      }
+
+      .btn-secondary {
+        background: #e0e0e0;
+        color: #666;
+      }
+
+      .btn-secondary:hover {
+        background: #d0d0d0;
+      }
+
+      .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .explanation {
+        margin-top: 20px;
+        padding: 15px 20px;
+        background: linear-gradient(135deg, #e8f4fd, #f0e6ff);
+        border-left: 4px solid #7b2cbf;
+        border-radius: 0 12px 12px 0;
+        display: none;
+      }
+
+      .explanation.show {
+        display: block;
+        animation: fadeIn 0.3s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .explanation h4 {
+        color: #7b2cbf;
+        margin-bottom: 8px;
+      }
+
+      .start-screen {
+        text-align: center;
+        padding: 30px 20px;
+      }
+
+      .start-screen h2 {
+        color: #333;
+        margin-bottom: 15px;
+        font-size: 1.6rem;
+      }
+
+      .start-screen p {
+        color: #666;
+        margin-bottom: 25px;
+        line-height: 1.6;
+      }
+
+      .stats-preview {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 15px;
+        margin-bottom: 25px;
+      }
+
+      .stat-card {
+        background: linear-gradient(135deg, #00d4ff 0%, #7b2cbf 100%);
+        color: white;
+        padding: 20px 15px;
+        border-radius: 15px;
+        text-align: center;
+      }
+
+      .stat-card .number {
+        font-size: 2rem;
+        font-weight: bold;
+      }
+
+      .stat-card .label {
+        font-size: 0.85rem;
+        opacity: 0.9;
+      }
+
+      .category-select {
+        margin-bottom: 25px;
+        text-align: left;
+      }
+
+      .category-select label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+        color: #333;
+      }
+
+      .category-select select {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 1rem;
+        cursor: pointer;
+        background: white;
+      }
+
+      .category-select select:focus {
+        outline: none;
+        border-color: #7b2cbf;
+      }
+
+      .results-screen {
+        text-align: center;
+        padding: 30px 20px;
+      }
+
+      .results-screen h2 {
+        color: #333;
+        margin-bottom: 10px;
+      }
+
+      .score-circle {
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #00d4ff 0%, #7b2cbf 100%);
+        margin: 25px auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        box-shadow: 0 10px 40px rgba(123, 44, 191, 0.3);
+      }
+
+      .score-circle .percentage {
+        font-size: 2.5rem;
+        font-weight: bold;
+      }
+
+      .score-circle .text {
+        font-size: 0.9rem;
+        opacity: 0.9;
+      }
+
+      .results-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin: 25px 0;
+      }
+
+      .result-stat {
+        padding: 15px 10px;
+        border-radius: 10px;
+      }
+
+      .result-stat.correct {
+        background: #d4edda;
+        color: #28a745;
+      }
+
+      .result-stat.incorrect {
+        background: #f8d7da;
+        color: #dc3545;
+      }
+
+      .result-stat.skipped {
+        background: #fff3cd;
+        color: #856404;
+      }
+
+      .result-stat .number {
+        font-size: 1.4rem;
+        font-weight: bold;
+      }
+
+      .question-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 2px solid #f0f0f0;
+        max-height: 150px;
+        overflow-y: auto;
+      }
+
+      .nav-btn {
+        width: 36px;
+        height: 36px;
+        border: 2px solid #e0e0e0;
+        border-radius: 6px;
+        background: white;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 0.8rem;
+        transition: all 0.2s ease;
+      }
+
+      .nav-btn:hover {
+        border-color: #7b2cbf;
+      }
+
+      .nav-btn.current {
+        background: #7b2cbf;
+        color: white;
+        border-color: #7b2cbf;
+      }
+
+      .nav-btn.answered {
+        background: #28a745;
+        color: white;
+        border-color: #28a745;
+      }
+
+      .nav-btn.wrong {
+        background: #dc3545;
+        color: white;
+        border-color: #dc3545;
+      }
+
+      .filter-buttons {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .filter-btn {
+        padding: 8px 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 20px;
+        background: white;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 0.9rem;
+      }
+
+      .filter-btn:hover,
+      .filter-btn.active {
+        border-color: #7b2cbf;
+        background: #f0e6ff;
+      }
+
+      .review-list {
+        max-height: 350px;
+        overflow-y: auto;
+        text-align: left;
+      }
+
+      .review-item {
+        padding: 12px 15px;
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 0.9rem;
+      }
+
+      .review-item:hover {
+        border-color: #7b2cbf;
+        background: #f8f9ff;
+      }
+
+      .review-item.correct {
+        border-left: 4px solid #28a745;
+      }
+
+      .review-item.incorrect {
+        border-left: 4px solid #dc3545;
+      }
+
+      @media (max-width: 600px) {
+        .header h1 {
+          font-size: 1.8rem;
+        }
+
+        .question-text {
+          font-size: 1rem;
+        }
+
+        .buttons {
+          flex-direction: column;
+        }
+
+        .btn {
+          width: 100%;
+        }
+
+        .results-stats {
+          grid-template-columns: 1fr;
+        }
+
+        .nav-btn {
+          width: 32px;
+          height: 32px;
+          font-size: 0.75rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🤖 Android Quiz Master</h1>
+        <p>Câu hỏi ôn thi mở rộng</p>
+      </div>
+
+      <div class="quiz-container" id="quizContainer"></div>
+    </div>
+
+    <script>
+      // Complete Quiz Questions Database - 350+ questions
+      const questions = [
+        // ==================== KOTLIN CƠ BẢN ====================
+        {
+          id: 1,
+          category: "Kotlin cơ bản",
+          question: "Từ khóa 'val' được sử dụng với mục đích gì trong Kotlin?",
+          options: [
+            "Định nghĩa một lớp",
+            "Định nghĩa một biến không thay đổi được giá trị",
+            "Định nghĩa một biến có thể thay đổi giá trị",
+            "Định nghĩa một hàm",
+          ],
+          correct: 1,
+          explanation:
+            "val (value) dùng để khai báo biến bất biến (immutable), không thể gán lại giá trị sau khi khởi tạo.",
+        },
+        {
+          id: 2,
+          category: "Kotlin cơ bản",
+          question: "Từ khóa 'var' được sử dụng với mục đích gì trong Kotlin?",
+          options: [
+            "Định nghĩa một lớp",
+            "Định nghĩa một biến không thay đổi được giá trị",
+            "Định nghĩa một biến có thể thay đổi giá trị",
+            "Định nghĩa một hàm",
+          ],
+          correct: 2,
+          explanation:
+            "var (variable) dùng để khai báo biến có thể thay đổi (mutable), có thể gán lại giá trị.",
+        },
+        {
+          id: 3,
+          category: "Kotlin cơ bản",
+          question:
+            "Trong Kotlin, dấu chấm phẩy (;) được sử dụng trong trường hợp nào?",
+          options: [
+            "Kết thúc mỗi câu lệnh",
+            "Kotlin không sử dụng dấu chấm phẩy",
+            "Ngăn cách các câu lệnh trên cùng một dòng",
+            "Kết thúc mỗi dòng lệnh",
+          ],
+          correct: 2,
+          explanation:
+            "Kotlin không bắt buộc dấu chấm phẩy cuối dòng, nhưng dùng để ngăn cách nhiều câu lệnh trên cùng một dòng.",
+        },
+        {
+          id: 4,
+          category: "Kotlin cơ bản",
+          question:
+            "Trong Kotlin, từ khóa nào được sử dụng để mô tả một hàm hoặc thuộc tính có thể được viết chồng?",
+          options: ["override", "open", "final", "abstract"],
+          correct: 1,
+          explanation:
+            "Từ khóa 'open' cho phép class hoặc method có thể được kế thừa/override. Mặc định trong Kotlin là final.",
+        },
+        {
+          id: 5,
+          category: "Kotlin cơ bản",
+          question:
+            "Đoạn chương trình sau sẽ in ra kết quả như thế nào?\nvar s = 0\nrepeat(5) { s += it }\nprintln(s)",
+          options: ["10", "Đoạn chương trình bị lỗi cú pháp", "15", "6"],
+          correct: 0,
+          explanation: "repeat(5) lặp từ it=0 đến it=4. Tổng = 0+1+2+3+4 = 10.",
+        },
+        {
+          id: 6,
+          category: "Kotlin cơ bản",
+          question:
+            "Đoạn chương trình sau sẽ in ra kết quả như thế nào?\nfun main() {\n    println(calc(6, 4))\n}\nfun calc(x: Int, y: Int) = x % y",
+          options: ["Đoạn chương trình bị lỗi cú pháp", "10", "2", "1"],
+          correct: 2,
+          explanation: "calc(6, 4) trả về 6 % 4 = 2 (phép chia lấy dư).",
+        },
+        {
+          id: 7,
+          category: "Kotlin cơ bản",
+          question:
+            "Phương án nào được sử dụng để tạo và khai báo các giá trị của mảng trong Kotlin?",
+          options: [
+            "val a = {1, 2, 3, 4, 5}",
+            "val a = [1, 2, 3, 4, 5]",
+            "val a = array(1, 2, 3, 4, 5)",
+            "val a = arrayOf(1, 2, 3, 4, 5)",
+          ],
+          correct: 3,
+          explanation: "arrayOf() là hàm tạo mảng trong Kotlin.",
+        },
+        {
+          id: 8,
+          category: "Kotlin cơ bản",
+          question:
+            "Trong Kotlin, câu lệnh nào được sử dụng để khai báo biến kiểu số thực float với giá trị khởi tạo là 3.14?",
+          options: [
+            "val x = 3.14",
+            "float x = 3.14",
+            "double x = 3.14",
+            "val x = 3.14f",
+          ],
+          correct: 3,
+          explanation:
+            "Cần thêm hậu tố 'f' để chỉ định kiểu Float. Mặc định số thập phân là Double.",
+        },
+        {
+          id: 9,
+          category: "Kotlin cơ bản",
+          question:
+            "Mệnh đề 'when' trong Kotlin giống với mệnh đề nào trong ngôn ngữ Java?",
+          options: ["while", "switch", "if", "continue"],
+          correct: 1,
+          explanation:
+            "when trong Kotlin tương đương switch trong Java nhưng mạnh mẽ hơn.",
+        },
+        {
+          id: 10,
+          category: "Kotlin cơ bản",
+          question: "Đáp án nào là định nghĩa về lambda trong Kotlin?",
+          options: [
+            "Là một kiểu dữ liệu",
+            "Là một lớp",
+            "Là một biểu thức mô tả một hàm không bao gồm tên hàm",
+            "Là một giao diện (Interface)",
+          ],
+          correct: 2,
+          explanation:
+            "Lambda là anonymous function - hàm không có tên, được định nghĩa inline.",
+        },
+        {
+          id: 11,
+          category: "Kotlin cơ bản",
+          question:
+            'Trong Kotlin, giá trị nào sẽ được in ra màn hình sau khi đoạn chương trình sau được thực hiện?\nval i = 10\nprintln("${i++}")',
+          options: ["Đoạn chương trình bị lỗi cú pháp", "10", "11", "$11"],
+          correct: 0,
+          explanation:
+            "val không thể thay đổi giá trị nên i++ gây lỗi compile-time.",
+        },
+        {
+          id: 12,
+          category: "Kotlin cơ bản",
+          question:
+            'Đoạn chương trình sau sẽ in ra kết quả như thế nào?\nfun main() {\n    process("SoICT") { it.uppercase() }\n}\nfun process(s: String, method: (String) -> String) {\n    println(method(s).lowercase())\n}',
+          options: [
+            "SoICT",
+            "soict",
+            "SOICT",
+            "Đoạn chương trình bị lỗi cú pháp",
+          ],
+          correct: 1,
+          explanation:
+            "it.uppercase() -> 'SOICT', sau đó lowercase() -> 'soict'.",
+        },
+        {
+          id: 13,
+          category: "Kotlin cơ bản",
+          question:
+            "Giả sử có đoạn khởi tạo như sau:\nval textView = findViewById<TextView>(R.id.textView)\nval count = 123\n\nLệnh nào dưới đây có thể gây lỗi khi chạy chương trình?",
+          options: [
+            'textView.text = "" + count',
+            'textView.text = "$count"',
+            "textView.setText(count)",
+            "textView.text = count.toString()",
+          ],
+          correct: 2,
+          explanation:
+            "setText(int) sẽ tìm resource string với ID đó, không phải hiển thị số. Cần setText(count.toString()).",
+        },
+        {
+          id: 14,
+          category: "Kotlin cơ bản",
+          question:
+            "Ngôn ngữ lập trình nào KHÔNG được sử dụng để lập trình ứng dụng Android dạng native?",
+          options: ["C++", "Kotlin", "Java", "JavaScript"],
+          correct: 3,
+          explanation:
+            "JavaScript dùng cho cross-platform frameworks (React Native), không phải native Android.",
+        },
+        {
+          id: 15,
+          category: "Kotlin cơ bản",
+          question:
+            "Trong mã nguồn Kotlin, thuộc tính nào dùng để thay đổi phông chữ của văn bản trong TextView?",
+          options: ["textStyle", "typeface", "textFont", "fontFamily"],
+          correct: 1,
+          explanation:
+            "textView.typeface dùng để thiết lập font trong Kotlin code.",
+        },
+
+        // ==================== ANDROID CƠ BẢN ====================
+        {
+          id: 16,
+          category: "Android cơ bản",
+          question: "APK là viết tắt của?",
+          options: [
+            "Android Package",
+            "Android Proprietary Kit",
+            "Application Program Kit",
+            "Application Package",
+          ],
+          correct: 0,
+          explanation:
+            "APK (Android Package) là định dạng file cài đặt ứng dụng Android.",
+        },
+        {
+          id: 17,
+          category: "Android cơ bản",
+          question: "Android là hệ điều hành dựa trên nền tảng nào?",
+          options: ["Ubuntu", "Windows", "Linux", "macOS"],
+          correct: 2,
+          explanation: "Android được xây dựng trên nền tảng Linux kernel.",
+        },
+        {
+          id: 18,
+          category: "Android cơ bản",
+          question: "Built-in database trong Android là?",
+          options: ["Oracle", "MySQL", "DB2", "SQLite"],
+          correct: 3,
+          explanation:
+            "SQLite là hệ quản trị CSDL nhẹ được tích hợp sẵn trong Android.",
+        },
+        {
+          id: 19,
+          category: "Android cơ bản",
+          question:
+            "Đâu là công cụ chính thức để phát triển ứng dụng Android hiện nay?",
+          options: [
+            "Android Studio",
+            "Eclipse",
+            "Visual Studio Code",
+            "NetBeans",
+          ],
+          correct: 0,
+          explanation:
+            "Android Studio là IDE chính thức từ Google cho phát triển Android.",
+        },
+        {
+          id: 20,
+          category: "Android cơ bản",
+          question:
+            "Phát biểu nào KHÔNG phải là một thách thức khi lập trình ứng dụng Android?",
+          options: [
+            "Lập trình viên chỉ sử dụng công cụ lập trình trên một hệ điều hành nhất định",
+            "Ứng dụng cần tương thích với các phiên bản hệ điều hành khác nhau",
+            "Ứng dụng cần thiết kế phù hợp với nhiều độ phân giải khác nhau",
+            "Mã nguồn và dữ liệu người dùng cần được bảo mật",
+          ],
+          correct: 0,
+          explanation:
+            "Android Studio chạy được trên Windows, macOS, Linux nên không phải thách thức.",
+        },
+        {
+          id: 21,
+          category: "Android cơ bản",
+          question:
+            "Ký tự R trong 'R.layout.activity_main' tham chiếu đến thành phần nào trong Android?",
+          options: ["Resource", "Room", "Receiver", "Runnable"],
+          correct: 0,
+          explanation:
+            "R là lớp Resource được tự động generate, chứa ID của tất cả resources.",
+        },
+        {
+          id: 22,
+          category: "Android cơ bản",
+          question:
+            "Ở cửa sổ Project trong phần mềm Android Studio, chức năng hiển thị nào chỉ liệt kê 4 thành phần cơ bản của một dự án (AndroidManifest, mã nguồn Kotlin, các thư mục tài nguyên, các file gradle)?",
+          options: ["Production", "Android", "Project Files", "Packages"],
+          correct: 1,
+          explanation:
+            "Chế độ Android view hiển thị cấu trúc đơn giản hóa của project.",
+        },
+        {
+          id: 23,
+          category: "Android cơ bản",
+          question:
+            "File nào chứa thông tin phiên bản và các dependencies của ứng dụng?",
+          options: [
+            "AndroidManifest.xml",
+            "proguard-rules.pro",
+            "build.gradle",
+            "settings.gradle",
+          ],
+          correct: 2,
+          explanation:
+            "build.gradle chứa cấu hình build, dependencies, SDK versions.",
+        },
+        {
+          id: 24,
+          category: "Android cơ bản",
+          question: "Phát biểu nào KHÔNG đúng về Gradle trong Android Studio?",
+          options: [
+            "Các cấu hình đặc thù của Android (ví dụ phiên bản SDK) liên quan đến ứng dụng được thiết lập trong file build.gradle",
+            "File build.gradle được mô tả bằng ngôn ngữ XML",
+            "Gradle là hệ thống tự động dịch ứng dụng được sử dụng trong Android Studio",
+            "Gradle thực hiện việc cài đặt ứng dụng trên thiết bị",
+          ],
+          correct: 1,
+          explanation:
+            "build.gradle sử dụng ngôn ngữ Groovy hoặc Kotlin DSL, không phải XML.",
+        },
+        {
+          id: 25,
+          category: "Android cơ bản",
+          question:
+            "Công cụ nào trong Android Studio được sử dụng để quản lý phiên bản Android được sử dụng để lập trình?",
+          options: [
+            "SDK Manager",
+            "Project Structure",
+            "Resource Manager",
+            "Device Manager",
+          ],
+          correct: 0,
+          explanation:
+            "SDK Manager quản lý các phiên bản Android SDK, build tools, emulator images.",
+        },
+        {
+          id: 26,
+          category: "Android cơ bản",
+          question:
+            "Đâu là ưu điểm của việc phát triển ứng dụng Android so với iOS?",
+          options: [
+            "Có thể sử dụng các hệ điều hành khác nhau",
+            "Thử nghiệm trên thiết bị vật lý dễ dàng",
+            "Có thể sử dụng các công cụ IDE khác nhau",
+            "Tất cả các đáp án đều đúng",
+          ],
+          correct: 3,
+          explanation:
+            "Android development có thể trên nhiều OS, IDE và test device dễ dàng hơn iOS.",
+        },
+        {
+          id: 27,
+          category: "Android cơ bản",
+          question:
+            "Thành phần nào là đối tượng được sử dụng để xử lý các tác vụ nền, không có giao diện người dùng trong Android?",
+          options: ["Service", "Activity", "Fragment", "ViewModel"],
+          correct: 0,
+          explanation:
+            "Service chạy ngầm không có UI, dùng cho background tasks.",
+        },
+
+        // ==================== LAYOUT & UI ====================
+        {
+          id: 28,
+          category: "Layout & UI",
+          question:
+            "Công cụ Layout Editor trong Android Studio được sử dụng phù hợp nhất với kiểu layout nào?",
+          options: [
+            "FrameLayout",
+            "ConstraintLayout",
+            "LinearLayout",
+            "RelativeLayout",
+          ],
+          correct: 1,
+          explanation:
+            "ConstraintLayout được thiết kế để hoạt động tốt với visual editor.",
+        },
+        {
+          id: 29,
+          category: "Layout & UI",
+          question:
+            "Kiểu layout nào phù hợp nhất để thiết kế giao diện cho các màn hình phức tạp, cần phải kiểm soát vị trí của nhiều đối tượng giao diện?",
+          options: [
+            "LinearLayout",
+            "RelativeLayout",
+            "ConstraintLayout",
+            "FrameLayout",
+          ],
+          correct: 2,
+          explanation:
+            "ConstraintLayout cho phép định vị chính xác và linh hoạt các view.",
+        },
+        {
+          id: 30,
+          category: "Layout & UI",
+          question:
+            "Thuộc tính layout_weight chỉ được sử dụng cho kiểu layout nào?",
+          options: [
+            "FrameLayout",
+            "ConstraintLayout",
+            "LinearLayout",
+            "RelativeLayout",
+          ],
+          correct: 2,
+          explanation:
+            "layout_weight chỉ có ý nghĩa trong LinearLayout để phân chia không gian.",
+        },
+        {
+          id: 31,
+          category: "Layout & UI",
+          question:
+            "Thuộc tính layout_alignParentLeft chỉ được sử dụng trong kiểu layout nào?",
+          options: [
+            "RelativeLayout",
+            "LinearLayout",
+            "FrameLayout",
+            "ConstraintLayout",
+          ],
+          correct: 0,
+          explanation:
+            "alignParentLeft/Right/Top/Bottom là thuộc tính riêng của RelativeLayout.",
+        },
+        {
+          id: 32,
+          category: "Layout & UI",
+          question:
+            "Kiểu layout nào thường được sử dụng chỉ để chứa 1 đối tượng bên trong?",
+          options: [
+            "ConstraintLayout",
+            "LinearLayout",
+            "RelativeLayout",
+            "FrameLayout",
+          ],
+          correct: 3,
+          explanation:
+            "FrameLayout thường dùng để chứa 1 view hoặc fragment container.",
+        },
+        {
+          id: 33,
+          category: "Layout & UI",
+          question:
+            "Các lớp layout LinearLayout, RelativeLayout, ConstraintLayout được kế thừa trực tiếp từ lớp nào?",
+          options: [
+            "android.widget.FrameLayout",
+            "android.view.ViewGroup",
+            "android.view.View",
+            "android.view.Layout",
+          ],
+          correct: 1,
+          explanation:
+            "ViewGroup là lớp cha của tất cả Layout, kế thừa từ View.",
+        },
+        {
+          id: 34,
+          category: "Layout & UI",
+          question:
+            "Trong ConstraintLayout để thiết lập 2 đối tượng Button có chiều rộng đều bằng một nửa chiều rộng của layout thì tính năng nào sau đây được sử dụng?",
+          options: [
+            "layout_weight",
+            "horizontal chain",
+            "horizontal bias",
+            "vertical chain",
+          ],
+          correct: 1,
+          explanation:
+            "Horizontal chain với spread/spread_inside mode phân chia đều không gian ngang.",
+        },
+        {
+          id: 35,
+          category: "Layout & UI",
+          question:
+            "Đối tượng Layout nào cung cấp cách sắp xếp các view con bằng cách sử dụng các ràng buộc như start_toStartOf và end_toEndOf?",
+          options: [
+            "LinearLayout",
+            "ConstraintLayout",
+            "FrameLayout",
+            "RelativeLayout",
+          ],
+          correct: 1,
+          explanation:
+            "ConstraintLayout sử dụng các constraint để định vị view.",
+        },
+        {
+          id: 36,
+          category: "Layout & UI",
+          question:
+            "Thuộc tính layout_gravity của đối tượng view không tự căn chỉnh theo cả 2 hướng khi đặt đối tượng bên trong loại layout nào?",
+          options: [
+            "LinearLayout",
+            "GridLayout",
+            "RelativeLayout",
+            "FrameLayout",
+          ],
+          correct: 2,
+          explanation:
+            "RelativeLayout sử dụng các thuộc tính alignParent thay vì layout_gravity.",
+        },
+        {
+          id: 37,
+          category: "Layout & UI",
+          question:
+            'Giả sử bên trong RelativeLayout có đối tượng được định nghĩa như sau:\n<TextView android:layout_width="wrap_content"\n    android:layout_height="wrap_content"\n    android:layout_alignParentRight="true"\n    android:layout_alignParentLeft="true"\n    android:text="Hello"/>\n\nHỏi chiều rộng thực tế của đối tượng là bao nhiêu?',
+          options: [
+            "Vừa đủ để chứa chuỗi 'Hello'",
+            "Bằng 0dp",
+            "Bằng với chiều rộng RelativeLayout",
+            "Các đáp án đều không đúng",
+          ],
+          correct: 2,
+          explanation:
+            "alignParentLeft=true và alignParentRight=true kéo view ra full width.",
+        },
+        {
+          id: 38,
+          category: "Layout & UI",
+          question:
+            "Trong trường hợp giao diện có nhiều đối tượng làm cho chiều cao của layout lớn hơn chiều cao của màn hình thiết bị, đối tượng nào sau đây được sử dụng cho phép người dùng duyệt được toàn bộ nội dung của layout?",
+          options: [
+            "ConstraintLayout",
+            "ScrollView",
+            "LinearLayout",
+            "HorizontalScrollView",
+          ],
+          correct: 1,
+          explanation:
+            "ScrollView cho phép cuộn nội dung khi vượt quá kích thước màn hình.",
+        },
+        {
+          id: 39,
+          category: "Layout & UI",
+          question:
+            "File nào được sử dụng để thiết kế giao diện trong Android?",
+          options: [
+            "MainActivity.kt",
+            "AndroidManifest.xml",
+            "activity_main.xml",
+            "build.gradle",
+          ],
+          correct: 2,
+          explanation: "File XML trong thư mục res/layout dùng để thiết kế UI.",
+        },
+        {
+          id: 40,
+          category: "Layout & UI",
+          question:
+            "Để đặt kích thước font chữ cho các thành phần giao diện ta nên dùng đơn vị nào?",
+          options: ["pixel", "dp", "sp", "mm"],
+          correct: 2,
+          explanation:
+            "sp (Scale-independent Pixels) tự động điều chỉnh theo cài đặt font của user.",
+        },
+        {
+          id: 41,
+          category: "Layout & UI",
+          question:
+            "Để đặt kích thước hợp lý nhất cho một view ta nên dùng đơn vị nào?",
+          options: ["pixel", "inch", "mm", "dp"],
+          correct: 3,
+          explanation:
+            "dp (Density-independent Pixels) đảm bảo kích thước nhất quán trên các màn hình.",
+        },
+        {
+          id: 42,
+          category: "Layout & UI",
+          question:
+            "Thuộc tính nào trong file XML được sử dụng để gán ID cho một đối tượng giao diện?",
+          options: ["android:id", "android:ID", "layout:id", "app:id"],
+          correct: 0,
+          explanation: 'android:id="@+id/ten_id" để khai báo ID cho view.',
+        },
+
+        // ==================== UI COMPONENTS ====================
+        {
+          id: 43,
+          category: "UI Components",
+          question: "Lớp Button là lớp con trực tiếp của lớp nào?",
+          options: [
+            "android.view.View",
+            "android.widget.TextView",
+            "android.widget.View",
+            "android.view.TextView",
+          ],
+          correct: 1,
+          explanation: "Button extends TextView extends View.",
+        },
+        {
+          id: 44,
+          category: "UI Components",
+          question:
+            "Các lớp widget (Button, TextView, EditText, ...) kế thừa thuộc tính id từ lớp nào?",
+          options: [
+            "android.view.View",
+            "android.widget.TextView",
+            "java.lang.Object",
+            "android.view.ViewGroup",
+          ],
+          correct: 0,
+          explanation:
+            "View là base class chứa thuộc tính id cho tất cả UI components.",
+        },
+        {
+          id: 45,
+          category: "UI Components",
+          question:
+            "Phương thức nào được sử dụng để xử lý sự kiện nhấn và giữ nút trong một khoảng thời gian?",
+          options: [
+            "setOnClickListener",
+            "setOnLongTouchListener",
+            "setOnLongClickListener",
+            "setLongClickListener",
+          ],
+          correct: 2,
+          explanation: "setOnLongClickListener() cho long press event.",
+        },
+        {
+          id: 46,
+          category: "UI Components",
+          question:
+            "Thuộc tính text trong EditText là đối tượng thuộc lớp nào?",
+          options: ["CharSequence", "Editable", "TextView", "String"],
+          correct: 1,
+          explanation: "EditText.text trả về Editable, có thể sửa đổi được.",
+        },
+        {
+          id: 47,
+          category: "UI Components",
+          question:
+            "Phương thức nào dùng để thêm văn bản vào cuối nội dung hiện có trong TextView?",
+          options: ["append()", "insertText()", "addText()", "appendText()"],
+          correct: 0,
+          explanation:
+            "textView.append(text) thêm text vào cuối nội dung hiện có.",
+        },
+        {
+          id: 48,
+          category: "UI Components",
+          question: "Đối tượng nào không hiển thị được nội dung là ảnh?",
+          options: ["ImageView", "TextView", "Button", "ImageButton"],
+          correct: 1,
+          explanation:
+            "TextView chỉ hiển thị text, không có khả năng hiển thị ảnh như ImageView.",
+        },
+        {
+          id: 49,
+          category: "UI Components",
+          question:
+            "Giả sử file 'mobile.png' nằm trong thư mục res/drawable và một đối tượng ImageView trong giao diện, phương thức nào được sử dụng để thiết lập ảnh cho ImageView là file 'mobile.png'?",
+          options: [
+            "setImageResource(R.drawable.mobile.png)",
+            "setImageResource(R.drawable.mobile)",
+            "setImageDrawable(R.drawable.mobile)",
+            "setImageResource(R.id.mobile)",
+          ],
+          correct: 1,
+          explanation:
+            "setImageResource() nhận resource ID, không cần extension.",
+        },
+        {
+          id: 50,
+          category: "UI Components",
+          question:
+            "Giả sử ảnh có kích thước 200px x 200px và đối tượng ImageView có kích thước 100px x 100px. Với cách thiết lập nào của thuộc tính scaleType của đối tượng ImageView sẽ có kết quả hiển thị khác với các cách còn lại?",
+          options: [
+            'scaleType="centerCrop"',
+            'scaleType="center"',
+            'scaleType="centerInside"',
+            'scaleType="fitXY"',
+          ],
+          correct: 1,
+          explanation:
+            "center không scale ảnh, chỉ căn giữa. Ảnh 200x200 sẽ bị crop trong view 100x100.",
+        },
+        {
+          id: 51,
+          category: "UI Components",
+          question:
+            "Giả sử có đoạn lệnh khởi tạo như sau:\nval textView = findViewById<TextView>(R.id.textView)\nval stringId = R.string.app_name\n\nLệnh nào sau đây thiết lập nội dung của textView là chuỗi app_name được khai báo trong file strings.xml?",
+          options: [
+            "textView.text = stringId.toString()",
+            "textView.setText(stringId)",
+            "textView.setText(stringId.toString())",
+            'textView.text = "$stringId"',
+          ],
+          correct: 1,
+          explanation:
+            "setText(int resId) nhận resource ID và tự động lấy string từ strings.xml.",
+        },
+        {
+          id: 52,
+          category: "UI Components",
+          question:
+            "Trong một activity, nếu các đối tượng nút bấm đều thiết lập với phương thức setOnClickListener(this), thì trong phương thức callback onClick, làm thế nào để xác định nút bấm nào đã được nhấn?",
+          options: [
+            "Dựa vào vị trí của nút trên màn hình",
+            "Dựa vào tên của nút",
+            "Dựa vào thứ tự khai báo trong file XML",
+            "Dựa vào định danh (ID) của nút",
+          ],
+          correct: 3,
+          explanation: "Dùng view.id để lấy ID và so sánh với R.id.xxx.",
+        },
+        {
+          id: 53,
+          category: "UI Components",
+          question: "Thư mục res không chứa loại tài nguyên nào sau đây?",
+          options: [
+            "File định nghĩa cấu trúc menu",
+            "File định nghĩa các thư viện",
+            "File định nghĩa chuỗi ký tự, các giá trị màu",
+            "File định nghĩa các kích thước",
+          ],
+          correct: 1,
+          explanation:
+            "Thư viện dependencies được định nghĩa trong build.gradle, không phải res.",
+        },
+
+        // ==================== ACTIVITY LIFECYCLE ====================
+        {
+          id: 54,
+          category: "Activity Lifecycle",
+          question: "Các phương thức của Android activity life cycle?",
+          options: [
+            "onCreate(), onStart(), onActivityStarted(), onResume(), onPause(), onStop(), onActivityDestroy(), onDestroy()",
+            "onCreate(), onStart(), onResume(), onPause(), onStop(), onRestart(), onDestroy()",
+            "onCreate(), onStart(), onPause(), onResume(), onFinish(), onStop(), onDestroy()",
+            "onCreate(), onInit(), onStart(), onPause(), onStop(), onDestroy(), onResume()",
+          ],
+          correct: 1,
+          explanation:
+            "7 callback chính: onCreate → onStart → onResume → onPause → onStop → onRestart → onDestroy.",
+        },
+        {
+          id: 55,
+          category: "Activity Lifecycle",
+          question: "Thứ tự các callback được gọi khi bật 1 app là?",
+          options: [
+            "onCreate, onStart, onResume",
+            "onStart, onCreate, onResume",
+            "onResume, onCreate, onStart",
+            "onCreate, onResume, onStart",
+          ],
+          correct: 0,
+          explanation:
+            "onCreate() khởi tạo → onStart() hiển thị → onResume() tương tác được.",
+        },
+        {
+          id: 56,
+          category: "Activity Lifecycle",
+          question:
+            "Khi ứng dụng đang chạy, người dùng bấm nút Home thì hàm callback được gọi đầu tiên là?",
+          options: ["onPause", "onStop", "onDestroy", "onRestart"],
+          correct: 0,
+          explanation: "onPause() được gọi đầu tiên khi Activity mất focus.",
+        },
+        {
+          id: 57,
+          category: "Activity Lifecycle",
+          question:
+            "Activity hiện tại của ứng dụng đang mở sẽ được tạo lại (onCreate() được gọi lại) khi nào?",
+          options: [
+            "Người dùng nhấn nút home và mở ứng dụng khác",
+            "Người dùng xoay màn hình hoặc đổi ngôn ngữ của hệ thống",
+            "Điện thoại sắp hết pin",
+            "Điện thoại bị thay đổi cấu hình mạng",
+          ],
+          correct: 1,
+          explanation:
+            "Configuration change khiến Activity bị destroy và tạo lại.",
+        },
+        {
+          id: 58,
+          category: "Activity Lifecycle",
+          question: "Phương thức nào được sử dụng để tắt một activity?",
+          options: ["finish()", "finishActivity()", "Dispose()", "Destroy()"],
+          correct: 0,
+          explanation: "finish() kết thúc Activity hiện tại.",
+        },
+
+        // ==================== INTENT ====================
+        {
+          id: 59,
+          category: "Intent",
+          question: "Bạn sử dụng Intent action nào để mở trang web?",
+          options: [
+            "Intent.ACTION_ACCESS_INTERNET",
+            "Intent.ACTION_MAIN",
+            "Intent.ACTION_VIEW",
+            "Intent.ACTION_GET_CONTENT",
+          ],
+          correct: 2,
+          explanation:
+            "ACTION_VIEW dùng để hiển thị dữ liệu (web URL, ảnh, video...) bằng app phù hợp.",
+        },
+        {
+          id: 60,
+          category: "Intent",
+          question:
+            "Giả sử có 2 activity trong project là MainActivity và SecondActivity. Hãy điền phần còn thiếu để mở SecondActivity từ MainActivity trong Kotlin?\n\nval intent = Intent(this, [____])",
+          options: [
+            "SecondActivity::class.java",
+            "SecondActivity.class",
+            "SecondActivity::class",
+            "SecondActivity.java",
+          ],
+          correct: 0,
+          explanation:
+            "Trong Kotlin: SecondActivity::class.java để lấy Java Class reference.",
+        },
+        {
+          id: 61,
+          category: "Intent",
+          question: "Mô tả nào sau đây là SAI về implicit intent?",
+          options: [
+            "Android runtime giữ danh sách các app đã đăng ký chạy implicit intent",
+            "Android runtime sẽ nhận các yêu cầu và tìm intent khớp với yêu cầu",
+            "Để gọi được implicit intent cần biết class name của intent đích",
+            "Android runtime sẽ cho phép chọn các ứng dụng phù hợp để thực hiện",
+          ],
+          correct: 2,
+          explanation:
+            "Implicit intent KHÔNG cần biết class name. Nó chỉ định action và data.",
+        },
+
+        // ==================== FRAGMENT ====================
+        {
+          id: 62,
+          category: "Fragment",
+          question: "Đáp án nào đúng về Fragment trong Android?",
+          options: [
+            "Fragment là một phần của giao diện trong Activity và có cùng vòng đời với Activity",
+            "Một Activity chỉ có một Fragment",
+            "Fragment có thể hoạt động độc lập không gắn với Activity nào",
+            "Fragment có vòng đời riêng của mình",
+          ],
+          correct: 3,
+          explanation:
+            "Fragment có vòng đời riêng nhưng phụ thuộc vào Activity chứa nó.",
+        },
+        {
+          id: 63,
+          category: "Fragment",
+          question:
+            "Phương thức nào được sử dụng khi khai báo fragment để khởi tạo các đối tượng widget?",
+          options: ["onAttach()", "onCreateView()", "onCreate()", "onStart()"],
+          correct: 1,
+          explanation: "onCreateView() là nơi inflate layout và khởi tạo view.",
+        },
+        {
+          id: 64,
+          category: "Fragment",
+          question:
+            "Lớp nào KHÔNG phải là thành phần ứng dụng (application component) của Android?",
+          options: ["Fragment", "Activity", "Service", "Broadcast Receiver"],
+          correct: 0,
+          explanation:
+            "4 thành phần chính: Activity, Service, BroadcastReceiver, ContentProvider. Fragment không phải.",
+        },
+
+        // ==================== RECYCLERVIEW ====================
+        {
+          id: 65,
+          category: "RecyclerView",
+          question:
+            "ViewHolder trong Adapter khi sử dụng RecyclerView có vai trò gì?",
+          options: [
+            "Lưu trữ id của từng view trong danh sách",
+            "Có tác dụng render view lên danh sách",
+            "Làm cầu nối giữa data và view",
+          ],
+          correct: 0,
+          explanation:
+            "ViewHolder cache view references để tránh gọi findViewById() nhiều lần.",
+        },
+        {
+          id: 66,
+          category: "RecyclerView",
+          question:
+            "Phương thức nào KHÔNG bắt buộc viết chồng khi kế thừa từ RecyclerView.Adapter?",
+          options: [
+            "onBindViewHolder",
+            "getItemCount",
+            "onCreateViewHolder",
+            "getItemViewType",
+          ],
+          correct: 3,
+          explanation:
+            "getItemViewType() là optional, chỉ cần khi có nhiều loại view khác nhau.",
+        },
+
+        // ==================== DATA STORAGE ====================
+        {
+          id: 67,
+          category: "Data Storage",
+          question:
+            "File strings.xml chứa các tài nguyên chuỗi ký tự nằm trong thư mục nào?",
+          options: ["res/strings", "res/xml", "res/drawable", "res/values"],
+          correct: 3,
+          explanation: "strings.xml nằm trong thư mục res/values.",
+        },
+        {
+          id: 68,
+          category: "Data Storage",
+          question:
+            "Giả sử file my_font.ttf đã được sao chép vào thư mục font trong thư mục res. Để thiết lập font chữ cho đối tượng TextView thì thuộc tính nào cần được khai báo trong file XML?",
+          options: [
+            'android:textFont="@font/my_font"',
+            'android:fontFamily="@font/my_font"',
+            'android:font="@font/my_font"',
+            'android:typeface="@font/my_font"',
+          ],
+          correct: 1,
+          explanation:
+            "android:fontFamily dùng để thiết lập font từ res/font folder.",
+        },
+
+        // ==================== ROOM DATABASE ====================
+        {
+          id: 69,
+          category: "Room Database",
+          question: "Lợi ích của việc sử dụng Room database?",
+          options: [
+            "Tự động cập nhật UI khi room database thay đổi",
+            "Giúp app không bị mất dữ liệu khi crash",
+            "Giúp quản lý nhiều trình backends",
+            "Sử dụng mô hình DAO, cung cấp cơ chế ánh xạ các phương thức Java với các câu truy vấn database",
+          ],
+          correct: 3,
+          explanation:
+            "Room cung cấp abstraction layer trên SQLite, sử dụng DAO pattern.",
+        },
+        {
+          id: 70,
+          category: "Room Database",
+          question:
+            "Khi sử dụng Room, chú thích nào đánh dấu một lớp ứng với một bảng trong CSDL?",
+          options: ["@Entity", "@Dao", "@PrimaryKey", "@Database"],
+          correct: 0,
+          explanation: "@Entity đánh dấu class là một bảng.",
+        },
+
+        // ==================== VIEWMODEL & LIVEDATA ====================
+        {
+          id: 71,
+          category: "ViewModel & LiveData",
+          question: "Phát biểu nào đúng về ViewModel?",
+          options: [
+            "ViewModel có vòng đời giống với Activity",
+            "ViewModel vẫn active ngay cả khi Activity đang ở trong Back Stack",
+            "ViewModel không thể cập nhật dữ liệu khi UI thay đổi",
+            "UI không thể cập nhật khi dữ liệu trong ViewModel thay đổi",
+          ],
+          correct: 1,
+          explanation:
+            "ViewModel survive configuration changes và vẫn active khi Activity trong back stack.",
+        },
+
+        // ==================== DEBUGGING ====================
+        {
+          id: 72,
+          category: "Debugging",
+          question:
+            "Phát biểu nào sau đây KHÔNG đúng về Logcat trong Android Studio?",
+          options: [
+            "Logcat có chức năng lọc dữ liệu theo thẻ hoặc tên gói của ứng dụng",
+            "Logcat hiển thị thông tin trên màn hình của ứng dụng",
+            "Cần có kết nối giữa máy tính và thiết bị Android để hiển thị dữ liệu",
+            "Logcat hiển thị thông tin trên máy tính của lập trình viên",
+          ],
+          correct: 1,
+          explanation:
+            "Logcat hiển thị trong Android Studio, không phải trên màn hình thiết bị.",
+        },
+
+        // ==================== CÂU HỎI MỚI TỪ ĐỀ THI ====================
+        {
+          id: 73,
+          category: "Kotlin cơ bản",
+          question:
+            "Trong Kotlin, từ khóa nào được sử dụng để khai báo một hằng số compile-time?",
+          options: ["val", "const val", "final", "static"],
+          correct: 1,
+          explanation:
+            "const val dùng cho compile-time constants, phải là top-level hoặc trong object.",
+        },
+        {
+          id: 74,
+          category: "Kotlin cơ bản",
+          question: "Toán tử '?.' trong Kotlin được gọi là gì?",
+          options: [
+            "Null check operator",
+            "Safe call operator",
+            "Elvis operator",
+            "Not-null assertion",
+          ],
+          correct: 1,
+          explanation:
+            "Safe call operator ?. chỉ gọi method/property nếu object không null.",
+        },
+        {
+          id: 75,
+          category: "Kotlin cơ bản",
+          question: "Toán tử '?:' trong Kotlin được gọi là gì?",
+          options: [
+            "Null check operator",
+            "Safe call operator",
+            "Elvis operator",
+            "Not-null assertion",
+          ],
+          correct: 2,
+          explanation:
+            "Elvis operator ?: trả về giá trị bên phải nếu bên trái là null.",
+        },
+        {
+          id: 76,
+          category: "Kotlin cơ bản",
+          question:
+            'Đoạn code sau in ra gì?\nval x: String? = null\nprintln(x?.length ?: "null")',
+          options: ["null", "0", "Lỗi NullPointerException", "Lỗi compile"],
+          correct: 0,
+          explanation: 'x là null, x?.length là null, elvis trả về "null".',
+        },
+        {
+          id: 77,
+          category: "Kotlin cơ bản",
+          question: "Hàm extension trong Kotlin là gì?",
+          options: [
+            "Hàm để mở rộng visibility của class",
+            "Hàm cho phép thêm method mới vào class mà không cần kế thừa",
+            "Hàm để extend thời gian chạy của coroutine",
+            "Hàm để mở rộng bộ nhớ của app",
+          ],
+          correct: 1,
+          explanation:
+            "Extension functions cho phép thêm method vào class mà không modify source code.",
+        },
+        {
+          id: 78,
+          category: "Kotlin cơ bản",
+          question:
+            "Data class trong Kotlin tự động generate những method nào?",
+          options: [
+            "Chỉ toString()",
+            "equals(), hashCode(), toString(), copy()",
+            "Chỉ equals() và hashCode()",
+            "Không generate method nào",
+          ],
+          correct: 1,
+          explanation:
+            "Data class tự động generate equals(), hashCode(), toString(), copy(), và componentN().",
+        },
+        {
+          id: 79,
+          category: "Kotlin cơ bản",
+          question: "Sealed class trong Kotlin dùng để làm gì?",
+          options: [
+            "Tạo class không thể kế thừa",
+            "Tạo class với các subclass được định nghĩa hạn chế",
+            "Mã hóa dữ liệu trong class",
+            "Tạo singleton",
+          ],
+          correct: 1,
+          explanation:
+            "Sealed class hạn chế các subclass phải được định nghĩa trong cùng file.",
+        },
+        {
+          id: 80,
+          category: "Kotlin cơ bản",
+          question: "Object declaration trong Kotlin dùng để tạo gì?",
+          options: ["Interface", "Abstract class", "Singleton", "Data class"],
+          correct: 2,
+          explanation:
+            "object declaration tạo singleton một cách an toàn về thread.",
+        },
+        {
+          id: 81,
+          category: "Kotlin cơ bản",
+          question:
+            "Companion object trong Kotlin tương đương với gì trong Java?",
+          options: [
+            "Instance method",
+            "Static member",
+            "Inner class",
+            "Anonymous class",
+          ],
+          correct: 1,
+          explanation:
+            "Companion object chứa các member tương tự static trong Java.",
+        },
+        {
+          id: 82,
+          category: "Kotlin cơ bản",
+          question:
+            "Kết quả của đoạn code:\nlistOf(1, 2, 3, 4, 5).filter { it > 2 }.map { it * 2 }",
+          options: [
+            "[6, 8, 10]",
+            "[2, 4, 6, 8, 10]",
+            "[3, 4, 5]",
+            "[1, 2, 3, 4, 5]",
+          ],
+          correct: 0,
+          explanation: "filter giữ lại [3,4,5], map nhân 2 được [6,8,10].",
+        },
+        {
+          id: 83,
+          category: "Android cơ bản",
+          question:
+            "Thành phần nào trong kiến trúc Android nằm ở tầng cao nhất?",
+          options: ["Linux Kernel", "HAL", "Native Libraries", "Applications"],
+          correct: 3,
+          explanation:
+            "Kiến trúc từ dưới lên: Linux Kernel → HAL → Native Libraries → Framework → Applications.",
+        },
+        {
+          id: 84,
+          category: "Android cơ bản",
+          question: "ART trong Android là gì?",
+          options: [
+            "Android Runtime - môi trường chạy ứng dụng",
+            "Android Resource Tool",
+            "Application Repository Tool",
+            "Android Rendering Technology",
+          ],
+          correct: 0,
+          explanation:
+            "ART (Android Runtime) thay thế Dalvik từ Android 5.0, compile AOT.",
+        },
+        {
+          id: 85,
+          category: "Android cơ bản",
+          question: "minSdkVersion trong build.gradle xác định điều gì?",
+          options: [
+            "Phiên bản Android tối đa app hỗ trợ",
+            "Phiên bản Android tối thiểu để cài đặt app",
+            "Phiên bản Android dùng để compile",
+            "Phiên bản Android mục tiêu",
+          ],
+          correct: 1,
+          explanation:
+            "minSdkVersion là API level tối thiểu cần thiết để chạy app.",
+        },
+        {
+          id: 86,
+          category: "Android cơ bản",
+          question: "targetSdkVersion trong build.gradle xác định điều gì?",
+          options: [
+            "Phiên bản Android tối thiểu",
+            "Phiên bản Android mà app được test và tối ưu",
+            "Phiên bản Android dùng để compile",
+            "Phiên bản Android tối đa",
+          ],
+          correct: 1,
+          explanation:
+            "targetSdkVersion cho hệ thống biết app được thiết kế cho phiên bản nào.",
+        },
+        {
+          id: 87,
+          category: "Android cơ bản",
+          question: "compileSdkVersion trong build.gradle xác định điều gì?",
+          options: [
+            "Phiên bản Android tối thiểu",
+            "Phiên bản Android mục tiêu",
+            "Phiên bản API dùng để compile source code",
+            "Phiên bản Android tối đa",
+          ],
+          correct: 2,
+          explanation:
+            "compileSdkVersion xác định API level mà code được compile against.",
+        },
+        {
+          id: 88,
+          category: "Layout & UI",
+          question:
+            "Thuộc tính android:gravity khác gì với android:layout_gravity?",
+          options: [
+            "Không có sự khác biệt",
+            "gravity căn nội dung bên trong view, layout_gravity căn vị trí view trong parent",
+            "layout_gravity căn nội dung bên trong view, gravity căn vị trí view",
+            "Cả hai đều căn vị trí view trong parent",
+          ],
+          correct: 1,
+          explanation:
+            "gravity: căn nội dung bên trong. layout_gravity: căn view trong parent.",
+        },
+        {
+          id: 89,
+          category: "Layout & UI",
+          question:
+            "Trong ConstraintLayout, constraint nào làm cho view căn giữa theo chiều ngang?",
+          options: [
+            'app:layout_constraintHorizontal_bias="0.5"',
+            'app:layout_constraintStart_toStartOf="parent" và app:layout_constraintEnd_toEndOf="parent"',
+            'android:layout_centerHorizontal="true"',
+            'android:gravity="center_horizontal"',
+          ],
+          correct: 1,
+          explanation:
+            "Ràng buộc cả 2 phía (start và end) với parent tạo hiệu ứng căn giữa.",
+        },
+        {
+          id: 90,
+          category: "Layout & UI",
+          question: "Guideline trong ConstraintLayout dùng để làm gì?",
+          options: [
+            "Hiển thị đường kẻ hướng dẫn trên màn hình",
+            "Tạo helper invisible để căn chỉnh các view",
+            "Vẽ đường phân cách giữa các view",
+            "Tạo animation cho view",
+          ],
+          correct: 1,
+          explanation:
+            "Guideline là invisible helper dùng làm anchor cho các constraint.",
+        },
+        {
+          id: 91,
+          category: "Layout & UI",
+          question: "Barrier trong ConstraintLayout dùng để làm gì?",
+          options: [
+            "Ngăn không cho view di chuyển",
+            "Tạo ranh giới động dựa trên kích thước của nhiều view",
+            "Tạo animation chặn",
+            "Vẽ đường phân cách",
+          ],
+          correct: 1,
+          explanation:
+            "Barrier tạo ranh giới ảo dựa trên cạnh của nhóm các view.",
+        },
+        {
+          id: 92,
+          category: "Layout & UI",
+          question: "Chain trong ConstraintLayout có những mode nào?",
+          options: [
+            "spread, spread_inside, packed",
+            "horizontal, vertical, diagonal",
+            "start, center, end",
+            "match_parent, wrap_content, fixed",
+          ],
+          correct: 0,
+          explanation:
+            "Chain có 3 style: spread (mặc định), spread_inside, packed.",
+        },
+        {
+          id: 93,
+          category: "UI Components",
+          question: "CardView được sử dụng để làm gì?",
+          options: [
+            "Hiển thị danh sách card",
+            "Tạo view có bóng đổ và góc bo tròn",
+            "Chơi game bài",
+            "Hiển thị thông tin thanh toán",
+          ],
+          correct: 1,
+          explanation:
+            "CardView tạo container với elevation (shadow) và corner radius.",
+        },
+        {
+          id: 94,
+          category: "UI Components",
+          question: "MaterialButton khác gì với Button thông thường?",
+          options: [
+            "Không có sự khác biệt",
+            "MaterialButton có style Material Design với ripple effect và theming",
+            "MaterialButton chỉ dùng cho tablet",
+            "MaterialButton không thể customize",
+          ],
+          correct: 1,
+          explanation:
+            "MaterialButton tuân theo Material Design guidelines với ripple, shape, theming.",
+        },
+        {
+          id: 95,
+          category: "UI Components",
+          question: "TextInputLayout dùng để làm gì?",
+          options: [
+            "Tạo layout cho nhiều TextView",
+            "Wrapper cho EditText với floating label và error display",
+            "Input text bằng giọng nói",
+            "Tạo text animation",
+          ],
+          correct: 1,
+          explanation:
+            "TextInputLayout wrap EditText, cung cấp floating hint, error text, character counter.",
+        },
+        {
+          id: 96,
+          category: "UI Components",
+          question: "ChipGroup dùng để làm gì?",
+          options: [
+            "Nhóm các nút radio",
+            "Nhóm các Chip để tạo filter hoặc selection",
+            "Tạo chip điện tử",
+            "Nhóm các checkbox",
+          ],
+          correct: 1,
+          explanation:
+            "ChipGroup quản lý Chips cho filtering, selection, hoặc action.",
+        },
+        {
+          id: 97,
+          category: "UI Components",
+          question: "FloatingActionButton (FAB) thường được đặt ở đâu?",
+          options: [
+            "Góc trên trái màn hình",
+            "Giữa màn hình",
+            "Góc dưới phải màn hình",
+            "Trên ActionBar",
+          ],
+          correct: 2,
+          explanation:
+            "FAB theo Material Design thường đặt ở góc dưới phải cho primary action.",
+        },
+        {
+          id: 98,
+          category: "UI Components",
+          question: "BottomNavigationView dùng để làm gì?",
+          options: [
+            "Hiển thị navigation drawer",
+            "Thanh điều hướng ở dưới màn hình với 3-5 destinations",
+            "Hiển thị tabs ở trên",
+            "Scroll nội dung",
+          ],
+          correct: 1,
+          explanation:
+            "BottomNavigationView cho navigation giữa 3-5 top-level destinations.",
+        },
+        {
+          id: 99,
+          category: "UI Components",
+          question: "CoordinatorLayout dùng để làm gì?",
+          options: [
+            "Tạo layout đơn giản",
+            "Quản lý behavior và animation giữa các view con",
+            "Coordinate network requests",
+            "Tạo grid layout",
+          ],
+          correct: 1,
+          explanation:
+            "CoordinatorLayout quản lý behaviors như FAB hiding, AppBar scrolling.",
+        },
+        {
+          id: 100,
+          category: "UI Components",
+          question: "AppBarLayout dùng để làm gì?",
+          options: [
+            "Tạo app icon",
+            "Vertical LinearLayout với Material scrolling gestures",
+            "Hiển thị progress bar",
+            "Tạo bottom bar",
+          ],
+          correct: 1,
+          explanation:
+            "AppBarLayout wrap Toolbar/CollapsingToolbar với scroll behaviors.",
+        },
+        {
+          id: 101,
+          category: "Activity Lifecycle",
+          question: "Khi Activity A mở Activity B, thứ tự callback là gì?",
+          options: [
+            "A.onPause → B.onCreate → B.onStart → B.onResume → A.onStop",
+            "A.onStop → B.onCreate → B.onStart → B.onResume",
+            "B.onCreate → B.onStart → B.onResume → A.onPause → A.onStop",
+            "A.onPause → A.onStop → B.onCreate → B.onStart → B.onResume",
+          ],
+          correct: 0,
+          explanation:
+            "A pause trước, B create/start/resume, sau đó A mới stop.",
+        },
+        {
+          id: 102,
+          category: "Activity Lifecycle",
+          question: "onSaveInstanceState() được gọi khi nào?",
+          options: [
+            "Trước onDestroy()",
+            "Trước onStop() khi activity có thể bị destroy",
+            "Sau onCreate()",
+            "Khi activity resume",
+          ],
+          correct: 1,
+          explanation:
+            "onSaveInstanceState được gọi trước onStop khi có khả năng activity bị hủy.",
+        },
+        {
+          id: 103,
+          category: "Activity Lifecycle",
+          question: "onRestoreInstanceState() được gọi khi nào?",
+          options: [
+            "Sau onCreate()",
+            "Trước onResume()",
+            "Sau onStart() nếu có saved state",
+            "Sau onDestroy()",
+          ],
+          correct: 2,
+          explanation:
+            "onRestoreInstanceState được gọi sau onStart nếu có bundle được save trước đó.",
+        },
+        {
+          id: 104,
+          category: "Activity Lifecycle",
+          question: "Khi thiết bị xoay màn hình, các callback nào được gọi?",
+          options: [
+            "Chỉ onResume()",
+            "onPause → onStop → onDestroy → onCreate → onStart → onResume",
+            "onPause → onResume",
+            "Không có callback nào",
+          ],
+          correct: 1,
+          explanation:
+            "Configuration change gây ra full lifecycle: destroy rồi create lại.",
+        },
+        {
+          id: 105,
+          category: "Activity Lifecycle",
+          question:
+            "Làm sao để prevent Activity bị recreate khi xoay màn hình?",
+          options: [
+            "Không thể ngăn",
+            "Khai báo android:configChanges trong manifest",
+            "Override onDestroy()",
+            "Sử dụng finish()",
+          ],
+          correct: 1,
+          explanation:
+            'android:configChanges="orientation|screenSize" để tự handle config change.',
+        },
+        {
+          id: 106,
+          category: "Intent",
+          question: "Intent.ACTION_DIAL khác gì với Intent.ACTION_CALL?",
+          options: [
+            "Không khác biệt",
+            "ACTION_DIAL mở dialer, ACTION_CALL thực hiện cuộc gọi ngay",
+            "ACTION_CALL mở dialer, ACTION_DIAL thực hiện cuộc gọi",
+            "Cả hai đều cần permission CALL_PHONE",
+          ],
+          correct: 1,
+          explanation:
+            "ACTION_DIAL chỉ mở dialer. ACTION_CALL gọi ngay (cần CALL_PHONE permission).",
+        },
+        {
+          id: 107,
+          category: "Intent",
+          question: "PendingIntent dùng để làm gì?",
+          options: [
+            "Intent đang chờ xử lý",
+            "Cho phép app khác thực hiện intent thay mặt app của bạn",
+            "Intent bị delay",
+            "Intent chưa hoàn thành",
+          ],
+          correct: 1,
+          explanation:
+            "PendingIntent wrap intent để app khác (như system) có thể fire nó với permission của app bạn.",
+        },
+        {
+          id: 108,
+          category: "Intent",
+          question: "Intent flags FLAG_ACTIVITY_NEW_TASK dùng để làm gì?",
+          options: [
+            "Tạo activity mới trong task hiện tại",
+            "Tạo activity trong task mới hoặc đưa task có activity lên foreground",
+            "Xóa tất cả activities",
+            "Clear top của stack",
+          ],
+          correct: 1,
+          explanation:
+            "FLAG_ACTIVITY_NEW_TASK tạo task mới hoặc bring existing task to front.",
+        },
+        {
+          id: 109,
+          category: "Intent",
+          question: "Intent flags FLAG_ACTIVITY_CLEAR_TOP dùng để làm gì?",
+          options: [
+            "Clear tất cả activities",
+            "Nếu activity đã tồn tại trong stack, destroy các activity phía trên nó",
+            "Clear data của activity",
+            "Restart activity",
+          ],
+          correct: 1,
+          explanation:
+            "FLAG_ACTIVITY_CLEAR_TOP pop tất cả activities phía trên target activity.",
+        },
+        {
+          id: 110,
+          category: "Intent",
+          question: "Làm sao để truyền object qua Intent?",
+          options: [
+            "Không thể truyền object",
+            "Implement Parcelable hoặc Serializable",
+            "Chỉ dùng putExtra với primitive types",
+            "Dùng static variable",
+          ],
+          correct: 1,
+          explanation:
+            "Object phải implement Parcelable (recommended) hoặc Serializable.",
+        },
+        {
+          id: 111,
+          category: "Fragment",
+          question: "FragmentManager dùng để làm gì?",
+          options: [
+            "Quản lý memory của fragment",
+            "Thực hiện các transaction thêm/xóa/thay thế fragment",
+            "Manage fragment data",
+            "Tạo fragment mới",
+          ],
+          correct: 1,
+          explanation:
+            "FragmentManager quản lý fragments và thực hiện các fragment transactions.",
+        },
+        {
+          id: 112,
+          category: "Fragment",
+          question:
+            "Phương thức add() và replace() của FragmentTransaction khác gì nhau?",
+          options: [
+            "Không khác biệt",
+            "add() thêm fragment, replace() xóa fragment cũ rồi thêm mới",
+            "replace() thêm fragment, add() xóa fragment cũ",
+            "Cả hai đều thay thế fragment",
+          ],
+          correct: 1,
+          explanation:
+            "add() chỉ thêm, replace() remove fragment hiện tại trong container rồi add mới.",
+        },
+        {
+          id: 113,
+          category: "Fragment",
+          question:
+            "addToBackStack() trong FragmentTransaction dùng để làm gì?",
+          options: [
+            "Thêm activity vào back stack",
+            "Cho phép quay lại fragment trước đó bằng nút Back",
+            "Thêm fragment vào cuối danh sách",
+            "Stack overflow protection",
+          ],
+          correct: 1,
+          explanation:
+            "addToBackStack cho phép revert transaction khi user press Back.",
+        },
+        {
+          id: 114,
+          category: "Fragment",
+          question: "setArguments() của Fragment dùng để làm gì?",
+          options: [
+            "Set return value",
+            "Truyền dữ liệu vào fragment trước khi attach",
+            "Set listeners",
+            "Configure fragment settings",
+          ],
+          correct: 1,
+          explanation:
+            "setArguments() truyền Bundle vào fragment, phải gọi trước khi attach.",
+        },
+        {
+          id: 115,
+          category: "Fragment",
+          question: "DialogFragment là gì?",
+          options: [
+            "Fragment hiển thị danh sách",
+            "Fragment được hiển thị như một dialog",
+            "Fragment cho chat",
+            "Fragment không có UI",
+          ],
+          correct: 1,
+          explanation:
+            "DialogFragment là fragment hiển thị dạng floating dialog.",
+        },
+        {
+          id: 116,
+          category: "RecyclerView",
+          question: "DiffUtil trong RecyclerView dùng để làm gì?",
+          options: [
+            "Tạo different layouts",
+            "Tính toán sự khác biệt giữa 2 lists để update hiệu quả",
+            "Diff merge conflicts",
+            "Utility functions khác nhau",
+          ],
+          correct: 1,
+          explanation:
+            "DiffUtil tính diff giữa old và new list, chỉ update items thay đổi.",
+        },
+        {
+          id: 117,
+          category: "RecyclerView",
+          question: "ListAdapter trong RecyclerView có lợi ích gì?",
+          options: [
+            "Adapter cho ListView",
+            "Tự động sử dụng DiffUtil để update list hiệu quả",
+            "Adapter đơn giản hơn",
+            "Chỉ cho simple lists",
+          ],
+          correct: 1,
+          explanation:
+            "ListAdapter extends RecyclerView.Adapter, tích hợp AsyncListDiffer.",
+        },
+        {
+          id: 118,
+          category: "RecyclerView",
+          question: "ItemDecoration trong RecyclerView dùng để làm gì?",
+          options: [
+            "Decorate item với ảnh",
+            "Thêm dividers, offsets, hoặc drawings xung quanh items",
+            "Add animations",
+            "Style text",
+          ],
+          correct: 1,
+          explanation:
+            "ItemDecoration cho phép thêm dividers, spacing, hoặc custom drawings.",
+        },
+        {
+          id: 119,
+          category: "RecyclerView",
+          question: "ItemTouchHelper trong RecyclerView dùng để làm gì?",
+          options: [
+            "Touch event handling",
+            "Implement swipe-to-dismiss và drag-and-drop",
+            "Multi-touch gestures",
+            "Touch feedback",
+          ],
+          correct: 1,
+          explanation:
+            "ItemTouchHelper hỗ trợ swipe và drag gestures trên RecyclerView items.",
+        },
+        {
+          id: 120,
+          category: "RecyclerView",
+          question:
+            "LayoutManager nào hiển thị items theo dạng grid với span khác nhau?",
+          options: [
+            "LinearLayoutManager",
+            "GridLayoutManager với SpanSizeLookup",
+            "FlexboxLayoutManager",
+            "CustomLayoutManager",
+          ],
+          correct: 1,
+          explanation:
+            "GridLayoutManager + SpanSizeLookup cho phép items chiếm nhiều columns khác nhau.",
+        },
+        {
+          id: 121,
+          category: "Data Storage",
+          question: "SharedPreferences được lưu ở đâu?",
+          options: [
+            "External storage",
+            "data/data/<package>/shared_prefs/ dạng XML",
+            "SQLite database",
+            "Cloud storage",
+          ],
+          correct: 1,
+          explanation:
+            "SharedPreferences lưu trong thư mục app's private storage dạng XML.",
+        },
+        {
+          id: 122,
+          category: "Data Storage",
+          question: "DataStore khác gì SharedPreferences?",
+          options: [
+            "Không khác biệt",
+            "DataStore async, type-safe, sử dụng Kotlin coroutines/Flow",
+            "DataStore chỉ cho data lớn",
+            "SharedPreferences nhanh hơn",
+          ],
+          correct: 1,
+          explanation:
+            "DataStore là Jetpack library thay thế SharedPreferences với async API và type safety.",
+        },
+        {
+          id: 123,
+          category: "Data Storage",
+          question: "getExternalFilesDir() trả về thư mục ở đâu?",
+          options: [
+            "Internal storage",
+            "External storage dành riêng cho app",
+            "Shared external storage",
+            "Root storage",
+          ],
+          correct: 1,
+          explanation:
+            "getExternalFilesDir trả về /Android/data/<package>/ trên external storage.",
+        },
+        {
+          id: 124,
+          category: "Data Storage",
+          question: "Scoped Storage trong Android 10+ ảnh hưởng gì?",
+          options: [
+            "Không ảnh hưởng",
+            "Apps chỉ access được files trong app-specific directory và media files",
+            "Tất cả storage bị encrypted",
+            "Storage giới hạn 1GB",
+          ],
+          correct: 1,
+          explanation:
+            "Scoped Storage hạn chế direct access, dùng MediaStore cho media files.",
+        },
+        {
+          id: 125,
+          category: "Data Storage",
+          question: "ContentProvider dùng để làm gì?",
+          options: [
+            "Provide content cho UI",
+            "Chia sẻ data giữa các apps một cách có kiểm soát",
+            "Provider network content",
+            "Content caching",
+          ],
+          correct: 1,
+          explanation:
+            "ContentProvider cho phép apps chia sẻ data với nhau thông qua URI.",
+        },
+        {
+          id: 126,
+          category: "Room Database",
+          question: "@Insert annotation với onConflict = REPLACE làm gì?",
+          options: [
+            "Throw exception khi conflict",
+            "Replace row cũ nếu primary key trùng",
+            "Ignore insert mới",
+            "Merge data",
+          ],
+          correct: 1,
+          explanation:
+            "REPLACE strategy xóa row cũ và insert row mới khi conflict.",
+        },
+        {
+          id: 127,
+          category: "Room Database",
+          question: "@Relation trong Room dùng để làm gì?",
+          options: [
+            "Define foreign key",
+            "Định nghĩa relationship giữa entities trong query results",
+            "Create table relation",
+            "Join tables",
+          ],
+          correct: 1,
+          explanation:
+            "@Relation dùng trong POJO để embed related entities từ query.",
+        },
+        {
+          id: 128,
+          category: "Room Database",
+          question: "TypeConverter trong Room dùng để làm gì?",
+          options: [
+            "Convert entity types",
+            "Convert custom types để Room có thể persist",
+            "Convert query results",
+            "Data type validation",
+          ],
+          correct: 1,
+          explanation:
+            "TypeConverter cho phép Room lưu custom types (Date, List, etc.).",
+        },
+        {
+          id: 129,
+          category: "Room Database",
+          question: "Migration trong Room dùng để làm gì?",
+          options: [
+            "Migrate data to cloud",
+            "Handle database schema changes giữa các versions",
+            "Move database file",
+            "Backup database",
+          ],
+          correct: 1,
+          explanation:
+            "Migration giữ data khi database schema thay đổi giữa các version.",
+        },
+        {
+          id: 130,
+          category: "Room Database",
+          question:
+            "Room database có thể return LiveData trực tiếp từ DAO không?",
+          options: [
+            "Không, phải wrap manual",
+            "Có, Room tự động observe và update LiveData",
+            "Chỉ với annotation đặc biệt",
+            "Chỉ cho SELECT queries",
+          ],
+          correct: 1,
+          explanation:
+            "Room DAO có thể return LiveData<List<T>>, tự động update khi data change.",
+        },
+        {
+          id: 131,
+          category: "ViewModel & LiveData",
+          question: "MutableLiveData khác gì LiveData?",
+          options: [
+            "Không khác biệt",
+            "MutableLiveData có setValue/postValue để update value",
+            "LiveData mutable, MutableLiveData immutable",
+            "MutableLiveData chỉ cho primitives",
+          ],
+          correct: 1,
+          explanation:
+            "LiveData chỉ read-only, MutableLiveData có thể setValue/postValue.",
+        },
+        {
+          id: 132,
+          category: "ViewModel & LiveData",
+          question:
+            "setValue() và postValue() của MutableLiveData khác gì nhau?",
+          options: [
+            "Không khác biệt",
+            "setValue phải gọi từ main thread, postValue có thể từ background",
+            "postValue nhanh hơn",
+            "setValue cho primitives, postValue cho objects",
+          ],
+          correct: 1,
+          explanation:
+            "setValue() cho main thread, postValue() cho background thread (posts to main).",
+        },
+        {
+          id: 133,
+          category: "ViewModel & LiveData",
+          question: "Transformations.map() trong LiveData dùng để làm gì?",
+          options: [
+            "Map to different collection",
+            "Transform value của LiveData thành type khác",
+            "Map locations",
+            "Create new LiveData",
+          ],
+          correct: 1,
+          explanation:
+            "Transformations.map biến đổi LiveData<X> thành LiveData<Y>.",
+        },
+        {
+          id: 134,
+          category: "ViewModel & LiveData",
+          question: "Transformations.switchMap() khác gì map()?",
+          options: [
+            "Không khác biệt",
+            "switchMap() trả về LiveData, cho phép switch giữa các sources",
+            "switchMap nhanh hơn",
+            "map cho collections, switchMap cho singles",
+          ],
+          correct: 1,
+          explanation:
+            "switchMap returns LiveData từ function, useful khi result là async operation.",
+        },
+        {
+          id: 135,
+          category: "ViewModel & LiveData",
+          question: "MediatorLiveData dùng để làm gì?",
+          options: [
+            "Mediate conflicts",
+            "Observe multiple LiveData sources và react to changes",
+            "Improve performance",
+            "Cache LiveData",
+          ],
+          correct: 1,
+          explanation:
+            "MediatorLiveData có thể observe multiple sources và emit combined results.",
+        },
+        {
+          id: 136,
+          category: "ViewModel & LiveData",
+          question: "SavedStateHandle trong ViewModel dùng để làm gì?",
+          options: [
+            "Save to database",
+            "Survive process death bằng cách save state vào Bundle",
+            "Handle errors",
+            "Save UI state",
+          ],
+          correct: 1,
+          explanation:
+            "SavedStateHandle cho phép ViewModel survive process death.",
+        },
+        {
+          id: 137,
+          category: "Coroutines",
+          question: "suspend function trong Kotlin là gì?",
+          options: [
+            "Function bị tạm dừng",
+            "Function có thể pause và resume mà không block thread",
+            "Deprecated function",
+            "Function chạy trên background",
+          ],
+          correct: 1,
+          explanation:
+            "suspend function có thể suspend execution mà không block thread.",
+        },
+        {
+          id: 138,
+          category: "Coroutines",
+          question: "CoroutineScope dùng để làm gì?",
+          options: [
+            "Limit coroutine memory",
+            "Định nghĩa lifecycle của coroutines",
+            "Scope variables",
+            "Debug coroutines",
+          ],
+          correct: 1,
+          explanation:
+            "CoroutineScope quản lý lifecycle, khi cancel scope thì cancel all children.",
+        },
+        {
+          id: 139,
+          category: "Coroutines",
+          question: "viewModelScope là gì?",
+          options: [
+            "Scope for view layer",
+            "CoroutineScope tied to ViewModel lifecycle",
+            "Scope for model classes",
+            "Global scope",
+          ],
+          correct: 1,
+          explanation: "viewModelScope auto-cancel khi ViewModel cleared.",
+        },
+        {
+          id: 140,
+          category: "Coroutines",
+          question: "lifecycleScope là gì?",
+          options: [
+            "Scope cho data layer",
+            "CoroutineScope tied to Lifecycle owner (Activity/Fragment)",
+            "Scope cho services",
+            "Application scope",
+          ],
+          correct: 1,
+          explanation:
+            "lifecycleScope auto-cancel based on lifecycle state của owner.",
+        },
+        {
+          id: 141,
+          category: "Coroutines",
+          question: "withContext() trong coroutines dùng để làm gì?",
+          options: [
+            "Create new context",
+            "Switch dispatcher trong suspend function",
+            "Add context to coroutine",
+            "Remove context",
+          ],
+          correct: 1,
+          explanation:
+            "withContext switches dispatcher, useful for calling suspending code on different thread.",
+        },
+        {
+          id: 142,
+          category: "Coroutines",
+          question: "async/await trong coroutines dùng để làm gì?",
+          options: [
+            "Synchronous execution",
+            "Chạy concurrent code và await kết quả",
+            "Error handling",
+            "Thread management",
+          ],
+          correct: 1,
+          explanation:
+            "async starts concurrent work, await gets result. Useful for parallel operations.",
+        },
+        {
+          id: 143,
+          category: "Coroutines",
+          question: "Flow trong Kotlin dùng để làm gì?",
+          options: [
+            "Control flow statements",
+            "Cold asynchronous stream of multiple values",
+            "Network flow control",
+            "UI flow",
+          ],
+          correct: 1,
+          explanation:
+            "Flow là cold stream, emit multiple values over time, similar to sequences but async.",
+        },
+        {
+          id: 144,
+          category: "Coroutines",
+          question: "StateFlow khác gì Flow?",
+          options: [
+            "Không khác biệt",
+            "StateFlow là hot stream với current value, always has value",
+            "StateFlow cho UI, Flow cho data",
+            "Flow nhanh hơn",
+          ],
+          correct: 1,
+          explanation:
+            "StateFlow là hot, conflated, có value property, luôn có initial value.",
+        },
+        {
+          id: 145,
+          category: "Coroutines",
+          question: "SharedFlow khác gì StateFlow?",
+          options: [
+            "Không khác biệt",
+            "SharedFlow không cần initial value, có replay cache config",
+            "StateFlow can share, SharedFlow cannot",
+            "SharedFlow chỉ cho single subscriber",
+          ],
+          correct: 1,
+          explanation:
+            "SharedFlow flexible hơn: config replay, buffer, no required initial value.",
+        },
+        {
+          id: 146,
+          category: "Networking",
+          question: "Retrofit @GET annotation dùng để làm gì?",
+          options: [
+            "Get data from cache",
+            "Định nghĩa HTTP GET request",
+            "Get local data",
+            "Get permissions",
+          ],
+          correct: 1,
+          explanation:
+            "@GET, @POST, @PUT, @DELETE định nghĩa HTTP methods trong Retrofit.",
+        },
+        {
+          id: 147,
+          category: "Networking",
+          question: "@Path annotation trong Retrofit dùng để làm gì?",
+          options: [
+            "Define file path",
+            "Replace placeholder trong URL với parameter value",
+            "Set base path",
+            "Navigation path",
+          ],
+          correct: 1,
+          explanation: "@Path replaces {placeholder} trong URL endpoint.",
+        },
+        {
+          id: 148,
+          category: "Networking",
+          question: "@Query annotation trong Retrofit dùng để làm gì?",
+          options: [
+            "Database query",
+            "Thêm query parameters vào URL",
+            "Search query",
+            "Query cache",
+          ],
+          correct: 1,
+          explanation: "@Query adds ?key=value query parameters to URL.",
+        },
+        {
+          id: 149,
+          category: "Networking",
+          question: "@Body annotation trong Retrofit dùng để làm gì?",
+          options: [
+            "Define body class",
+            "Serialize object thành request body (JSON)",
+            "Parse response body",
+            "Validate body",
+          ],
+          correct: 1,
+          explanation: "@Body serializes object as request body for POST/PUT.",
+        },
+        {
+          id: 150,
+          category: "Networking",
+          question: "OkHttp Interceptor dùng để làm gì?",
+          options: [
+            "Intercept user input",
+            "Modify requests/responses, add headers, logging",
+            "Block requests",
+            "Validate data",
+          ],
+          correct: 1,
+          explanation:
+            "Interceptors observe, modify requests/responses. Useful for auth, logging, caching.",
+        },
+        {
+          id: 151,
+          category: "Manifest",
+          question: "android:exported attribute trong manifest dùng để làm gì?",
+          options: [
+            "Export app",
+            "Xác định component có thể được start bởi apps khác không",
+            "Export data",
+            "Export logs",
+          ],
+          correct: 1,
+          explanation:
+            'exported="true" cho phép other apps start component, required for Android 12+.',
+        },
+        {
+          id: 152,
+          category: "Manifest",
+          question: 'android:launchMode="singleTop" làm gì?',
+          options: [
+            "Activity luôn ở top",
+            "Nếu activity đã ở top of stack, gọi onNewIntent thay vì tạo mới",
+            "Chỉ 1 instance",
+            "Top priority",
+          ],
+          correct: 1,
+          explanation:
+            "singleTop: không tạo instance mới nếu activity đã ở top, gọi onNewIntent.",
+        },
+        {
+          id: 153,
+          category: "Manifest",
+          question: 'android:launchMode="singleTask" làm gì?',
+          options: [
+            "Single threaded task",
+            "Chỉ 1 instance trong một task, bring task to front nếu đã tồn tại",
+            "Single background task",
+            "Priority task",
+          ],
+          correct: 1,
+          explanation:
+            "singleTask: 1 instance, activity là root của task, clear activities above nếu relaunch.",
+        },
+        {
+          id: 154,
+          category: "Manifest",
+          question: 'android:launchMode="singleInstance" làm gì?',
+          options: [
+            "Instance variable",
+            "Chỉ 1 instance, nằm một mình trong task riêng",
+            "Singleton pattern",
+            "Single activity",
+          ],
+          correct: 1,
+          explanation:
+            "singleInstance: 1 instance globally, task chỉ chứa activity đó.",
+        },
+        {
+          id: 155,
+          category: "Manifest",
+          question: "<uses-feature> trong manifest dùng để làm gì?",
+          options: [
+            "Enable feature",
+            "Khai báo hardware/software features app cần",
+            "Feature flags",
+            "AB testing",
+          ],
+          correct: 1,
+          explanation:
+            "uses-feature khai báo required features, dùng cho Google Play filtering.",
+        },
+        {
+          id: 156,
+          category: "Testing",
+          question: "@Test annotation trong Android testing dùng để làm gì?",
+          options: [
+            "Test build",
+            "Đánh dấu method là test case",
+            "Test production code",
+            "Test deployment",
+          ],
+          correct: 1,
+          explanation: "@Test marks method as test case for JUnit runner.",
+        },
+        {
+          id: 157,
+          category: "Testing",
+          question: "androidTest directory chứa loại tests nào?",
+          options: [
+            "Unit tests",
+            "Instrumented tests chạy trên device/emulator",
+            "Integration tests",
+            "Performance tests",
+          ],
+          correct: 1,
+          explanation:
+            "androidTest chứa instrumented tests cần Android runtime.",
+        },
+        {
+          id: 158,
+          category: "Testing",
+          question: "test directory chứa loại tests nào?",
+          options: [
+            "UI tests",
+            "Local unit tests chạy trên JVM",
+            "Device tests",
+            "End-to-end tests",
+          ],
+          correct: 1,
+          explanation:
+            "test directory cho local JVM tests, không cần Android device.",
+        },
+        {
+          id: 159,
+          category: "Testing",
+          question: "Espresso trong Android testing dùng để làm gì?",
+          options: [
+            "Make coffee",
+            "UI testing framework cho Android",
+            "Network testing",
+            "Unit testing",
+          ],
+          correct: 1,
+          explanation:
+            "Espresso là UI testing framework, test user interactions.",
+        },
+        {
+          id: 160,
+          category: "Testing",
+          question: "MockK hoặc Mockito dùng để làm gì trong testing?",
+          options: [
+            "Mock UI",
+            "Tạo mock objects để isolate unit under test",
+            "Mock network",
+            "Mock database",
+          ],
+          correct: 1,
+          explanation:
+            "Mocking frameworks tạo fake dependencies để test unit một cách isolated.",
+        },
+        {
+          id: 161,
+          category: "Architecture",
+          question: "MVVM pattern trong Android có những layers nào?",
+          options: [
+            "Model, View, Controller",
+            "Model, View, ViewModel",
+            "Model, View, Presenter",
+            "Module, View, ViewModel",
+          ],
+          correct: 1,
+          explanation:
+            "MVVM: Model (data), View (UI), ViewModel (logic và state).",
+        },
+        {
+          id: 162,
+          category: "Architecture",
+          question: "Repository pattern dùng để làm gì?",
+          options: [
+            "Store code",
+            "Abstract data sources, single source of truth cho data",
+            "Repository of assets",
+            "Store configurations",
+          ],
+          correct: 1,
+          explanation:
+            "Repository abstracts data sources (local, remote), mediates between domain và data layers.",
+        },
+        {
+          id: 163,
+          category: "Architecture",
+          question:
+            "Use Case / Interactor trong Clean Architecture dùng để làm gì?",
+          options: [
+            "User interface",
+            "Chứa business logic, orchestrate data flow",
+            "Use resources",
+            "Interface definitions",
+          ],
+          correct: 1,
+          explanation:
+            "Use Cases encapsulate single business action, independent of UI và data layers.",
+        },
+        {
+          id: 164,
+          category: "Architecture",
+          question: "Dependency Injection (DI) dùng để làm gì?",
+          options: [
+            "Inject code",
+            "Provide dependencies từ bên ngoài thay vì tạo bên trong class",
+            "Inject data",
+            "Database injection",
+          ],
+          correct: 1,
+          explanation:
+            "DI cung cấp dependencies, giúp loose coupling và testability.",
+        },
+        {
+          id: 165,
+          category: "Architecture",
+          question: "Hilt trong Android dùng để làm gì?",
+          options: [
+            "Handle errors",
+            "Dependency injection library built on Dagger",
+            "UI library",
+            "Testing framework",
+          ],
+          correct: 1,
+          explanation:
+            "Hilt là DI library, simplifies Dagger setup cho Android.",
+        },
+        {
+          id: 166,
+          category: "Navigation",
+          question:
+            "Navigation Component trong Android Jetpack dùng để làm gì?",
+          options: [
+            "GPS navigation",
+            "Handle in-app navigation giữa destinations",
+            "Navigate files",
+            "Navigate code",
+          ],
+          correct: 1,
+          explanation:
+            "Navigation Component manages fragment transactions, back stack, deep links.",
+        },
+        {
+          id: 167,
+          category: "Navigation",
+          question: "NavGraph dùng để làm gì?",
+          options: [
+            "Graph visualization",
+            "Định nghĩa navigation paths giữa destinations",
+            "Display graphs",
+            "Data graphs",
+          ],
+          correct: 1,
+          explanation:
+            "NavGraph là resource định nghĩa tất cả destinations và actions.",
+        },
+        {
+          id: 168,
+          category: "Navigation",
+          question: "Safe Args trong Navigation Component dùng để làm gì?",
+          options: [
+            "Secure arguments",
+            "Type-safe argument passing giữa destinations",
+            "Encrypt arguments",
+            "Validate arguments",
+          ],
+          correct: 1,
+          explanation:
+            "Safe Args generates classes cho type-safe navigation arguments.",
+        },
+        {
+          id: 169,
+          category: "Navigation",
+          question: "Deep Link trong Navigation dùng để làm gì?",
+          options: [
+            "Link sâu trong code",
+            "URL navigates trực tiếp đến specific destination trong app",
+            "Database link",
+            "Link dependencies",
+          ],
+          correct: 1,
+          explanation:
+            "Deep Links cho phép navigate đến destination từ URL, notification, etc.",
+        },
+        {
+          id: 170,
+          category: "Permissions",
+          question: "Dangerous permissions trong Android cần gì?",
+          options: [
+            "Admin access",
+            "Runtime permission request từ user",
+            "Special certificate",
+            "Root access",
+          ],
+          correct: 1,
+          explanation:
+            "Dangerous permissions cần user grant at runtime (Android 6.0+).",
+        },
+        {
+          id: 171,
+          category: "Permissions",
+          question:
+            "ActivityResultContracts.RequestPermission() dùng để làm gì?",
+          options: [
+            "Request contract signing",
+            "Request single permission với new Activity Result API",
+            "Request feature",
+            "Request data",
+          ],
+          correct: 1,
+          explanation:
+            "ActivityResultContracts thay thế deprecated startActivityForResult cho permissions.",
+        },
+        {
+          id: 172,
+          category: "Services",
+          question: "Foreground Service khác gì Background Service?",
+          options: [
+            "Không khác biệt",
+            "Foreground phải show notification, ít bị system kill",
+            "Foreground chạy nhanh hơn",
+            "Background visible hơn",
+          ],
+          correct: 1,
+          explanation:
+            "Foreground Service cần notification, higher priority, less likely to be killed.",
+        },
+        {
+          id: 173,
+          category: "Services",
+          question: "WorkManager dùng để làm gì?",
+          options: [
+            "Manage workers",
+            "Deferrable, guaranteed background work với constraints",
+            "Thread management",
+            "UI work",
+          ],
+          correct: 1,
+          explanation:
+            "WorkManager cho background work cần execute eventually, survives app restart.",
+        },
+        {
+          id: 174,
+          category: "Services",
+          question:
+            "OneTimeWorkRequest vs PeriodicWorkRequest trong WorkManager?",
+          options: [
+            "Không khác biệt",
+            "OneTime chạy một lần, Periodic chạy lặp lại theo interval",
+            "OneTime nhanh hơn",
+            "Periodic chỉ cho sync",
+          ],
+          correct: 1,
+          explanation:
+            "OneTimeWorkRequest cho single execution, PeriodicWorkRequest repeats với minimum 15min.",
+        },
+        {
+          id: 175,
+          category: "Services",
+          question: "WorkManager Constraints dùng để làm gì?",
+          options: [
+            "Constraint UI",
+            "Định nghĩa điều kiện để work execute (network, charging, etc.)",
+            "Limit work time",
+            "Memory constraints",
+          ],
+          correct: 1,
+          explanation:
+            "Constraints xác định điều kiện như NetworkType, BatteryNotLow, StorageNotLow.",
+        },
+        {
+          id: 176,
+          category: "Broadcast",
+          question: "BroadcastReceiver dùng để làm gì?",
+          options: [
+            "Broadcast media",
+            "Nhận và respond to system-wide broadcast events",
+            "Send broadcasts",
+            "Network broadcast",
+          ],
+          correct: 1,
+          explanation:
+            "BroadcastReceiver listens for system broadcasts (battery, connectivity, etc.).",
+        },
+        {
+          id: 177,
+          category: "Broadcast",
+          question: "LocalBroadcastManager khác gì global broadcasts?",
+          options: [
+            "Không khác biệt",
+            "LocalBroadcast chỉ trong app, an toàn và hiệu quả hơn",
+            "LocalBroadcast chậm hơn",
+            "Global broadcasts chỉ trong app",
+          ],
+          correct: 1,
+          explanation:
+            "LocalBroadcastManager (deprecated, dùng LiveData/Flow) broadcasts chỉ trong app process.",
+        },
+        {
+          id: 178,
+          category: "Notifications",
+          question: "NotificationChannel trong Android O+ dùng để làm gì?",
+          options: [
+            "TV channel",
+            "Group notifications để user có thể control settings riêng",
+            "Communication channel",
+            "Data channel",
+          ],
+          correct: 1,
+          explanation:
+            "NotificationChannel cho phép user customize notification behavior per category.",
+        },
+        {
+          id: 179,
+          category: "Notifications",
+          question: "NotificationCompat.Builder dùng để làm gì?",
+          options: [
+            "Build apps",
+            "Tạo notifications compatible với nhiều Android versions",
+            "Build UI",
+            "Compile notifications",
+          ],
+          correct: 1,
+          explanation:
+            "NotificationCompat.Builder từ AndroidX tạo backward-compatible notifications.",
+        },
+        {
+          id: 180,
+          category: "ProGuard/R8",
+          question: "ProGuard/R8 trong Android build dùng để làm gì?",
+          options: [
+            "Protect từ virus",
+            "Code shrinking, obfuscation, optimization",
+            "Guard resources",
+            "Security scanning",
+          ],
+          correct: 1,
+          explanation:
+            "R8 (replaced ProGuard) shrinks, obfuscates code, removes unused resources.",
+        },
+        {
+          id: 181,
+          category: "ProGuard/R8",
+          question: "@Keep annotation dùng để làm gì?",
+          options: [
+            "Keep data",
+            "Prevent ProGuard/R8 từ removing hoặc renaming class/method",
+            "Keep reference",
+            "Memory retention",
+          ],
+          correct: 1,
+          explanation:
+            "@Keep marks elements that shouldn't be removed/obfuscated by R8.",
+        },
+        {
+          id: 182,
+          category: "Performance",
+          question: "Memory leak trong Android thường do nguyên nhân nào?",
+          options: [
+            "Too much data",
+            "Giữ reference đến Context/Activity sau khi destroyed",
+            "Large images",
+            "Many activities",
+          ],
+          correct: 1,
+          explanation:
+            "Holding Activity/Context reference trong long-lived objects gây leak.",
+        },
+        {
+          id: 183,
+          category: "Performance",
+          question: "LeakCanary dùng để làm gì?",
+          options: [
+            "Fix leaks",
+            "Detect memory leaks trong debug builds",
+            "Prevent leaks",
+            "Leak data",
+          ],
+          correct: 1,
+          explanation:
+            "LeakCanary là library tự động detect và report memory leaks.",
+        },
+        {
+          id: 184,
+          category: "Performance",
+          question: "StrictMode trong Android dùng để làm gì?",
+          options: [
+            "Strict coding standards",
+            "Detect disk/network operations trên main thread",
+            "Strict UI rules",
+            "Security mode",
+          ],
+          correct: 1,
+          explanation:
+            "StrictMode giúp detect common issues như disk I/O trên main thread.",
+        },
+        {
+          id: 185,
+          category: "Performance",
+          question: "ViewBinding so với findViewById có ưu điểm gì?",
+          options: [
+            "Không khác biệt",
+            "Null-safe, type-safe, no reflection, faster",
+            "findViewById nhanh hơn",
+            "ViewBinding flexible hơn",
+          ],
+          correct: 1,
+          explanation:
+            "ViewBinding generates binding class, type-safe và null-safe references.",
+        },
+        {
+          id: 186,
+          category: "Compose",
+          question: "Jetpack Compose là gì?",
+          options: [
+            "Music compose app",
+            "Modern declarative UI toolkit cho Android",
+            "Image editor",
+            "Code editor",
+          ],
+          correct: 1,
+          explanation:
+            "Compose là modern UI toolkit, declarative approach thay vì XML layouts.",
+        },
+        {
+          id: 187,
+          category: "Compose",
+          question: "@Composable annotation dùng để làm gì?",
+          options: [
+            "Mark data class",
+            "Đánh dấu function có thể emit UI",
+            "Compose music",
+            "Combine functions",
+          ],
+          correct: 1,
+          explanation:
+            "@Composable marks functions that describe UI, can call other composables.",
+        },
+        {
+          id: 188,
+          category: "Compose",
+          question: "remember trong Compose dùng để làm gì?",
+          options: [
+            "Memory management",
+            "Lưu giữ value across recompositions",
+            "Remember user preferences",
+            "Cache images",
+          ],
+          correct: 1,
+          explanation:
+            "remember{} preserves state across recompositions within same composition.",
+        },
+        {
+          id: 189,
+          category: "Compose",
+          question: "State hoisting trong Compose là gì?",
+          options: [
+            "State lifting",
+            "Pattern đưa state lên caller để composable stateless",
+            "Hoist flags",
+            "Raise exceptions",
+          ],
+          correct: 1,
+          explanation:
+            "State hoisting moves state up to caller, making composable reusable và testable.",
+        },
+        {
+          id: 190,
+          category: "Compose",
+          question: "LaunchedEffect trong Compose dùng để làm gì?",
+          options: [
+            "Launch app",
+            "Run suspend function when composable enters composition",
+            "Effect animation",
+            "Launch coroutine",
+          ],
+          correct: 1,
+          explanation:
+            "LaunchedEffect runs suspend code, tied to composition lifecycle.",
+        },
+
+        // Thêm câu hỏi từ đề thi PDF
+        {
+          id: 191,
+          category: "Layout & UI",
+          question:
+            "Trong trường hợp giao diện có nhiều đối tượng làm cho chiều cao của layout lớn hơn chiều cao của màn hình, đối tượng nào sau đây được sử dụng để người dùng duyệt được toàn bộ nội dung?",
+          options: [
+            "ConstraintLayout",
+            "ScrollView",
+            "LinearLayout",
+            "HorizontalScrollView",
+          ],
+          correct: 1,
+          explanation:
+            "ScrollView cho phép cuộn theo chiều dọc khi nội dung vượt quá màn hình.",
+        },
+        {
+          id: 192,
+          category: "Kotlin cơ bản",
+          question:
+            "Phương án nào được sử dụng để tạo và khai báo các giá trị của mảng trong Kotlin?",
+          options: [
+            "val a = {1, 2, 3, 4, 5}",
+            "val a = [1, 2, 3, 4, 5]",
+            "val a = array(1, 2, 3, 4, 5)",
+            "val a = arrayOf(1, 2, 3, 4, 5)",
+          ],
+          correct: 3,
+          explanation: "arrayOf() là cách chuẩn để tạo mảng trong Kotlin.",
+        },
+        {
+          id: 193,
+          category: "Kotlin cơ bản",
+          question:
+            "Trong Kotlin, câu lệnh nào được sử dụng để khai báo biến kiểu số thực float với giá trị khởi tạo là 3.14?",
+          options: [
+            "val x = 3.14",
+            "float x = 3.14",
+            "double x = 3.14",
+            "val x = 3.14f",
+          ],
+          correct: 3,
+          explanation:
+            "Cần hậu tố 'f' để chỉ định Float, mặc định số thập phân là Double.",
+        },
+        {
+          id: 194,
+          category: "Android cơ bản",
+          question:
+            "Các lớp layout LinearLayout, RelativeLayout, ConstraintLayout được kế thừa trực tiếp từ lớp nào?",
+          options: [
+            "android.widget.FrameLayout",
+            "android.view.ViewGroup",
+            "android.view.View",
+            "android.view.Layout",
+          ],
+          correct: 1,
+          explanation: "ViewGroup là lớp cha trực tiếp của các Layout classes.",
+        },
+        {
+          id: 195,
+          category: "UI Components",
+          question:
+            "Các lớp widget (Button, TextView, EditText, ...) kế thừa thuộc tính id từ lớp nào?",
+          options: [
+            "android.view.View",
+            "android.widget.TextView",
+            "java.lang.Object",
+            "android.view.ViewGroup",
+          ],
+          correct: 0,
+          explanation: "android.view.View là base class chứa thuộc tính id.",
+        },
+        {
+          id: 196,
+          category: "Layout & UI",
+          question:
+            'Giả sử bên trong RelativeLayout có đối tượng được định nghĩa với alignParentRight="true" và alignParentLeft="true". Hỏi chiều rộng thực tế của đối tượng là bao nhiêu?',
+          options: [
+            "Vừa đủ để chứa chuỗi",
+            "Bằng 0dp",
+            "Bằng với chiều rộng RelativeLayout",
+            "Các đáp án đều không đúng",
+          ],
+          correct: 2,
+          explanation:
+            "Khi align cả 2 phía parent, view sẽ stretch full width của parent.",
+        },
+        {
+          id: 197,
+          category: "Layout & UI",
+          question:
+            "Thuộc tính layout_gravity của đối tượng view không tự căn chỉnh theo cả 2 hướng khi đặt đối tượng bên trong loại layout nào?",
+          options: [
+            "LinearLayout",
+            "GridLayout",
+            "RelativeLayout",
+            "FrameLayout",
+          ],
+          correct: 2,
+          explanation:
+            "RelativeLayout sử dụng các thuộc tính alignParent riêng, không dùng layout_gravity.",
+        },
+        {
+          id: 198,
+          category: "Debugging",
+          question:
+            "Phát biểu nào sau đây KHÔNG đúng về Logcat trong Android Studio?",
+          options: [
+            "Logcat có chức năng lọc dữ liệu theo thẻ hoặc tên gói của ứng dụng",
+            "Logcat hiển thị thông tin trên màn hình của ứng dụng",
+            "Cần có kết nối giữa máy tính và thiết bị Android để hiển thị dữ liệu",
+            "Logcat hiển thị thông tin trên máy tính của lập trình viên",
+          ],
+          correct: 1,
+          explanation:
+            "Logcat hiển thị trong Android Studio IDE, không phải trên màn hình thiết bị.",
+        },
+        {
+          id: 199,
+          category: "Data Storage",
+          question:
+            "File strings.xml chứa các tài nguyên chuỗi ký tự nằm trong thư mục nào?",
+          options: ["res/strings", "res/xml", "res/drawable", "res/values"],
+          correct: 3,
+          explanation: "strings.xml nằm trong thư mục res/values.",
+        },
+        {
+          id: 200,
+          category: "Data Storage",
+          question:
+            "Giả sử file my_font.ttf đã được sao chép vào thư mục font trong thư mục res. Để thiết lập font chữ cho đối tượng TextView thì thuộc tính nào cần được khai báo trong file XML?",
+          options: [
+            'android:font="@font/my_font"',
+            'android:textFont="@font/my_font"',
+            'android:fontFamily="@font/my_font"',
+            'android:typeface="@font/my_font"',
+          ],
+          correct: 2,
+          explanation:
+            'android:fontFamily="@font/my_font" là cách đúng để set custom font.',
+        },
+      ];
+
+      // Quiz State
+      let currentQuestion = 0;
+      let score = 0;
+      let answers = [];
+      let selectedCategory = "all";
+      let filteredQuestions = [...questions];
+      let quizStarted = false;
+      let showingResults = false;
+      let questionLimit = 0;
+
+      function getCategories() {
+        return [...new Set(questions.map((q) => q.category))];
+      }
+
+      function filterQuestions() {
+        if (selectedCategory === "all") {
+          filteredQuestions = [...questions];
+        } else {
+          filteredQuestions = questions.filter(
+            (q) => q.category === selectedCategory
+          );
+        }
+        filteredQuestions = shuffleArray(filteredQuestions);
+        if (questionLimit > 0 && questionLimit < filteredQuestions.length) {
+          filteredQuestions = filteredQuestions.slice(0, questionLimit);
+        }
+      }
+
+      function shuffleArray(array) {
+        const newArray = [...array];
+        for (let i = newArray.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+        }
+        return newArray;
+      }
+
+      function showStartScreen() {
+        quizStarted = false;
+        showingResults = false;
+        const categories = getCategories();
+
+        document.getElementById("quizContainer").innerHTML = `
+                <div class="start-screen">
+                    <h2>🎯 Chào mừng đến với Android Quiz Master!</h2>
+                    <p>Ngân hàng câu hỏi ôn thi Android đầy đủ với <strong>${
+                      questions.length
+                    }</strong> câu hỏi được tổng hợp từ các đề thi.</p>
+                    
+                    <div class="stats-preview">
+                        <div class="stat-card">
+                            <div class="number">${questions.length}</div>
+                            <div class="label">Câu hỏi</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="number">${categories.length}</div>
+                            <div class="label">Chủ đề</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="number">∞</div>
+                            <div class="label">Lần thử</div>
+                        </div>
+                    </div>
+                    
+                    <div class="category-select">
+                        <label>📚 Chọn chủ đề:</label>
+                        <select id="categorySelect">
+                            <option value="all">Tất cả chủ đề (${
+                              questions.length
+                            } câu)</option>
+                            ${categories
+                              .map((cat) => {
+                                const count = questions.filter(
+                                  (q) => q.category === cat
+                                ).length;
+                                return `<option value="${cat}">${cat} (${count} câu)</option>`;
+                              })
+                              .join("")}
+                        </select>
+                    </div>
+                    
+                    <div class="category-select">
+                        <label>🔢 Số câu hỏi:</label>
+                        <select id="questionLimit">
+                            <option value="0">Tất cả câu hỏi</option>
+                            <option value="10">10 câu</option>
+                            <option value="20">20 câu</option>
+                            <option value="30">30 câu</option>
+                            <option value="50">50 câu</option>
+                            <option value="100">100 câu</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn btn-primary" onclick="startQuiz()" style="margin-top: 20px;">🚀 Bắt đầu Quiz</button>
+                </div>
+            `;
+      }
+
+      function startQuiz() {
+        selectedCategory = document.getElementById("categorySelect").value;
+        questionLimit = parseInt(
+          document.getElementById("questionLimit").value
+        );
+        filterQuestions();
+        currentQuestion = 0;
+        score = 0;
+        answers = new Array(filteredQuestions.length).fill(null);
+        quizStarted = true;
+        showingResults = false;
+        showQuestion();
+      }
+
+      function showQuestion() {
+        const q = filteredQuestions[currentQuestion];
+        const progress =
+          ((currentQuestion + 1) / filteredQuestions.length) * 100;
+        const answered = answers.filter((a) => a !== null).length;
+
+        document.getElementById("quizContainer").innerHTML = `
+                <div class="progress-bar">
+                    <div class="progress" style="width: ${progress}%"></div>
+                </div>
+                
+                <div class="question-info">
+                    <span class="question-number">Câu ${currentQuestion + 1}/${
+          filteredQuestions.length
+        }</span>
+                    <span class="category-tag">${q.category}</span>
+                    <span class="score-display">✓ ${score}/${answered}</span>
+                </div>
+                
+                <div class="question-text">${formatQuestion(q.question)}</div>
+                
+                <div class="options">
+                    ${q.options
+                      .map(
+                        (opt, i) => `
+                        <div class="option ${
+                          answers[currentQuestion] === i ? "selected" : ""
+                        }" 
+                             onclick="selectOption(${i})" data-index="${i}">
+                            <span class="option-letter">${String.fromCharCode(
+                              65 + i
+                            )}</span>
+                            <span class="option-text">${opt}</span>
+                        </div>
+                    `
+                      )
+                      .join("")}
+                </div>
+                
+                <div class="explanation" id="explanation">
+                    <h4>💡 Giải thích:</h4>
+                    <p>${q.explanation}</p>
+                </div>
+                
+                <div class="buttons">
+                    <button class="btn btn-secondary" onclick="prevQuestion()" ${
+                      currentQuestion === 0 ? "disabled" : ""
+                    }>
+                        ← Trước
+                    </button>
+                    <button class="btn btn-primary" onclick="checkAnswer()" id="checkBtn">
+                        Kiểm tra
+                    </button>
+                    <button class="btn btn-primary" onclick="nextQuestion()" id="nextBtn" style="display: none;">
+                        ${
+                          currentQuestion === filteredQuestions.length - 1
+                            ? "Xem kết quả"
+                            : "Tiếp theo →"
+                        }
+                    </button>
+                </div>
+                
+                <div class="question-nav">
+                    ${filteredQuestions
+                      .map((_, i) => {
+                        let className = "nav-btn";
+                        if (i === currentQuestion) className += " current";
+                        else if (answers[i] !== null) {
+                          className +=
+                            answers[i] === filteredQuestions[i].correct
+                              ? " answered"
+                              : " wrong";
+                        }
+                        return `<button class="${className}" onclick="goToQuestion(${i})">${
+                          i + 1
+                        }</button>`;
+                      })
+                      .join("")}
+                </div>
+            `;
+      }
+
+      function formatQuestion(text) {
+        if (text.includes("\n")) {
+          const parts = text.split("\n");
+          const mainQuestion = parts[0];
+          const code = parts.slice(1).join("\n");
+          return `${mainQuestion}<pre class="code-block">${escapeHtml(
+            code
+          )}</pre>`;
+        }
+        return text;
+      }
+
+      function escapeHtml(text) {
+        return text
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+
+      function selectOption(index) {
+        answers[currentQuestion] = index;
+        document.querySelectorAll(".option").forEach((opt, i) => {
+          opt.classList.toggle("selected", i === index);
+        });
+      }
+
+      function checkAnswer() {
+        if (answers[currentQuestion] === null) {
+          alert("Vui lòng chọn một đáp án!");
+          return;
+        }
+
+        const q = filteredQuestions[currentQuestion];
+        const selected = answers[currentQuestion];
+        const correct = q.correct;
+
+        if (selected === correct) score++;
+
+        document.querySelectorAll(".option").forEach((opt, i) => {
+          opt.onclick = null;
+          if (i === correct) opt.classList.add("correct");
+          else if (i === selected && selected !== correct)
+            opt.classList.add("incorrect");
+        });
+
+        document.getElementById("explanation").classList.add("show");
+        document.getElementById("checkBtn").style.display = "none";
+        document.getElementById("nextBtn").style.display = "inline-block";
+
+        const navBtns = document.querySelectorAll(".nav-btn");
+        navBtns[currentQuestion].classList.remove("current");
+        navBtns[currentQuestion].classList.add(
+          selected === correct ? "answered" : "wrong"
+        );
+      }
+
+      function nextQuestion() {
+        if (currentQuestion < filteredQuestions.length - 1) {
+          currentQuestion++;
+          showQuestion();
+        } else {
+          showResults();
+        }
+      }
+
+      function prevQuestion() {
+        if (currentQuestion > 0) {
+          currentQuestion--;
+          showQuestion();
+        }
+      }
+
+      function goToQuestion(index) {
+        currentQuestion = index;
+        showQuestion();
+      }
+
+      function showResults() {
+        showingResults = true;
+        const percentage = Math.round((score / filteredQuestions.length) * 100);
+        const incorrect = filteredQuestions.length - score;
+
+        let message, emoji;
+        if (percentage >= 90) {
+          message = "Xuất sắc! Bạn đã nắm vững kiến thức Android!";
+          emoji = "🏆";
+        } else if (percentage >= 70) {
+          message = "Tốt lắm! Tiếp tục cố gắng nhé!";
+          emoji = "🎉";
+        } else if (percentage >= 50) {
+          message = "Khá ổn! Cần ôn tập thêm một chút!";
+          emoji = "💪";
+        } else {
+          message = "Cần cố gắng nhiều hơn! Hãy ôn tập lại nhé!";
+          emoji = "📚";
+        }
+
+        document.getElementById("quizContainer").innerHTML = `
+                <div class="results-screen">
+                    <h2>${emoji} Kết quả của bạn</h2>
+                    <p>${message}</p>
+                    
+                    <div class="score-circle">
+                        <span class="percentage">${percentage}%</span>
+                        <span class="text">${score}/${
+          filteredQuestions.length
+        } câu</span>
+                    </div>
+                    
+                    <div class="results-stats">
+                        <div class="result-stat correct">
+                            <div class="number">${score}</div>
+                            <div>Đúng</div>
+                        </div>
+                        <div class="result-stat incorrect">
+                            <div class="number">${incorrect}</div>
+                            <div>Sai</div>
+                        </div>
+                        <div class="result-stat skipped">
+                            <div class="number">${
+                              answers.filter((a) => a === null).length
+                            }</div>
+                            <div>Bỏ qua</div>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" onclick="filterReview('all')">Tất cả</button>
+                        <button class="filter-btn" onclick="filterReview('incorrect')">Câu sai</button>
+                        <button class="filter-btn" onclick="filterReview('correct')">Câu đúng</button>
+                    </div>
+                    
+                    <div class="review-list" id="reviewList">
+                        ${generateReviewList("all")}
+                    </div>
+                    
+                    <div class="buttons" style="margin-top: 25px;">
+                        <button class="btn btn-secondary" onclick="showStartScreen()">← Về trang chủ</button>
+                        <button class="btn btn-primary" onclick="startQuiz()">🔄 Làm lại</button>
+                    </div>
+                </div>
+            `;
+      }
+
+      function generateReviewList(filter) {
+        let items = filteredQuestions
+          .map((q, i) => {
+            const isCorrect = answers[i] === q.correct;
+            const showItem =
+              filter === "all" ||
+              (filter === "correct" && isCorrect) ||
+              (filter === "incorrect" && !isCorrect);
+
+            if (!showItem) return "";
+
+            return `
+                    <div class="review-item ${
+                      isCorrect ? "correct" : "incorrect"
+                    }" onclick="reviewQuestion(${i})">
+                        <strong>Câu ${i + 1}:</strong> ${q.question.substring(
+              0,
+              70
+            )}${q.question.length > 70 ? "..." : ""}
+                        <br><small>${isCorrect ? "✓ Đúng" : "✗ Sai"} - ${
+              q.category
+            }</small>
+                    </div>
+                `;
+          })
+          .join("");
+
+        return (
+          items ||
+          '<p style="text-align: center; color: #666; padding: 20px;">Không có câu hỏi nào.</p>'
+        );
+      }
+
+      function filterReview(filter) {
+        document
+          .querySelectorAll(".filter-btn")
+          .forEach((btn) => btn.classList.remove("active"));
+        event.target.classList.add("active");
+        document.getElementById("reviewList").innerHTML =
+          generateReviewList(filter);
+      }
+
+      function reviewQuestion(index) {
+        const q = filteredQuestions[index];
+        const selected = answers[index];
+        const correct = q.correct;
+
+        alert(
+          `Câu ${index + 1}: ${q.question}\n\n` +
+            `Đáp án của bạn: ${
+              selected !== null ? q.options[selected] : "Chưa trả lời"
+            }\n` +
+            `Đáp án đúng: ${q.options[correct]}\n\n` +
+            `Giải thích: ${q.explanation}`
+        );
+      }
+
+      showStartScreen();
+    </script>
+  </body>
+</html>

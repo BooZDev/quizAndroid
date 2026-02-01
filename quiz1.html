@@ -1,0 +1,3283 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Android Quiz - Ngân Hàng Câu Hỏi Đầy Đủ</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(
+          135deg,
+          #1a1a2e 0%,
+          #16213e 50%,
+          #0f3460 100%
+        );
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 950px;
+        margin: 0 auto;
+      }
+
+      .header {
+        text-align: center;
+        color: white;
+        margin-bottom: 30px;
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: none;
+      }
+
+      .header p {
+        font-size: 1.1rem;
+        opacity: 0.8;
+      }
+
+      .quiz-container {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+      }
+
+      .progress-bar {
+        width: 100%;
+        height: 8px;
+        background: #e0e0e0;
+        border-radius: 4px;
+        margin-bottom: 20px;
+        overflow: hidden;
+      }
+
+      .progress {
+        height: 100%;
+        background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+        border-radius: 4px;
+        transition: width 0.3s ease;
+      }
+
+      .question-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #f0f0f0;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .question-number {
+        font-size: 0.95rem;
+        color: #7b2cbf;
+        font-weight: bold;
+      }
+
+      .score-display {
+        font-size: 0.95rem;
+        color: #28a745;
+        font-weight: bold;
+      }
+
+      .category-tag {
+        background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+        color: white;
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+      }
+
+      .question-text {
+        font-size: 1.15rem;
+        color: #333;
+        margin-bottom: 25px;
+        line-height: 1.7;
+      }
+
+      .code-block {
+        background: #1e1e1e;
+        color: #d4d4d4;
+        padding: 15px;
+        border-radius: 10px;
+        margin: 15px 0;
+        font-family: "Consolas", "Courier New", monospace;
+        font-size: 0.85rem;
+        overflow-x: auto;
+        white-space: pre-wrap;
+        border-left: 4px solid #7b2cbf;
+      }
+
+      .options {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .option {
+        padding: 14px 18px;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .option:hover {
+        border-color: #7b2cbf;
+        background: #f8f4ff;
+        transform: translateX(5px);
+      }
+
+      .option.selected {
+        border-color: #7b2cbf;
+        background: #f0e6ff;
+      }
+
+      .option.correct {
+        border-color: #28a745;
+        background: #d4edda;
+        animation: pulse-green 0.5s;
+      }
+
+      .option.incorrect {
+        border-color: #dc3545;
+        background: #f8d7da;
+        animation: shake 0.5s;
+      }
+
+      .option.show-correct {
+        border-color: #28a745;
+        background: #d4edda;
+      }
+
+      @keyframes pulse-green {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.02);
+        }
+      }
+
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(-5px);
+        }
+        75% {
+          transform: translateX(5px);
+        }
+      }
+
+      .option-letter {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #e0e0e0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #666;
+        flex-shrink: 0;
+        font-size: 0.9rem;
+      }
+
+      .option.selected .option-letter {
+        background: #7b2cbf;
+        color: white;
+      }
+
+      .option.correct .option-letter {
+        background: #28a745;
+        color: white;
+      }
+
+      .option.incorrect .option-letter {
+        background: #dc3545;
+        color: white;
+      }
+
+      .option-text {
+        flex: 1;
+        line-height: 1.5;
+        font-size: 0.95rem;
+      }
+
+      .buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 25px;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        padding: 12px 28px;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        font-size: 0.95rem;
+        font-weight: bold;
+        transition: all 0.3s ease;
+      }
+
+      .btn-primary {
+        background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(123, 44, 191, 0.4);
+      }
+
+      .btn-secondary {
+        background: #e0e0e0;
+        color: #666;
+      }
+
+      .btn-secondary:hover {
+        background: #d0d0d0;
+      }
+
+      .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .explanation {
+        margin-top: 20px;
+        padding: 15px 20px;
+        background: linear-gradient(135deg, #e8f4fd, #f0e6ff);
+        border-left: 4px solid #7b2cbf;
+        border-radius: 0 12px 12px 0;
+        display: none;
+      }
+
+      .explanation.show {
+        display: block;
+        animation: fadeIn 0.3s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .explanation h4 {
+        color: #7b2cbf;
+        margin-bottom: 8px;
+      }
+
+      /* Start Screen */
+      .start-screen {
+        text-align: center;
+        padding: 30px 20px;
+      }
+
+      .start-screen h2 {
+        color: #333;
+        margin-bottom: 15px;
+        font-size: 1.6rem;
+      }
+
+      .start-screen p {
+        color: #666;
+        margin-bottom: 25px;
+        line-height: 1.6;
+      }
+
+      .stats-preview {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 15px;
+        margin-bottom: 25px;
+      }
+
+      .stat-card {
+        background: linear-gradient(135deg, #00d4ff 0%, #7b2cbf 100%);
+        color: white;
+        padding: 20px 15px;
+        border-radius: 15px;
+        text-align: center;
+      }
+
+      .stat-card .number {
+        font-size: 2rem;
+        font-weight: bold;
+      }
+
+      .stat-card .label {
+        font-size: 0.85rem;
+        opacity: 0.9;
+      }
+
+      .category-select {
+        margin-bottom: 25px;
+        text-align: left;
+      }
+
+      .category-select label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+        color: #333;
+      }
+
+      .category-select select {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 1rem;
+        cursor: pointer;
+        background: white;
+      }
+
+      .category-select select:focus {
+        outline: none;
+        border-color: #7b2cbf;
+      }
+
+      .mode-select {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .mode-btn {
+        padding: 10px 20px;
+        border: 2px solid #e0e0e0;
+        border-radius: 20px;
+        background: white;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .mode-btn:hover,
+      .mode-btn.active {
+        border-color: #7b2cbf;
+        background: #f0e6ff;
+      }
+
+      /* Results Screen */
+      .results-screen {
+        text-align: center;
+        padding: 30px 20px;
+      }
+
+      .results-screen h2 {
+        color: #333;
+        margin-bottom: 10px;
+      }
+
+      .score-circle {
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #00d4ff 0%, #7b2cbf 100%);
+        margin: 25px auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        box-shadow: 0 10px 40px rgba(123, 44, 191, 0.3);
+      }
+
+      .score-circle .percentage {
+        font-size: 2.5rem;
+        font-weight: bold;
+      }
+
+      .score-circle .text {
+        font-size: 0.9rem;
+        opacity: 0.9;
+      }
+
+      .results-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin: 25px 0;
+      }
+
+      .result-stat {
+        padding: 15px 10px;
+        border-radius: 10px;
+      }
+
+      .result-stat.correct {
+        background: #d4edda;
+        color: #28a745;
+      }
+
+      .result-stat.incorrect {
+        background: #f8d7da;
+        color: #dc3545;
+      }
+
+      .result-stat.skipped {
+        background: #fff3cd;
+        color: #856404;
+      }
+
+      .result-stat .number {
+        font-size: 1.4rem;
+        font-weight: bold;
+      }
+
+      /* Question Navigation */
+      .question-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 2px solid #f0f0f0;
+        max-height: 150px;
+        overflow-y: auto;
+      }
+
+      .nav-btn {
+        width: 36px;
+        height: 36px;
+        border: 2px solid #e0e0e0;
+        border-radius: 6px;
+        background: white;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 0.8rem;
+        transition: all 0.2s ease;
+      }
+
+      .nav-btn:hover {
+        border-color: #7b2cbf;
+      }
+
+      .nav-btn.current {
+        background: #7b2cbf;
+        color: white;
+        border-color: #7b2cbf;
+      }
+
+      .nav-btn.answered {
+        background: #28a745;
+        color: white;
+        border-color: #28a745;
+      }
+
+      .nav-btn.wrong {
+        background: #dc3545;
+        color: white;
+        border-color: #dc3545;
+      }
+
+      /* Filter buttons */
+      .filter-buttons {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .filter-btn {
+        padding: 8px 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 20px;
+        background: white;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 0.9rem;
+      }
+
+      .filter-btn:hover,
+      .filter-btn.active {
+        border-color: #7b2cbf;
+        background: #f0e6ff;
+      }
+
+      /* Review Mode */
+      .review-list {
+        max-height: 350px;
+        overflow-y: auto;
+        text-align: left;
+      }
+
+      .review-item {
+        padding: 12px 15px;
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 0.9rem;
+      }
+
+      .review-item:hover {
+        border-color: #7b2cbf;
+        background: #f8f9ff;
+      }
+
+      .review-item.correct {
+        border-left: 4px solid #28a745;
+      }
+
+      .review-item.incorrect {
+        border-left: 4px solid #dc3545;
+      }
+
+      /* Timer */
+      .timer {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #dc3545;
+      }
+
+      /* Search */
+      .search-box {
+        margin-bottom: 15px;
+      }
+
+      .search-box input {
+        width: 100%;
+        padding: 10px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 0.95rem;
+      }
+
+      .search-box input:focus {
+        outline: none;
+        border-color: #7b2cbf;
+      }
+
+      @media (max-width: 600px) {
+        .header h1 {
+          font-size: 1.8rem;
+        }
+
+        .question-text {
+          font-size: 1rem;
+        }
+
+        .buttons {
+          flex-direction: column;
+        }
+
+        .btn {
+          width: 100%;
+        }
+
+        .results-stats {
+          grid-template-columns: 1fr;
+        }
+
+        .nav-btn {
+          width: 32px;
+          height: 32px;
+          font-size: 0.75rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🤖 Android Quiz Master</h1>
+        <p>Câu hỏi ôn thi</p>
+      </div>
+
+      <div class="quiz-container" id="quizContainer">
+        <!-- Content will be dynamically loaded -->
+      </div>
+    </div>
+
+    <script>
+      // Complete Quiz Questions Database - Over 200 questions
+      const questions = [
+        // ==================== KHÁI NIỆM CƠ BẢN ====================
+        {
+          id: 1,
+          category: "Khái niệm cơ bản",
+          question: "APK là viết tắt của?",
+          options: [
+            "Android Package",
+            "Android Proprietary Kit",
+            "Application Program Kit",
+            "Application Package",
+          ],
+          correct: 0,
+          explanation:
+            "APK (Android Package) là định dạng file cài đặt ứng dụng Android.",
+        },
+        {
+          id: 2,
+          category: "Khái niệm cơ bản",
+          question: "Hệ điều hành được sử dụng cho Android Stack là?",
+          options: ["XML", "Java", "Windows", "Linux"],
+          correct: 3,
+          explanation: "Android được xây dựng trên nền tảng Linux kernel.",
+        },
+        {
+          id: 3,
+          category: "Khái niệm cơ bản",
+          question: "Built-in database trong Android là?",
+          options: ["Oracle", "MySQL", "DB2", "SQLite"],
+          correct: 3,
+          explanation:
+            "SQLite là hệ quản trị CSDL nhẹ được tích hợp sẵn trong Android.",
+        },
+        {
+          id: 4,
+          category: "Khái niệm cơ bản",
+          question:
+            "Thành phần nào nằm ở tầng cao nhất trong kiến trúc Android?",
+          options: [
+            "System Libraries and Android Runtime",
+            "Linux Kernel",
+            "Applications",
+            "Applications Framework",
+          ],
+          correct: 2,
+          explanation:
+            "Kiến trúc Android: Linux Kernel → HAL → Native Libraries → Application Framework → Applications.",
+        },
+        {
+          id: 5,
+          category: "Khái niệm cơ bản",
+          question: "Tầng HAL trong kiến trúc của Android có vai trò gì?",
+          options: [
+            "HAL xác định một giao diện tiêu chuẩn để các nhà cung cấp phần cứng triển khai trên thiết bị Android",
+            "HAL sẽ yêu cầu Android phải biết chính xác kiến trúc phần cứng của thiết bị",
+            "HAL cho phép Android quản lý các ứng dụng mức cao (High Application Level)",
+          ],
+          correct: 0,
+          explanation:
+            "HAL (Hardware Abstraction Layer) cung cấp interface chuẩn giữa phần cứng và framework Android.",
+        },
+        {
+          id: 6,
+          category: "Khái niệm cơ bản",
+          question:
+            "Thành phần nào sau đây KHÔNG phải là một trong 3 thành phần chính của APK?",
+          options: [
+            "Webkit",
+            "Native libraries",
+            "Resources",
+            "Dalvik Executable",
+          ],
+          correct: 0,
+          explanation:
+            "APK chứa: DEX files, Resources, Native libraries. Webkit là system library.",
+        },
+        {
+          id: 7,
+          category: "Khái niệm cơ bản",
+          question:
+            "Thành phần nào sau đây thuộc android native library?\n1) Webkit\n2) OpenGL\n3) SQLite\n4) Dalvik\n5) OpenUI",
+          options: ["1,2,3", "3,4,5", "1,4,5", "Không có đáp án nào đúng"],
+          correct: 0,
+          explanation:
+            "Webkit, OpenGL, SQLite là native libraries. Dalvik là runtime, không phải native library.",
+        },
+        {
+          id: 8,
+          category: "Khái niệm cơ bản",
+          question: "Android được phát triển dựa trên hệ điều hành nào?",
+          options: ["Linux", "Ubuntu", "Windows", "Mac OS"],
+          correct: 0,
+          explanation: "Android sử dụng Linux kernel làm nền tảng.",
+        },
+        {
+          id: 9,
+          category: "Khái niệm cơ bản",
+          question:
+            "Từ phiên bản nào của hệ điều hành Android không còn mang tên các loại bánh?",
+          options: ["9", "10", "11", "12"],
+          correct: 1,
+          explanation:
+            "Android 10 (2019) là phiên bản đầu tiên không có tên bánh kẹo.",
+        },
+        {
+          id: 10,
+          category: "Khái niệm cơ bản",
+          question:
+            "Đâu là công cụ chính thức để phát triển ứng dụng Android hiện nay?",
+          options: [
+            "Android Studio",
+            "Eclipse",
+            "Visual Studio Code",
+            "NetBeans",
+          ],
+          correct: 0,
+          explanation:
+            "Android Studio là IDE chính thức từ Google cho phát triển Android.",
+        },
+        {
+          id: 11,
+          category: "Khái niệm cơ bản",
+          question:
+            "Ngôn ngữ lập trình nào có thể được sử dụng để lập trình ứng dụng Android dạng native?",
+          options: [
+            "Java",
+            "Kotlin",
+            "C/C++",
+            "Tất cả các đáp án đều chính xác",
+          ],
+          correct: 3,
+          explanation:
+            "Java, Kotlin (chính thức) và C/C++ (qua NDK) đều có thể dùng để lập trình Android native.",
+        },
+        {
+          id: 12,
+          category: "Khái niệm cơ bản",
+          question:
+            "Ý kiến nào KHÔNG phải là một trong các thách thức khi lập trình ứng dụng Android?",
+          options: [
+            "Sử dụng công cụ phát triển ứng dụng trên các hệ điều hành khác nhau.",
+            "Ứng dụng cần đáp ứng với nhiều kiểu màn hình của thiết bị di động.",
+            "Ứng dụng cần tương thích với các phiên bản khác nhau của thiết bị di động.",
+            "Mã nguồn và dữ liệu của người dùng cần được bảo mật.",
+          ],
+          correct: 0,
+          explanation:
+            "Android Studio chạy được trên Windows, macOS, Linux nên không phải thách thức.",
+        },
+        {
+          id: 13,
+          category: "Khái niệm cơ bản",
+          question:
+            "Các dữ liệu lâu dài (persistent data) KHÔNG thể được lưu bằng cách nào trong Android?",
+          options: [
+            "Shared Preferences",
+            "Internal/External storage",
+            "SQLite",
+            "Network servers",
+            "Lưu trữ trong đối tượng shared data",
+          ],
+          correct: 4,
+          explanation:
+            "Shared data object chỉ tồn tại trong memory, không phải persistent storage.",
+        },
+
+        // ==================== ACTIVITY LIFECYCLE ====================
+        {
+          id: 14,
+          category: "Activity Lifecycle",
+          question: "Các phương thức của Android activity life cycle?",
+          options: [
+            "onCreate(), onStart(), onActivityStarted(), onResume(), onPause(), onStop(), onActivityDestroy(), onDestroy()",
+            "onCreate(), onStart(), onResume(), onPause(), onStop(), onRestart(), onDestroy()",
+            "onCreate(), onStart(), onPause(), onResume(), onFinish(), onStop(), onDestroy()",
+            "onCreate(), onInit(), onStart(), onPause(), onStop(), onDestroy(), onResume()",
+          ],
+          correct: 1,
+          explanation:
+            "7 callback chính: onCreate → onStart → onResume → onPause → onStop → onRestart → onDestroy.",
+        },
+        {
+          id: 15,
+          category: "Activity Lifecycle",
+          question:
+            "Chỉ có thể có 1 activity ở trạng thái đang chạy (running) trong 1 thời điểm?",
+          options: ["True", "False", "May be", "Can't say"],
+          correct: 0,
+          explanation:
+            "Tại một thời điểm, chỉ có một Activity ở foreground và nhận tương tác.",
+        },
+        {
+          id: 16,
+          category: "Activity Lifecycle",
+          question: "Thứ tự các callback được gọi khi bật 1 app là?",
+          options: [
+            "onCreate, onStart, onResume",
+            "onStart, onCreate, onResume",
+            "onResume, onCreate, onStart",
+            "onCreate, onResume, onStart",
+          ],
+          correct: 0,
+          explanation:
+            "onCreate() khởi tạo → onStart() hiển thị → onResume() tương tác được.",
+        },
+        {
+          id: 17,
+          category: "Activity Lifecycle",
+          question:
+            "Khi ứng dụng đang chạy, người dùng bấm nút Home thì hàm callback được gọi đầu tiên là?",
+          options: ["onPause", "onStop", "onDestroy", "onRestart"],
+          correct: 0,
+          explanation: "onPause() được gọi đầu tiên khi Activity mất focus.",
+        },
+        {
+          id: 18,
+          category: "Activity Lifecycle",
+          question:
+            "Trạng thái nào của Activity mà activity không được focus nhưng vẫn được nhìn thấy trên màn hình?",
+          options: [
+            "Stopped state",
+            "Destroyed state",
+            "Paused state",
+            "Running state",
+          ],
+          correct: 2,
+          explanation:
+            "Paused state: Activity vẫn hiển thị nhưng không có focus (ví dụ: dialog che một phần).",
+        },
+        {
+          id: 19,
+          category: "Activity Lifecycle",
+          question: "Khi nào thì ứng dụng phát hiện có sự thay đổi cấu hình?",
+          options: [
+            "Người dùng thu app xuống và chạy app khác",
+            "Người dùng xoay màn hình hoặc đổi ngôn ngữ",
+            "Điện thoại sắp hết pin",
+            "Điện thoại bị thay đổi cấu hình mạng",
+          ],
+          correct: 1,
+          explanation:
+            "Configuration change: xoay màn hình, thay đổi ngôn ngữ, kích thước màn hình... Activity sẽ được tạo lại.",
+        },
+        {
+          id: 20,
+          category: "Activity Lifecycle",
+          question: "Phát biểu đúng về onCreate, onStart, và onResume?",
+          options: [
+            "onCreate được gọi khi ứng dụng khởi chạy từ đầu, onStart được gọi khi ứng dụng visible với người dùng, onResume được gọi khi người dùng bắt đầu tương tác được với ứng dụng.",
+            "onStart được gọi khi ứng dụng khởi chạy từ đầu, onCreate được gọi khi ứng dụng visible với người dùng",
+            "onCreate được gọi khi ứng dụng khởi chạy từ đầu, onResume được gọi khi ứng dụng visible với người dùng",
+            "onResume được gọi khi ứng dụng khởi chạy từ đầu",
+          ],
+          correct: 0,
+          explanation:
+            "onCreate: khởi tạo | onStart: hiển thị | onResume: tương tác được.",
+        },
+        {
+          id: 21,
+          category: "Activity Lifecycle",
+          question:
+            "Activity hiện tại của ứng dụng đang mở sẽ được tạo lại (onCreate() được gọi lại) khi nào?",
+          options: [
+            "Người dùng nhấn nút home và mở ứng dụng khác.",
+            "Người dùng xoay màn hình hoặc đổi ngôn ngữ của hệ thống.",
+            "Điện thoại sắp hết pin.",
+            "Điện thoại bị thay đổi cấu hình mạng.",
+          ],
+          correct: 1,
+          explanation:
+            "Configuration change khiến Activity bị destroy và tạo lại.",
+        },
+        {
+          id: 22,
+          category: "Activity Lifecycle",
+          question:
+            "Kiểu dữ liệu trả về của hàm startActivityForResult() trong android là gì?",
+          options: [
+            "RESULT_CANCEL",
+            "RESULT_OK",
+            "RESULT_CRASH",
+            "RESULT_OK hoặc RESULT_CANCEL",
+          ],
+          correct: 3,
+          explanation:
+            "startActivityForResult() có thể nhận RESULT_OK (thành công) hoặc RESULT_CANCELED.",
+        },
+        {
+          id: 23,
+          category: "Activity Lifecycle",
+          question:
+            "Việc viết chồng hàm onSaveInstanceState sẽ KHÔNG phù hợp với ngữ cảnh nào?",
+          options: [
+            "Lưu lại trạng thái của Activity khi activity bị hủy do người dùng xoay màn hình",
+            "Lưu lại trạng thái của Activity do người dùng thay đổi ngôn ngữ",
+            "Lưu dữ liệu của Activity vào thẻ nhớ trong thiết bị để truy cập lâu dài về sau",
+          ],
+          correct: 2,
+          explanation:
+            "onSaveInstanceState() lưu tạm state vào Bundle, không phải persistent storage.",
+        },
+        {
+          id: 24,
+          category: "Activity Lifecycle",
+          question:
+            "Trong khi viết chồng hàm onRestoreInstanceState, tại sao tham số có kiểu dữ liệu là Bundle?",
+          options: [
+            "Android không hỗ trợ các kiểu dữ liệu nguyên thủy trong các hàm override",
+            "Kiểu dữ liệu Bundle cho phép đóng gói nhiều kiểu dữ liệu khác nhau để truyền vào hàm",
+            "Các kiểu dữ liệu nguyên thủy không hỗ trợ kiểm tra null",
+          ],
+          correct: 1,
+          explanation:
+            "Bundle là container có thể chứa nhiều kiểu dữ liệu khác nhau (String, int, Parcelable...).",
+        },
+
+        // ==================== ACTIVITY & INTENT ====================
+        {
+          id: 25,
+          category: "Intent",
+          question: "Bạn sử dụng Intent action nào để mở trang web?",
+          options: [
+            "Intent.ACTION_ACCESS_INTERNET",
+            "Intent.ACTION_MAIN",
+            "Intent.ACTION_VIEW",
+            "Intent.ACTION_GET_CONTENT",
+          ],
+          correct: 2,
+          explanation:
+            "ACTION_VIEW dùng để hiển thị dữ liệu (web URL, ảnh, video...) bằng app phù hợp.",
+        },
+        {
+          id: 26,
+          category: "Intent",
+          question: "Mô tả nào sau đây là SAI về implicit intent?",
+          options: [
+            "Android runtime giữ danh sách các app đã đăng ký chạy implicit intent",
+            "Android runtime sẽ nhận các yêu cầu và tìm intent khớp với yêu cầu",
+            "Để gọi được implicit intent cần biết class name của intent đích",
+            "Android runtime sẽ cho phép chọn các ứng dụng phù hợp để thực hiện",
+          ],
+          correct: 2,
+          explanation:
+            "Implicit intent KHÔNG cần biết class name. Nó chỉ định action và data.",
+        },
+        {
+          id: 27,
+          category: "Intent",
+          question:
+            "Implicit intent trong Android được sử dụng với mục đích gì?",
+          options: [
+            "Mở một activity của ứng dụng khác",
+            "Mở một activity của ứng dụng hiện tại",
+            "Mở một service của ứng dụng hiện tại",
+          ],
+          correct: 0,
+          explanation:
+            "Implicit intent dùng để yêu cầu chức năng từ ứng dụng khác.",
+        },
+        {
+          id: 28,
+          category: "Intent",
+          question: "Phát biểu nào sau đây KHÔNG đúng về intent?",
+          options: [
+            "Các intent xác định yêu cầu xác định lớp activity cần mở.",
+            "Cả intent ngầm định và intent xác định cho phép ứng dụng mở activity khác.",
+            "Các intent được thực hiện bằng cách sử dụng phương thức startActivity().",
+            "Khi thực hiện một intent ngầm định, hệ thống luôn mở hộp thoại hỏi người dùng lựa chọn activity cần thực hiện.",
+          ],
+          correct: 3,
+          explanation:
+            "Hệ thống CHỈ hiện dialog chọn app khi có NHIỀU app có thể xử lý intent.",
+        },
+        {
+          id: 29,
+          category: "Intent",
+          question:
+            "Intent nào được sử dụng để mở giao diện gọi điện nhưng chưa thực hiện cuộc gọi? (Intent.X)",
+          options: [
+            "ACTION_DIAL",
+            "ACTION_CALL",
+            "ACTION_PHONE",
+            "ACTION_VIEW",
+          ],
+          correct: 0,
+          explanation:
+            "ACTION_DIAL mở dialer. ACTION_CALL thực hiện cuộc gọi ngay (cần permission).",
+        },
+        {
+          id: 30,
+          category: "Intent",
+          question:
+            "Phương thức nào được sử dụng để mở một activity mới từ activity hiện tại?",
+          options: [
+            "startActivity()",
+            "newActivity()",
+            "openActivity()",
+            "beginActivity()",
+          ],
+          correct: 0,
+          explanation: "startActivity(intent) dùng để mở Activity mới.",
+        },
+        {
+          id: 31,
+          category: "Intent",
+          question:
+            "Phương thức callback nào được sử dụng để xử lý kết quả khi mở activity bằng startActivityForResult()?",
+          options: [
+            "onActivityResult",
+            "onActivityCallback",
+            "onActivityForResult",
+            "onActivityFinish",
+          ],
+          correct: 0,
+          explanation:
+            "onActivityResult() nhận kết quả từ Activity được gọi bằng startActivityForResult().",
+        },
+        {
+          id: 32,
+          category: "Intent",
+          question:
+            "Phương thức nào được sử dụng để thiết lập kết quả trả về của activity khi được mở bằng startActivityForResult()?",
+          options: ["setResult", "setData", "setIntent", "setActivity"],
+          correct: 0,
+          explanation:
+            "setResult(resultCode, intent) thiết lập kết quả trả về cho calling activity.",
+        },
+        {
+          id: 33,
+          category: "Intent",
+          question:
+            "Giả sử có 2 activity trong project là MainActivity và SecondActivity. Hãy điền phần còn thiếu để mở SecondActivity từ MainActivity trong Kotlin?\n\nval intent = Intent(this, [____])",
+          options: [
+            "SecondActivity::class.java",
+            "SecondActivity.class",
+            "SecondActivity::class",
+            "SecondActivity.java",
+          ],
+          correct: 0,
+          explanation:
+            "Trong Kotlin: SecondActivity::class.java để lấy Java Class reference.",
+        },
+
+        // ==================== LAYOUT & UI ====================
+        {
+          id: 34,
+          category: "Layout & UI",
+          question:
+            "Layout nào phù hợp nhất cho việc sắp xếp các đối tượng con theo chiều dọc hoặc ngang?",
+          options: [
+            "Linear layout",
+            "Relative layout",
+            "Frame Layout",
+            "Constraint Layout",
+          ],
+          correct: 0,
+          explanation:
+            "LinearLayout sắp xếp view con theo một hướng (vertical/horizontal).",
+        },
+        {
+          id: 35,
+          category: "Layout & UI",
+          question:
+            "Thành phần layout nào sắp xếp các đối tượng con thành các dòng và các cột?",
+          options: [
+            "RelativeLayout",
+            "TableLayout",
+            "FrameLayout",
+            "None of the above",
+          ],
+          correct: 1,
+          explanation: "TableLayout tổ chức view theo dạng bảng với TableRow.",
+        },
+        {
+          id: 36,
+          category: "Layout & UI",
+          question:
+            "Layout nào cho phép view này nằm chồng lên view khác trong android?",
+          options: [
+            "LinearLayout",
+            "RelativeLayout",
+            "FrameLayout",
+            "GridLayout",
+          ],
+          correct: 1,
+          explanation: "RelativeLayout và FrameLayout đều cho phép chồng view.",
+        },
+        {
+          id: 37,
+          category: "Layout & UI",
+          question: "Tất cả các lớp Layout được kế thừa từ lớp nào?",
+          options: [
+            "android.view.View",
+            "android.view.ViewGroup",
+            "android.widget",
+            "android.view.Layout",
+          ],
+          correct: 1,
+          explanation:
+            "ViewGroup là lớp cha của tất cả Layout, kế thừa từ View.",
+        },
+        {
+          id: 38,
+          category: "Layout & UI",
+          question:
+            "Tất cả các điều khiển trong Android đều kế thừa từ lớp nào?",
+          options: ["ViewGroup", "View", "Widget", "Control"],
+          correct: 1,
+          explanation:
+            "View là lớp cơ sở cho tất cả UI components (Button, TextView...).",
+        },
+        {
+          id: 39,
+          category: "Layout & UI",
+          question:
+            "Để đặt kích thước font chữ cho các thành phần giao diện ta nên dùng đơn vị nào?",
+          options: ["pixel", "dp", "sp", "mm"],
+          correct: 2,
+          explanation:
+            "sp (Scale-independent Pixels) tự động điều chỉnh theo cài đặt font của user.",
+        },
+        {
+          id: 40,
+          category: "Layout & UI",
+          question:
+            "Để đặt kích thước hợp lý nhất cho một view ta nên dùng đơn vị nào?",
+          options: ["pixel", "inch", "mm", "dp"],
+          correct: 3,
+          explanation:
+            "dp (Density-independent Pixels) đảm bảo kích thước nhất quán trên các màn hình.",
+        },
+        {
+          id: 41,
+          category: "Layout & UI",
+          question:
+            "Công cụ chỉnh sửa giao diện trực quan trong Android Studio phù hợp với layout nào nhất?",
+          options: [
+            "ConstraintLayout",
+            "RelativeLayout",
+            "LinearLayout",
+            "TableLayout",
+          ],
+          correct: 0,
+          explanation:
+            "ConstraintLayout được thiết kế để hoạt động tốt với visual editor.",
+        },
+        {
+          id: 42,
+          category: "Layout & UI",
+          question:
+            "Phương thức nào được sử dụng để thiết lập giao diện cho một activity?",
+          options: [
+            "setContentView",
+            "setLayoutView",
+            "setMainLayout",
+            "setMainContent",
+          ],
+          correct: 0,
+          explanation:
+            "setContentView(R.layout.xxx) thiết lập layout cho Activity.",
+        },
+        {
+          id: 43,
+          category: "Layout & UI",
+          question: "Layout nào sau đây có thể được sử dụng để chứa fragment?",
+          options: [
+            "FragmentContainerView",
+            "LinearLayout",
+            "FrameLayout",
+            "Tất cả các đáp án đều đúng",
+          ],
+          correct: 3,
+          explanation: "Fragment có thể được đặt trong bất kỳ ViewGroup nào.",
+        },
+
+        // ==================== UI COMPONENTS ====================
+        {
+          id: 44,
+          category: "UI Components",
+          question:
+            "Lớp nào cho phép hiển thị thông tin trong một thời gian ngắn sau đó sẽ biến mất?",
+          options: [
+            "Toast class",
+            "Log class",
+            "Maketest class",
+            "MessageBox class",
+          ],
+          correct: 0,
+          explanation: "Toast hiển thị message ngắn gọn và tự động biến mất.",
+        },
+        {
+          id: 45,
+          category: "UI Components",
+          question:
+            "Giả sử làm app khảo sát sở thích (chọn nhiều), điều khiển input nào phù hợp nhất?",
+          options: [
+            "RadioButton",
+            "CheckBox",
+            "EditText cho người dùng nhập",
+            "Spinner",
+          ],
+          correct: 1,
+          explanation:
+            "CheckBox cho phép chọn nhiều. RadioButton chỉ cho phép chọn 1 trong nhóm.",
+        },
+        {
+          id: 46,
+          category: "UI Components",
+          question:
+            "Để thiết lập EditText nhập mật khẩu (không hiển thị ký tự) ta chọn inputType là gì?",
+          options: [
+            'android:inputType="textPassword"',
+            'android:inputType="Password"',
+            'android:inputType="******"',
+            'android:inputControl="Password"',
+          ],
+          correct: 0,
+          explanation: 'inputType="textPassword" ẩn ký tự nhập vào.',
+        },
+        {
+          id: 47,
+          category: "UI Components",
+          question:
+            "Thuộc tính nào cho phép thiết lập màu sắc chữ của TextView?",
+          options: ["textColor", "color", "foregroundColor", "foreground"],
+          correct: 0,
+          explanation: "android:textColor thiết lập màu chữ.",
+        },
+        {
+          id: 48,
+          category: "UI Components",
+          question:
+            "Trong nội dung TextView, cần thuộc tính nào để nhúng weblink?",
+          options: [
+            'android:autoLink="web"',
+            'android:autoLink="url"',
+            'android:autoConnect="web"',
+            'android:autoLink="html"',
+          ],
+          correct: 0,
+          explanation:
+            'autoLink="web" tự động chuyển URL thành clickable link.',
+        },
+        {
+          id: 49,
+          category: "UI Components",
+          question: "ScrollView cho phép khai báo nhiều view con bên trong?",
+          options: ["Đúng", "Sai"],
+          correct: 1,
+          explanation: "ScrollView chỉ chứa được MỘT view con trực tiếp.",
+        },
+        {
+          id: 50,
+          category: "UI Components",
+          question: "Phát biểu nào về lớp ScrollView là KHÔNG chính xác?",
+          options: [
+            "Cho phép cuộn cả theo chiều dọc và chiều ngang",
+            "Cho phép cuộn khi nội dung lớn hơn kích thước màn hình",
+            "Chỉ có 1 đối tượng con trực tiếp",
+            "Các đáp án đều chính xác",
+          ],
+          correct: 0,
+          explanation:
+            "ScrollView chỉ cuộn dọc. HorizontalScrollView cuộn ngang.",
+        },
+        {
+          id: 51,
+          category: "UI Components",
+          question:
+            "Muốn lấy nội dung của editText và lưu vào biến String thì dùng cách nào?",
+          options: [
+            "editText.getText().toString()",
+            "editText.getText()",
+            "editText.getString()",
+            "editText.toString()",
+          ],
+          correct: 0,
+          explanation:
+            "getText() trả về Editable, cần toString() để chuyển thành String.",
+        },
+        {
+          id: 52,
+          category: "UI Components",
+          question:
+            "Phương thức nào kiểm tra xem CheckBox hoặc RadioButton có đang được chọn?",
+          options: [
+            "isChecked()",
+            "getChecked()",
+            "isSelected()",
+            "getSelected()",
+          ],
+          correct: 0,
+          explanation: "isChecked() trả về true nếu đang được check.",
+        },
+        {
+          id: 53,
+          category: "UI Components",
+          question: "Phương thức nào thiết lập nội dung cho editText?",
+          options: ["setText()", "setString()", "setContent()", "setValue()"],
+          correct: 0,
+          explanation: 'setText("...") thiết lập nội dung text.',
+        },
+        {
+          id: 54,
+          category: "UI Components",
+          question:
+            "Interface nào xử lý sự kiện khi người dùng thay đổi nội dung EditText?",
+          options: [
+            "TextWatcher",
+            "TextChangedListener",
+            "TextUpdatedListener",
+            "TextEditedListener",
+          ],
+          correct: 0,
+          explanation:
+            "TextWatcher có 3 methods: beforeTextChanged, onTextChanged, afterTextChanged.",
+        },
+        {
+          id: 55,
+          category: "UI Components",
+          question: "Lớp RadioGroup kế thừa trực tiếp từ lớp nào?",
+          options: [
+            "LinearLayout",
+            "RelativeLayout",
+            "TableLayout",
+            "ConstraintLayout",
+          ],
+          correct: 0,
+          explanation: "RadioGroup extends LinearLayout.",
+        },
+        {
+          id: 56,
+          category: "UI Components",
+          question: "Lớp RadioGroup được sử dụng để làm gì?",
+          options: [
+            "Gom nhóm các RadioButton",
+            "Sắp xếp các RadioButton theo dòng hoặc theo cột",
+            "Xác định RadioButton nào đang được chọn",
+            "Các đáp án đều chính xác",
+          ],
+          correct: 3,
+          explanation:
+            "RadioGroup quản lý nhóm RadioButton, đảm bảo chỉ có 1 được chọn.",
+        },
+        {
+          id: 57,
+          category: "UI Components",
+          question: "Lớp Button là lớp con trực tiếp của lớp nào?",
+          options: [
+            "android.widget.TextView",
+            "android.view.View",
+            "java.lang.Object",
+            "android.view.TextView",
+          ],
+          correct: 0,
+          explanation: "Button extends TextView extends View.",
+        },
+        {
+          id: 58,
+          category: "UI Components",
+          question:
+            "Sự kiện nhấn và giữ một nút được thiết lập thông qua phương thức nào?",
+          options: [
+            "setOnLongClickListener",
+            "setOnClickListener",
+            "setOnLongTouchListener",
+            "setOnTouchListener",
+          ],
+          correct: 0,
+          explanation: "setOnLongClickListener() cho long press event.",
+        },
+        {
+          id: 59,
+          category: "UI Components",
+          question:
+            "Đối tượng nào có thể được sử dụng để tạo một nút bấm với nội dung là ảnh?",
+          options: [
+            "Button",
+            "ImageButton",
+            "ImageView",
+            "Các đáp án đều chính xác",
+          ],
+          correct: 3,
+          explanation: "Cả 3 đều có thể hiển thị ảnh và xử lý click.",
+        },
+        {
+          id: 60,
+          category: "UI Components",
+          question:
+            "Giả sử ảnh test.jpg trong drawable, phương thức nào của ImageView thiết lập nội dung là ảnh này?",
+          options: [
+            "setImageResource(R.drawable.test)",
+            "setImageDrawable(R.drawable.test)",
+            "setImageBitmap(R.drawable.test)",
+            "Các đáp án đều chính xác",
+          ],
+          correct: 0,
+          explanation: "setImageResource() nhận resource ID.",
+        },
+        {
+          id: 61,
+          category: "UI Components",
+          question:
+            "Giá trị nào của scaleType của ImageView giữ nguyên tỷ lệ và nội dung ảnh (không bị crop)?",
+          options: ["centerInside", "center", "centerCrop", "fitXY"],
+          correct: 0,
+          explanation:
+            "centerInside scale ảnh để fit trong view mà không crop.",
+        },
+        {
+          id: 62,
+          category: "UI Components",
+          question:
+            "Muốn button có nội dung gồm ảnh bên trái và chữ bên phải thì dùng thuộc tính nào?",
+          options: [
+            "text và drawableLeft",
+            "textRight và drawableLeft",
+            "text và imageLeft",
+            "textRight và imageLeft",
+          ],
+          correct: 0,
+          explanation:
+            "android:text và android:drawableLeft (hoặc drawableStart).",
+        },
+        {
+          id: 63,
+          category: "UI Components",
+          question:
+            "Nếu các button trong activity có setOnClickListener(this), làm thế nào phân biệt button nào được nhấn trong onClick()?",
+          options: [
+            "Phân biệt dựa vào định danh (ID) của đối tượng",
+            "Phân biệt dựa vào tên của đối tượng",
+            "Phân biệt dựa vào vị trí của đối tượng",
+            "Phân biệt dựa vào thứ tự khai báo trong xml",
+          ],
+          correct: 0,
+          explanation: "Dùng view.getId() để lấy ID và so sánh với R.id.xxx.",
+        },
+
+        // ==================== FRAGMENT ====================
+        {
+          id: 64,
+          category: "Fragment",
+          question: "Đáp án nào đúng về Fragment trong Android?",
+          options: [
+            "Fragment là một phần của giao diện trong Activity và có cùng vòng đời với Activity",
+            "Một Activity chỉ có một Fragment",
+            "Fragment có thể hoạt động độc lập không gắn với Activity nào",
+            "Fragment có vòng đời riêng của mình",
+          ],
+          correct: 3,
+          explanation:
+            "Fragment có vòng đời riêng nhưng phụ thuộc vào Activity chứa nó.",
+        },
+        {
+          id: 65,
+          category: "Fragment",
+          question:
+            "Thành phần android nào hiển thị một phần của một activity trên màn hình?",
+          options: ["View", "Manifest", "Intent", "Fragment"],
+          correct: 3,
+          explanation: "Fragment đại diện cho một phần UI trong Activity.",
+        },
+        {
+          id: 66,
+          category: "Fragment",
+          question: "ViewPager được sử dụng cho mục đích gì?",
+          options: [
+            "Swiping Activities",
+            "Swiping Fragments",
+            "Paging Down List Items",
+            "ViewPager Is Not Supported",
+          ],
+          correct: 1,
+          explanation: "ViewPager cho phép vuốt qua lại giữa các Fragment.",
+        },
+        {
+          id: 67,
+          category: "Fragment",
+          question:
+            "Phương thức nào được sử dụng khi khai báo fragment để khởi tạo các đối tượng widget?",
+          options: ["onAttach()", "onCreateView()", "onCreate()", "onStart()"],
+          correct: 1,
+          explanation: "onCreateView() là nơi inflate layout và khởi tạo view.",
+        },
+        {
+          id: 68,
+          category: "Fragment",
+          question:
+            "Phương thức nào gắn fragment vào activity mà các fragment trước đó KHÔNG bị xóa?",
+          options: ["add()", "replace()", "insert()", "show()"],
+          correct: 0,
+          explanation:
+            "add() thêm fragment. replace() xóa fragment cũ trước khi thêm mới.",
+        },
+        {
+          id: 69,
+          category: "Fragment",
+          question:
+            "Phương thức nào gắn fragment vào activity mà các fragment trước đó sẽ bị xóa?",
+          options: ["add()", "replace()", "show()", "insert()"],
+          correct: 1,
+          explanation:
+            "replace() remove các fragment hiện tại trong container.",
+        },
+        {
+          id: 70,
+          category: "Fragment",
+          question:
+            "Phương thức onCreateView() chỉ được gọi một lần trong suốt vòng đời của fragment?",
+          options: ["Đúng", "Sai"],
+          correct: 1,
+          explanation:
+            "onCreateView() có thể được gọi nhiều lần (khi detach/attach lại).",
+        },
+        {
+          id: 71,
+          category: "Fragment",
+          question:
+            "Phát biểu nào đúng về addToBackStack trong FragmentManager?",
+          options: [
+            "Nếu không gọi addToBackStack thì khi remove fragment, fragment đó sẽ bị hủy và người dùng không thể quay lại bằng nút Back.",
+            "Khi gọi addToBackStack thì khi remove fragment, fragment rơi vào trạng thái STOPPED và không thể quay lại.",
+            "Khi không gọi addToBackStack thì fragment rơi vào trạng thái STOPPED và có thể quay lại.",
+          ],
+          correct: 0,
+          explanation:
+            "addToBackStack() cho phép quay lại fragment trước bằng nút Back.",
+        },
+        {
+          id: 72,
+          category: "Fragment",
+          question: "Lớp nào KHÔNG phải là thành phần ứng dụng của Android?",
+          options: ["Fragment", "Activity", "Service", "Broadcast Receiver"],
+          correct: 0,
+          explanation:
+            "4 thành phần chính: Activity, Service, BroadcastReceiver, ContentProvider. Fragment không phải.",
+        },
+        {
+          id: 73,
+          category: "Fragment",
+          question:
+            "Đối tượng nào được sử dụng để tạo giao diện có thể tái sử dụng trong các phần khác nhau của activity?",
+          options: ["Intent", "Service", "BroadcastReceiver", "Fragment"],
+          correct: 3,
+          explanation: "Fragment là UI module có thể tái sử dụng.",
+        },
+        {
+          id: 74,
+          category: "Fragment",
+          question:
+            "Phát biểu nào KHÔNG phải là ưu điểm khi sử dụng fragment (so với activity)?",
+          options: [
+            "Di chuyển giữa các fragment cho phép sử dụng các mẫu thiết kế phức tạp như TabBar hoặc NavigationDrawer.",
+            "Fragment gọn nhẹ hơn activity nên cần ưu tiên sử dụng fragment hơn activity.",
+            "Sử dụng các fragment trong một activity cho phép thực hiện kiểu giao diện thích nghi với các kích thước màn hình khác nhau.",
+            "Cùng một lớp fragment có thể được tái sử dụng ở các activity khác nhau.",
+          ],
+          correct: 1,
+          explanation:
+            "Fragment không nhất thiết gọn nhẹ hơn, và việc chọn phụ thuộc vào use case.",
+        },
+
+        // ==================== RECYCLERVIEW & ADAPTER ====================
+        {
+          id: 75,
+          category: "RecyclerView",
+          question:
+            "Bạn cần implement interface nào để lắng nghe user clicks trong RecyclerView?",
+          options: [
+            "RecyclerView.OnClickListener",
+            "ViewHolder.OnClickListener",
+            "View.OnClickListener",
+            "View.OnKeyListener",
+          ],
+          correct: 2,
+          explanation:
+            "RecyclerView không có built-in click listener. Dùng View.OnClickListener trong ViewHolder.",
+        },
+        {
+          id: 76,
+          category: "RecyclerView",
+          question:
+            "ViewHolder trong Adapter khi sử dụng RecyclerView có vai trò gì?",
+          options: [
+            "Lưu trữ id của từng view trong danh sách",
+            "Có tác dụng render view lên danh sách",
+            "Làm cầu nối giữa data và view",
+          ],
+          correct: 0,
+          explanation:
+            "ViewHolder cache view references để tránh gọi findViewById() nhiều lần.",
+        },
+        {
+          id: 77,
+          category: "RecyclerView",
+          question:
+            "Phương thức nào KHÔNG bắt buộc viết chồng khi kế thừa từ RecyclerView.Adapter?",
+          options: [
+            "onBindViewHolder",
+            "getItemCount",
+            "onCreateViewHolder",
+            "getItemViewType",
+          ],
+          correct: 3,
+          explanation:
+            "getItemViewType() là optional, chỉ cần khi có nhiều loại view khác nhau.",
+        },
+        {
+          id: 78,
+          category: "RecyclerView",
+          question:
+            "Lớp ArrayAdapter KHÔNG sử dụng được với kiểu danh sách nào?",
+          options: ["GridView", "ListView", "Spinner", "RecyclerView"],
+          correct: 3,
+          explanation:
+            "RecyclerView sử dụng RecyclerView.Adapter, không dùng ArrayAdapter.",
+        },
+        {
+          id: 79,
+          category: "RecyclerView",
+          question: "Đâu là phát biểu KHÔNG chính xác về kỹ thuật ViewHolder?",
+          options: [
+            "Giảm số lần sử dụng phương thức findViewById",
+            "Giảm số lần tạo view từ file XML",
+            "Không bắt buộc sử dụng với danh sách kiểu ListView",
+            "Bắt buộc sử dụng với danh sách thuộc kiểu RecyclerView",
+          ],
+          correct: 1,
+          explanation:
+            "ViewHolder giảm findViewById(), không giảm số lần tạo view (inflate).",
+        },
+        {
+          id: 80,
+          category: "RecyclerView",
+          question:
+            "Lớp nào có thể tạo danh sách của danh sách (list of lists) giống Google Play?",
+          options: ["RecyclerView", "ListView", "GridView", "ScrollView"],
+          correct: 0,
+          explanation:
+            "RecyclerView với nested RecyclerView (horizontal trong vertical).",
+        },
+        {
+          id: 81,
+          category: "RecyclerView",
+          question:
+            "Lớp nào được kế thừa để tạo adapter hiển thị các kiểu dữ liệu tùy ý?",
+          options: [
+            "BaseAdapter",
+            "ArrayAdapter",
+            "CustomAdapter",
+            "ListAdapter",
+          ],
+          correct: 0,
+          explanation: "BaseAdapter cho phép customize hoàn toàn.",
+        },
+        {
+          id: 82,
+          category: "RecyclerView",
+          question:
+            "Phương thức nào KHÔNG bắt buộc viết chồng khi kế thừa từ BaseAdapter?",
+          options: [
+            "getCount()",
+            "getItemId()",
+            "getItemViewType()",
+            "getView()",
+          ],
+          correct: 2,
+          explanation: "getItemViewType() là optional.",
+        },
+        {
+          id: 83,
+          category: "RecyclerView",
+          question:
+            "Adapter KHÔNG được sử dụng để thiết lập dữ liệu cho đối tượng nào?",
+          options: ["Spinner", "ListView", "GridView", "ScrollView"],
+          correct: 3,
+          explanation: "ScrollView không sử dụng Adapter.",
+        },
+        {
+          id: 84,
+          category: "RecyclerView",
+          question:
+            "Đối tượng Spinner có thể được sử dụng thay thế cho đối tượng nào?",
+          options: [
+            "CheckBox",
+            "EditText",
+            "RadioButton",
+            "AutoCompleteTextView",
+          ],
+          correct: 2,
+          explanation:
+            "Spinner và RadioButton đều cho phép chọn 1 item từ list.",
+        },
+        {
+          id: 85,
+          category: "RecyclerView",
+          question: "Lớp RecyclerView được sử dụng với mục đích gì?",
+          options: [
+            "Truy nhập cơ sở dữ liệu",
+            "Là một kiểu layout để bố trí giao diện",
+            "Là công cụ quản lý bộ nhớ",
+            "Hiển thị một danh sách",
+          ],
+          correct: 3,
+          explanation: "RecyclerView hiển thị danh sách lớn một cách hiệu quả.",
+        },
+        {
+          id: 86,
+          category: "RecyclerView",
+          question:
+            "Để hiện một danh sách với kiểu giao diện phức tạp nhiều thành phần, đối tượng nào có cách thiết lập khác với các đối tượng còn lại?",
+          options: [
+            "AutoCompleteTextView",
+            "Spinner",
+            "RecyclerView",
+            "GridView",
+            "ListView",
+          ],
+          correct: 2,
+          explanation:
+            "RecyclerView dùng RecyclerView.Adapter, còn lại dùng ArrayAdapter.",
+        },
+
+        // ==================== MENU ====================
+        {
+          id: 87,
+          category: "Menu",
+          question:
+            "Kiểu menu nào được kích hoạt khi nhấn và giữ widget trong 1 khoảng thời gian?",
+          options: ["Popup Menu", "Context Menu", "Option Menu"],
+          correct: 1,
+          explanation: "Context Menu hiện khi long-press view.",
+        },
+        {
+          id: 88,
+          category: "Menu",
+          question:
+            "Nếu muốn một menu item luôn xuất hiện trên action bar thì giá trị showAsAction nào được chọn?",
+          options: ["never", "ifRoom", "always", "withText"],
+          correct: 2,
+          explanation: "always đảm bảo menu item luôn hiển thị trên ActionBar.",
+        },
+        {
+          id: 89,
+          category: "Menu",
+          question:
+            "Phương thức onCreateOptionsMenu() được sử dụng khi tạo menu dạng nào?",
+          options: [
+            "Popup Menu",
+            "ActionBar Menu",
+            "Context Menu",
+            "Navigation Drawer",
+          ],
+          correct: 1,
+          explanation: "onCreateOptionsMenu() tạo Options Menu trên ActionBar.",
+        },
+        {
+          id: 90,
+          category: "Menu",
+          question: "Ta thường dùng context menu cho đối tượng view nào?",
+          options: ["Button", "EditText", "RecyclerView", "CheckBox"],
+          correct: 2,
+          explanation: "Context menu thường dùng cho list items.",
+        },
+        {
+          id: 91,
+          category: "Menu",
+          question:
+            "Nếu phương thức onCreateOptionsMenu được viết chồng trong activity, loại menu nào sẽ được tạo?",
+          options: [
+            "Context Menu",
+            "Popup Menu",
+            "Navigation Drawer Menu",
+            "ActionBar Menu",
+          ],
+          correct: 3,
+          explanation: "onCreateOptionsMenu() tạo ActionBar/Options Menu.",
+        },
+        {
+          id: 92,
+          category: "Menu",
+          question:
+            "Nếu ứng dụng có nhiều menu chức năng không thường xuyên cần truy cập, kiểu thiết kế giao diện nào phù hợp?",
+          options: [
+            "Navigation Drawer",
+            "Tab layout",
+            "Layout có nhiều nút bấm",
+            "Layout dạng có action bar",
+          ],
+          correct: 0,
+          explanation: "Navigation Drawer ẩn menu ở cạnh màn hình.",
+        },
+
+        // ==================== DIALOG ====================
+        {
+          id: 93,
+          category: "Dialog",
+          question:
+            "Phương thức nào được sử dụng để hiển thị một đối tượng dialog?",
+          options: ["show()", "open()", "start()", "create()"],
+          correct: 0,
+          explanation: "dialog.show() hiển thị dialog.",
+        },
+        {
+          id: 94,
+          category: "Dialog",
+          question: "Phương thức nào được sử dụng để đóng 1 dialog đang mở?",
+          options: ["dismiss()", "finish()", "close()", "destroy()"],
+          correct: 0,
+          explanation: "dialog.dismiss() đóng dialog.",
+        },
+
+        // ==================== DATA STORAGE ====================
+        {
+          id: 95,
+          category: "Data Storage",
+          question: "Ta nên sử dụng SharedPreferences khi nào?",
+          options: [
+            "Lưu dữ liệu nhỏ dạng key/value trong cùng phiên làm việc",
+            "Lưu dữ liệu nhỏ dạng key/value trong các phiên làm việc khác nhau",
+            "Lưu dữ liệu lớn dạng key/value trong cùng phiên làm việc",
+            "Lưu dữ liệu lớn dạng key/value trong các phiên làm việc khác nhau",
+          ],
+          correct: 1,
+          explanation:
+            "SharedPreferences lưu dữ liệu nhỏ và persist qua các phiên làm việc.",
+        },
+        {
+          id: 96,
+          category: "Data Storage",
+          question:
+            "Dữ liệu yêu cầu bảo mật, riêng tư thì KHÔNG nên lưu theo cách nào?",
+          options: [
+            "Shared Preferences",
+            "External Storage",
+            "Nhúng vào tài nguyên",
+            "Internal Storage",
+          ],
+          correct: 1,
+          explanation:
+            "External Storage có thể được truy cập bởi các app khác.",
+        },
+        {
+          id: 97,
+          category: "Data Storage",
+          question:
+            "Muốn lưu dữ liệu lâu dài, không bị xóa kể cả khi gỡ app, thì chọn phương án nào?",
+          options: [
+            "External Storage",
+            "Shared Preferences",
+            "Internal Storage",
+          ],
+          correct: 0,
+          explanation: "External Storage không bị xóa khi gỡ app.",
+        },
+        {
+          id: 98,
+          category: "Data Storage",
+          question:
+            "Phương án nào thích hợp nhất cho việc lưu trữ các cài đặt của ứng dụng?",
+          options: [
+            "External Storage",
+            "Shared Preferences",
+            "Internal Storage",
+            "SQLite Databases",
+          ],
+          correct: 1,
+          explanation: "SharedPreferences phù hợp cho settings/preferences.",
+        },
+        {
+          id: 99,
+          category: "Data Storage",
+          question: "Phương thức openFileInput() được sử dụng với mục đích gì?",
+          options: [
+            "Mở file trong thư mục cài đặt của ứng dụng để đọc",
+            "Mở file trong thư mục cài đặt của ứng dụng để ghi",
+            "Mở file trong thư mục dùng chung để đọc",
+            "Mở file trong thư mục dùng chung để ghi",
+          ],
+          correct: 0,
+          explanation: "openFileInput() mở file từ Internal Storage để đọc.",
+        },
+        {
+          id: 100,
+          category: "Data Storage",
+          question:
+            "Việc truy nhập file nào cần yêu cầu cấp quyền từ người dùng?",
+          options: [
+            "Truy nhập file từ bộ nhớ dùng chung giữa các ứng dụng",
+            "Truy nhập file trong thư mục cài đặt",
+            "Truy nhập file trong thư mục res",
+            "Truy nhập file trong thư mục assets",
+          ],
+          correct: 0,
+          explanation:
+            "External Storage cần runtime permission từ Android 6.0.",
+        },
+        {
+          id: 101,
+          category: "Data Storage",
+          question:
+            "Việc truy nhập file ở bộ nhớ ngoài cần cấp quyền từ người dùng bắt đầu từ phiên bản Android nào?",
+          options: ["Android 5.0", "Android 6.0", "Android 7.0", "Android 8.0"],
+          correct: 1,
+          explanation: "Android 6.0 (API 23) giới thiệu Runtime Permissions.",
+        },
+        {
+          id: 102,
+          category: "Data Storage",
+          question:
+            "Đối tượng thuộc lớp nào được sử dụng để ghi dữ liệu vào file?",
+          options: ["InputStream", "OutputStream", "ReadStream", "WriteStream"],
+          correct: 1,
+          explanation: "OutputStream để ghi, InputStream để đọc.",
+        },
+        {
+          id: 103,
+          category: "Data Storage",
+          question:
+            "Đối tượng thuộc lớp nào được sử dụng để đọc dữ liệu từ file?",
+          options: ["InputStream", "OutputStream", "ReadStream", "WriteStream"],
+          correct: 0,
+          explanation: "InputStream để đọc dữ liệu.",
+        },
+
+        // ==================== SQLITE ====================
+        {
+          id: 104,
+          category: "SQLite",
+          question:
+            "Thư viện của hệ quản trị CSDL nào được tích hợp sẵn trong Android?",
+          options: ["Oracle", "MySQL", "DB2", "SQLite", "SQL Server"],
+          correct: 3,
+          explanation: "SQLite là built-in database trong Android.",
+        },
+        {
+          id: 105,
+          category: "SQLite",
+          question: "Phát biểu nào về thư viện SQLite trên Android là SAI?",
+          options: [
+            "Cần phải kết nối đến server",
+            "Cần phải khai báo file lưu trữ dữ liệu",
+            "Dữ liệu có thể truy nhập bởi các ứng dụng khác",
+            "Không cần khai báo thêm thư viện trong gradle",
+          ],
+          correct: 0,
+          explanation: "SQLite là local database, không cần server.",
+        },
+        {
+          id: 106,
+          category: "SQLite",
+          question:
+            "Các bảng dữ liệu SQLite của ứng dụng có thể được lưu trữ như thế nào?",
+          options: [
+            "Có thể lưu trữ vào file ở thư mục cài đặt hoặc thư mục dùng chung",
+            "Chỉ có thể lưu trữ vào file ở thư mục cài đặt",
+            "Chỉ có thể lưu trữ vào file ở thư mục dùng chung",
+            "Thư viện SQLite không lưu trữ dữ liệu vào file",
+          ],
+          correct: 0,
+          explanation:
+            "SQLite database có thể lưu ở Internal hoặc External storage.",
+        },
+        {
+          id: 107,
+          category: "SQLite",
+          question:
+            'Câu lệnh db.execSQL("insert into...") trả về thông tin gì?',
+          options: [
+            "Số bản ghi bị ảnh hưởng",
+            "ID của bản ghi vừa được thêm",
+            "Phương thức execSQL() không có giá trị trả về",
+          ],
+          correct: 2,
+          explanation:
+            "execSQL() trả về void. Dùng insert() để có return value.",
+        },
+        {
+          id: 108,
+          category: "SQLite",
+          question:
+            'db.insert("tblUsers", null, new ContentValues()) trả về kết quả như thế nào?',
+          options: [
+            "Lệnh insert thành công, trả về id của bản ghi mới",
+            "Lệnh insert không thành công, trả về giá trị -1",
+            "Dòng lệnh bị lỗi, không thực hiện được",
+          ],
+          correct: 1,
+          explanation:
+            "ContentValues rỗng không có dữ liệu để insert, trả về -1.",
+        },
+
+        // ==================== ROOM DATABASE ====================
+        {
+          id: 109,
+          category: "Room Database",
+          question: "Lợi ích của việc sử dụng Room database?",
+          options: [
+            "Tự động cập nhật UI khi room database thay đổi.",
+            "Giúp app không bị mất dữ liệu khi crash",
+            "Giúp quản lý nhiều trình backends",
+            "Sử dụng mô hình DAO, cung cấp cơ chế ánh xạ các phương thức Java với các câu truy vấn database.",
+          ],
+          correct: 3,
+          explanation:
+            "Room cung cấp abstraction layer trên SQLite, sử dụng DAO pattern.",
+        },
+        {
+          id: 110,
+          category: "Room Database",
+          question: "Phát biểu nào về RoomDatabase là đúng?",
+          options: [
+            "RoomDatabase sẽ tự tạo các bảng CSDL và quản lý CSDL",
+            "Là phiên bản trước của DatabaseOpenHelper",
+            "Trong RoomDatabase cần viết các câu lệnh SQL để tạo bảng",
+          ],
+          correct: 0,
+          explanation: "Room tự động tạo bảng dựa trên @Entity annotations.",
+        },
+        {
+          id: 111,
+          category: "Room Database",
+          question:
+            "Thư viện Room cung cấp cách thức truy cập từ hệ quản trị CSDL nào?",
+          options: ["SQLite", "SQL Server", "MySQL", "MariaDB"],
+          correct: 0,
+          explanation: "Room là abstraction layer trên SQLite.",
+        },
+        {
+          id: 112,
+          category: "Room Database",
+          question:
+            "Khi sử dụng Room, chú thích nào đánh dấu một lớp ứng với một bảng trong CSDL?",
+          options: ["@Entity", "@Dao", "@PrimaryKey", "@Database"],
+          correct: 0,
+          explanation: "@Entity đánh dấu class là một bảng.",
+        },
+        {
+          id: 113,
+          category: "Room Database",
+          question:
+            "File database trong Room được lưu vào vị trí nào trong thư mục dành riêng của ứng dụng?",
+          options: ["databases", "cache", "shared_prefs", "files"],
+          correct: 0,
+          explanation: "Room database files được lưu trong thư mục databases.",
+        },
+        {
+          id: 114,
+          category: "Room Database",
+          question: "Thư viện Room được sử dụng với mục đích gì?",
+          options: [
+            "Xác thực người dùng",
+            "Thực hiện các thao tác cơ sở dữ liệu",
+            "Kết nối mạng",
+            "Mã hóa dữ liệu",
+          ],
+          correct: 1,
+          explanation: "Room là persistence library cho SQLite.",
+        },
+        {
+          id: 115,
+          category: "Room Database",
+          question:
+            "Để xóa sinh viên theo mã số trong Room DAO, điền vào chỗ trống:\n\n@Dao\ninterface StudentDao {\n    [___]\n    fun deleteStudentByMssv(mssv: Int)\n}",
+          options: [
+            '@Delete("DELETE FROM students WHERE mssv = :mssv")',
+            "@Delete",
+            '@Query("DELETE FROM students WHERE mssv = mssv")',
+            '@Query("DELETE FROM students WHERE mssv = :mssv")',
+          ],
+          correct: 3,
+          explanation:
+            "Dùng @Query với DELETE statement. :mssv là parameter binding.",
+        },
+
+        // ==================== VIEWMODEL & LIVEDATA ====================
+        {
+          id: 116,
+          category: "ViewModel & LiveData",
+          question: "Phát biểu nào đúng về ViewModel?",
+          options: [
+            "ViewModel có vòng đời giống với Activity",
+            "ViewModel vẫn active ngay cả khi Activity đang ở trong Back Stack",
+            "ViewModel không thể cập nhật dữ liệu khi UI thay đổi",
+            "UI không thể cập nhật khi dữ liệu trong ViewModel thay đổi",
+          ],
+          correct: 1,
+          explanation:
+            "ViewModel survive configuration changes và vẫn active khi Activity trong back stack.",
+        },
+        {
+          id: 117,
+          category: "ViewModel & LiveData",
+          question: "Phát biểu nào về LiveData là đúng?",
+          options: [
+            "Dữ liệu vẫn tồn tại ngay cả khi thiết bị xoay màn hình",
+            "Dữ liệu dạng nguyên thủy",
+            "Dữ liệu phụ thuộc vào dữ liệu đang nhập trên Activity",
+            "Dữ liệu luôn cần cập nhật với server",
+          ],
+          correct: 0,
+          explanation:
+            "LiveData trong ViewModel survive configuration changes.",
+        },
+        {
+          id: 118,
+          category: "ViewModel & LiveData",
+          question: "ViewModel được tạo như thế nào?",
+          options: [
+            "ViewModel chỉ được tạo một lần trong lần đầu tiên Activity gọi onCreate; các lần gọi lại do cấu hình thay đổi, ViewModel sẽ không được tạo mới.",
+            "ViewModel được tạo mới mỗi khi ứng dụng gọi onCreate",
+            "ViewModel chỉ được tạo mới một lần và không bao giờ tạo lại",
+          ],
+          correct: 0,
+          explanation:
+            "ViewModel được tạo lần đầu và tái sử dụng khi configuration change.",
+        },
+        {
+          id: 119,
+          category: "ViewModel & LiveData",
+          question: "LiveData trong Android được sử dụng để làm gì?",
+          options: [
+            "Lưu trữ dữ liệu lâu dài",
+            "Quan sát và phản ứng với các thay đổi của dữ liệu một cách tự động",
+            "Thay thế toàn bộ ViewModel",
+            "Hiển thị thông báo lỗi",
+          ],
+          correct: 1,
+          explanation:
+            "LiveData là observable data holder class, lifecycle-aware.",
+        },
+        {
+          id: 120,
+          category: "ViewModel & LiveData",
+          question:
+            "Lớp nào được sử dụng để theo dõi sự thay đổi trong vòng đời của một activity?",
+          options: [
+            "LiveData",
+            "LifecycleObserver",
+            "ViewModel",
+            "DataBinding",
+          ],
+          correct: 0,
+          explanation:
+            "LiveData là lifecycle-aware, tự động quản lý subscription.",
+        },
+        {
+          id: 121,
+          category: "ViewModel & LiveData",
+          question: "Phát biểu nào KHÔNG chính xác về ViewModel?",
+          options: [
+            "ViewModel có thể chia sẻ dữ liệu giữa các fragment.",
+            "ViewModel có thể chia sẻ dữ liệu giữa các activity.",
+            "Mỗi fragment có thể tạo ViewModel riêng.",
+            "Fragment có thể truy nhập vào ViewModel của activity chủ.",
+          ],
+          correct: 1,
+          explanation:
+            "ViewModel scope là Activity hoặc Fragment. Không chia sẻ giữa các Activity khác nhau.",
+        },
+        {
+          id: 122,
+          category: "ViewModel & LiveData",
+          question: "LiveData là một phần của thư viện nào trong Android?",
+          options: [
+            "AndroidX ViewBinding",
+            "Android Room",
+            "Android Jetpack",
+            "Android Core Library",
+          ],
+          correct: 2,
+          explanation:
+            "LiveData là một phần của Android Jetpack (Android Architecture Components).",
+        },
+
+        // ==================== DATA BINDING ====================
+        {
+          id: 123,
+          category: "Data Binding",
+          question:
+            "Thành phần nào là đối tượng được tự động tạo bởi Data Binding?",
+          options: ["ViewModel", "LiveData", "Binding Class", "LayoutInflater"],
+          correct: 2,
+          explanation:
+            "Data Binding tự động generate Binding class từ layout XML.",
+        },
+        {
+          id: 124,
+          category: "Data Binding",
+          question:
+            "Để kích hoạt Data Binding trong dự án, cần thêm gì vào build.gradle?",
+          options: [
+            "enableDataBinding()",
+            "buildFeatures { dataBinding = true }",
+            "Không cần thay đổi gì",
+            "dataBinding.enabled = true",
+          ],
+          correct: 1,
+          explanation: "android { buildFeatures { dataBinding = true } }",
+        },
+        {
+          id: 125,
+          category: "Data Binding",
+          question:
+            "Khi sử dụng Data Binding, thuộc tính nào trong XML dùng để gắn giá trị từ ViewModel vào View?",
+          options: ["#{}", "@{}", "%{}", "$[]"],
+          correct: 1,
+          explanation:
+            'Syntax: @{expression}. Ví dụ: android:text="@{viewModel.userName}"',
+        },
+        {
+          id: 126,
+          category: "Data Binding",
+          question:
+            "Nếu activity là SampleActivity.kt với layout activity_sample.xml, tên lớp binding được tạo tự động là gì?",
+          options: [
+            "SampleActivityBinding",
+            "ActivitySampleBinding",
+            "sample_activity_binding",
+            "activity_sample_binding",
+          ],
+          correct: 1,
+          explanation:
+            "Binding class name: PascalCase của layout file. activity_sample.xml → ActivitySampleBinding.",
+        },
+        {
+          id: 127,
+          category: "Data Binding",
+          question:
+            'Sử dụng Data Binding expression, điền vào chỗ trống để khi CheckBox được chọn thì TextView hiện, ngược lại thì ẩn:\n\nandroid:visibility="[___]"',
+          options: [
+            "@{checkBox.checked ? View.VISIBLE : View.GONE}",
+            "@{checkBox.isChecked ? View.VISIBLE : View.GONE}",
+            "@{checkBox.checked == true ? View.VISIBLE : View.GONE}",
+            "@{if(checkBox.checked) View.VISIBLE else View.GONE}",
+          ],
+          correct: 0,
+          explanation:
+            "Syntax: @{condition ? valueIfTrue : valueIfFalse}. checkBox.checked returns boolean.",
+        },
+
+        // ==================== THREADING & ASYNC ====================
+        {
+          id: 128,
+          category: "Threading",
+          question:
+            "Phương thức nào bắt buộc phải viết chồng khi sử dụng lớp AsyncTask?",
+          options: [
+            "doInBackground()",
+            "onPostExecute()",
+            "onPreExecute()",
+            "onProgressUpdate()",
+          ],
+          correct: 0,
+          explanation:
+            "doInBackground() là abstract method duy nhất bắt buộc override.",
+        },
+        {
+          id: 129,
+          category: "Threading",
+          question: "Bản chất của AsyncTask trong Android là?",
+          options: [
+            "Giống như thread bình thường, người dùng quản lý việc thread được chạy.",
+            "Tạo task chạy ngầm, người lập trình quản lý khi nào task được chạy",
+            "Tạo task chạy ngầm, hệ điều hành quản lý khi nào task được chạy",
+            "Giống như process trong linux",
+          ],
+          correct: 2,
+          explanation: "AsyncTask được hệ thống Android quản lý.",
+        },
+        {
+          id: 130,
+          category: "Threading",
+          question:
+            "Tác vụ quản lý việc phản hồi các tương tác với người dùng chạy ở thread nào?",
+          options: [
+            "Main thread hay UI thread",
+            "Background Thread",
+            "Worker thread",
+            "AsyncTask Thread",
+          ],
+          correct: 0,
+          explanation: "Main thread (UI thread) xử lý tất cả UI events.",
+        },
+        {
+          id: 131,
+          category: "Threading",
+          question:
+            "UI thread có bao nhiêu thời gian để thực hiện tác vụ để không bị treo giao diện?",
+          options: ["10 ms", "12 ms", "16 ms", "100 ms"],
+          correct: 2,
+          explanation: "16ms tương ứng với 60 FPS.",
+        },
+        {
+          id: 132,
+          category: "Threading",
+          question: "Broadcast receivers chạy ở thread nào trong Android?",
+          options: [
+            "Worker Thread",
+            "Main Thread",
+            "Background Thread",
+            "System Thread",
+          ],
+          correct: 1,
+          explanation: "BroadcastReceiver.onReceive() chạy trên Main Thread.",
+        },
+        {
+          id: 133,
+          category: "Threading",
+          question:
+            "Khi sử dụng AsyncTask, phương thức nào KHÔNG được sử dụng để cập nhật giao diện?",
+          options: [
+            "onPostExecute()",
+            "onProgressUpdate()",
+            "doInBackground()",
+            "onPreExecute()",
+          ],
+          correct: 2,
+          explanation:
+            "doInBackground() chạy trên background thread, không được update UI.",
+        },
+        {
+          id: 134,
+          category: "Threading",
+          question:
+            "Các câu lệnh trong onCreate() của một lớp service chạy trong luồng nào?",
+          options: [
+            "Main thread hoặc UI thread",
+            "Background thread",
+            "Worker thread",
+          ],
+          correct: 0,
+          explanation: "Service lifecycle methods chạy trên Main Thread.",
+        },
+        {
+          id: 135,
+          category: "Threading",
+          question:
+            "Khi startService() được gọi lại với cùng 1 lớp service thì onCreate() của service đó có được gọi lại không?",
+          options: ["Có", "Không"],
+          correct: 1,
+          explanation:
+            "onCreate() chỉ được gọi 1 lần khi service được tạo. onStartCommand() được gọi mỗi lần startService().",
+        },
+        {
+          id: 136,
+          category: "Threading",
+          question:
+            "Để truyền tham số kiểu String cho doInBackground() của AsyncTask tên SlowTask, dùng cách nào?",
+          options: [
+            'new SlowTask().execute("param1", "param2");',
+            'new SlowTask("param1", "param2").execute();',
+            'new SlowTask().run("param1", "param2");',
+            'new SlowTask("param1", "param2").run();',
+          ],
+          correct: 0,
+          explanation:
+            "execute() nhận varargs parameters cho doInBackground().",
+        },
+
+        // ==================== COROUTINES ====================
+        {
+          id: 137,
+          category: "Coroutines",
+          question: "Mục đích chính của Coroutine trong Kotlin là gì?",
+          options: [
+            "Lưu trữ dữ liệu",
+            "Phân tích chuỗi định dạng XML",
+            "Xử lý ảnh",
+            "Đơn giản hóa việc lập trình bất đồng bộ",
+          ],
+          correct: 3,
+          explanation:
+            "Coroutines cung cấp cách viết code bất đồng bộ theo style đồng bộ.",
+        },
+        {
+          id: 138,
+          category: "Coroutines",
+          question:
+            "Trong lập trình với Coroutine, hàm launch() trả về loại đối tượng nào?",
+          options: ["Thread", "CoroutineScope", "Job", "Deferred"],
+          correct: 2,
+          explanation: "launch{} trả về Job. async{} trả về Deferred.",
+        },
+        {
+          id: 139,
+          category: "Coroutines",
+          question:
+            "Dispatcher nào được sử dụng để chạy coroutine trên luồng giao diện?",
+          options: [
+            "Dispatchers.IO",
+            "Dispatchers.Default",
+            "newSingleThreadContext()",
+            "Dispatchers.Main",
+          ],
+          correct: 3,
+          explanation: "Dispatchers.Main chạy trên Android Main Thread.",
+        },
+        {
+          id: 140,
+          category: "Coroutines",
+          question:
+            "Để chạy đoạn chương trình ở luồng background trong activity, lệnh nào được sử dụng?",
+          options: [
+            "lifecycleScope.launch(Dispatchers.Main) { ... }",
+            "lifecycleScope.launch(Dispatchers.IO) { ... }",
+            "viewmodelScope.launch(Dispatchers.IO) { ... }",
+            "viewmodelScope.launch(Dispatchers.Main) { ... }",
+          ],
+          correct: 1,
+          explanation:
+            "lifecycleScope gắn với Activity lifecycle. Dispatchers.IO cho background operations.",
+        },
+        {
+          id: 141,
+          category: "Coroutines",
+          question:
+            "Điều gì xảy ra nếu withTimeout() vượt quá thời gian giới hạn?",
+          options: [
+            "Gửi cảnh báo nhưng không dừng coroutine",
+            "Coroutine tiếp tục chạy",
+            "Gây ra ngoại lệ TimeoutCancellationException",
+            "Dừng hoàn toàn ứng dụng",
+          ],
+          correct: 2,
+          explanation:
+            "withTimeout() throw TimeoutCancellationException nếu timeout.",
+        },
+        {
+          id: 142,
+          category: "Coroutines",
+          question:
+            'Cho đoạn chương trình sau, kết quả in ra là gì?\n\nfun main() {\n    runBlocking {\n        launch { delay(2000L); print("A") }\n        launch { delay(1000L); print("B") }\n        print("C")\n    }\n}',
+          options: ["CBA", "BAC", "CAB", "ABC"],
+          correct: 0,
+          explanation:
+            "C in ngay (không delay). B in sau 1s. A in sau 2s. Kết quả: CBA.",
+        },
+
+        // ==================== NETWORKING ====================
+        {
+          id: 143,
+          category: "Networking",
+          question:
+            "Lớp nào KHÔNG được sử dụng để xử lý kết nối mạng trong Android?",
+          options: ["Retrofit", "Volley", "HttpURLConnection", "JSONObject"],
+          correct: 3,
+          explanation: "JSONObject dùng để parse JSON, không phải networking.",
+        },
+        {
+          id: 144,
+          category: "Networking",
+          question:
+            "Việc truyền nhận dữ liệu qua Internet có thể thực hiện trong UI thread không?",
+          options: ["Có", "Không"],
+          correct: 1,
+          explanation:
+            "Network operations trên Main Thread gây NetworkOnMainThreadException.",
+        },
+        {
+          id: 145,
+          category: "Networking",
+          question:
+            "Trong ứng dụng download file, phương thức nào của HttpURLConnection xác định kích thước file?",
+          options: [
+            "getContentLength()",
+            "getContentSize()",
+            "getFileLength()",
+            "getFileSize()",
+          ],
+          correct: 0,
+          explanation: "getContentLength() trả về Content-Length header.",
+        },
+        {
+          id: 146,
+          category: "Networking",
+          question:
+            "Khi ứng dụng cần kết nối Internet thì quyền được khai báo trong file nào?",
+          options: [
+            "File AndroidManifest.xml",
+            "File build.gradle",
+            "File MainActivity.java",
+            "Không cần khai báo",
+          ],
+          correct: 0,
+          explanation:
+            '<uses-permission android:name="android.permission.INTERNET"/> trong AndroidManifest.',
+        },
+        {
+          id: 147,
+          category: "Networking",
+          question:
+            "Lớp nào có thể kết nối Internet không theo các giao thức chuẩn?",
+          options: ["Volley", "Socket", "HttpURLConnection", "URL"],
+          correct: 1,
+          explanation: "Socket cho phép kết nối TCP/UDP trực tiếp.",
+        },
+        {
+          id: 148,
+          category: "Networking",
+          question:
+            "Đối tượng thuộc lớp nào được sử dụng để đọc dữ liệu tải về từ Internet?",
+          options: [
+            "InputStream",
+            "OutputStream",
+            "UploadStream",
+            "DownloadStream",
+          ],
+          correct: 0,
+          explanation: "InputStream để đọc dữ liệu.",
+        },
+        {
+          id: 149,
+          category: "Networking",
+          question:
+            'Giả sử API endpoint: https://example.com/users/123. Đoạn mã Retrofit:\n\n@GET("users/{uid}")\nsuspend fun getUser([___] userId:String): User\n\nĐiền vào chỗ trống:',
+          options: [
+            '@Path("uid")',
+            '@Path("userId")',
+            '@Query("uid")',
+            '@Query("userId")',
+          ],
+          correct: 0,
+          explanation:
+            "@Path thay thế {uid} trong URL. Tên trong @Path phải match với placeholder.",
+        },
+
+        // ==================== MANIFEST & CONFIGURATION ====================
+        {
+          id: 150,
+          category: "Manifest",
+          question:
+            "Tập tin nào chịu trách nhiệm thiết lập các quyền, Activity, Service, BroadCast Receiver?",
+          options: [
+            "AndroidManifest",
+            "MainLayout",
+            "MainActivity",
+            "Resource",
+          ],
+          correct: 0,
+          explanation:
+            "AndroidManifest.xml khai báo tất cả components, permissions.",
+        },
+        {
+          id: 151,
+          category: "Manifest",
+          question:
+            "Muốn thiết lập Activity nào chạy đầu tiên thì thiết lập ở đâu?",
+          options: [
+            "Trong file java tương ứng",
+            "Trong file AndroidManifest.xml",
+            "Thiết lập trong file layout chính",
+            "Đặt tên là MainActivity",
+          ],
+          correct: 1,
+          explanation:
+            "Launcher Activity được đánh dấu bằng intent-filter trong Manifest.",
+        },
+        {
+          id: 152,
+          category: "Manifest",
+          question:
+            "Để thiết lập quan hệ cha - con giữa 2 Activities ta khai báo ở đâu?",
+          options: [
+            "Trong file java tương ứng",
+            "Trong file AndroidManifest.xml",
+            "Thiết lập trong file layout chính",
+            "Đặt tên activity cha là MainActivity",
+          ],
+          correct: 1,
+          explanation:
+            "android:parentActivityName trong Manifest khai báo parent activity.",
+        },
+        {
+          id: 153,
+          category: "Manifest",
+          question:
+            "Tham số android:maxSdkVersion trong AndroidManifest.xml không được khuyến khích sử dụng?",
+          options: ["Đúng", "Sai"],
+          correct: 0,
+          explanation:
+            "maxSdkVersion có thể khiến app bị gỡ khi user upgrade Android.",
+        },
+        {
+          id: 154,
+          category: "Manifest",
+          question:
+            "Khi dùng đối tượng nào, ta KHÔNG nhất thiết phải khai báo trong AndroidManifest.xml?",
+          options: ["Service", "Broadcast Receiver", "Activity"],
+          correct: 1,
+          explanation:
+            "BroadcastReceiver có thể đăng ký động bằng registerReceiver().",
+        },
+        {
+          id: 155,
+          category: "Manifest",
+          question: "Thành phần nào nằm trong file AndroidManifest.xml?",
+          options: [
+            "Source code",
+            "List of strings used in the app",
+            "Permission that the application requires",
+            "List of accounts",
+          ],
+          correct: 2,
+          explanation:
+            "Manifest chứa permissions, components, package name, etc.",
+        },
+        {
+          id: 156,
+          category: "Manifest",
+          question: "Quyền nào cần xin để truy cập GPS?",
+          options: [
+            '<uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION"/>',
+            '<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />',
+            '<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />',
+            '<uses-permission android:name="android.permission.ACCESS_GPS_STATE" />',
+          ],
+          correct: 1,
+          explanation: "ACCESS_FINE_LOCATION cho GPS chính xác.",
+        },
+
+        // ==================== DEBUGGING ====================
+        {
+          id: 157,
+          category: "Debugging",
+          question: "Breakpoint trong android là gì?",
+          options: [
+            "Ngắt chương trình (Breaks the application)",
+            "Ngắt chế độ phát triển (Breaks the development code)",
+            "Ngắt các lệnh đang thực thi (Breaks the execution)",
+            "Không có phương án ở trên.",
+          ],
+          correct: 2,
+          explanation: "Breakpoint dừng execution tại dòng code để debug.",
+        },
+        {
+          id: 158,
+          category: "Debugging",
+          question:
+            "Để xem logcat với lệnh Log.d() ta cần chọn bộ lọc Log levels là gì?",
+          options: ["Debug hoặc Verbose", "Info", "Warning", "Error"],
+          correct: 0,
+          explanation: "Log.d() là Debug level. Verbose hiển thị tất cả.",
+        },
+        {
+          id: 159,
+          category: "Debugging",
+          question:
+            "Cả Toast và Logcat đều dùng để gỡ rối chương trình. Phát biểu nào SAI?",
+          options: [
+            "Toast hiển thị trên màn hình thiết bị, Logcat hiển thị trên máy phát triển",
+            "Logcat chỉ hiển thị các thông tin debug do lập trình viên chủ động xuất ra",
+            "Logcat không hiển thị được nếu không có kênh kết nối giữa PC và thiết bị",
+            "Toast có thể hiển thị hướng dẫn cho người dùng",
+          ],
+          correct: 1,
+          explanation: "Logcat hiển thị cả system logs và app logs.",
+        },
+        {
+          id: 160,
+          category: "Debugging",
+          question:
+            "Kỹ thuật debug nào phù hợp nhất cho chương trình có nhiều tiến trình chạy song song?",
+          options: [
+            "Đặt breakpoint và chạy từng dòng lệnh",
+            "Ghi thông tin ra logcat và quan sát",
+            "Toast thông tin lên màn hình thiết bị",
+            "Log thông tin ra file lưu trên thiết bị",
+          ],
+          correct: 3,
+          explanation:
+            "Log ra file giúp capture timing chính xác của nhiều thread.",
+        },
+        {
+          id: 161,
+          category: "Debugging",
+          question:
+            "Giá trị của port mặc định trong câu lệnh: adb connect 192.168.0.10:port?",
+          options: ["80", "443", "5555", "8080"],
+          correct: 2,
+          explanation: "Port mặc định của ADB over TCP/IP là 5555.",
+        },
+
+        // ==================== MISCELLANEOUS ====================
+        {
+          id: 162,
+          category: "Khác",
+          question: "File xml nào chứa tất cả text mà ứng dụng sử dụng?",
+          options: ["string.xml", "texts.xml", "strings.xml", "array.xml"],
+          correct: 2,
+          explanation: "res/values/strings.xml chứa string resources.",
+        },
+        {
+          id: 163,
+          category: "Khác",
+          question:
+            "Cấu trúc mặc định của Empty Activity KHÔNG có thành phần nào?",
+          options: [
+            "Thư mục res",
+            "Thư mục java",
+            "Thư mục config",
+            "File AndroidManifest.xml",
+          ],
+          correct: 2,
+          explanation: "Empty Activity template không có thư mục config.",
+        },
+        {
+          id: 164,
+          category: "Khác",
+          question:
+            "Thư mục res KHÔNG chứa kiểu file tài nguyên nào của project Android?",
+          options: [
+            "File cấu hình các thư viện sử dụng trong project",
+            "File định nghĩa cấu trúc menu",
+            "File định nghĩa các giá trị dùng chung",
+            "File định nghĩa các chuỗi ký tự dùng chung",
+          ],
+          correct: 0,
+          explanation:
+            "File cấu hình thư viện nằm trong build.gradle, không phải res.",
+        },
+        {
+          id: 165,
+          category: "Khác",
+          question: "Phát biểu nào về lớp R trong Android là đúng?",
+          options: [
+            "Được người lập trình định nghĩa để truy cập resource",
+            "R là lớp được Android tạo ra để quản lý cho tất cả tài nguyên. Người lập trình có thể truy cập resource thông qua lớp R.",
+            "R là lớp được người lập trình tạo ra để định nghĩa tài nguyên.",
+            "Có thể xóa lớp R đi nếu không cần dùng.",
+          ],
+          correct: 1,
+          explanation:
+            "R.java được auto-generated, chứa IDs của tất cả resources.",
+        },
+        {
+          id: 166,
+          category: "Khác",
+          question:
+            "Cách thiết kế giao diện cho màn hình ngang cho Android như thế nào?",
+          options: [
+            "Trong thư mục res, tạo thư mục layout-land",
+            "Thiết kế đè vào file layout mặc định",
+            "Bổ sung thuộc tính layout-land vào AndroidManifest.xml",
+          ],
+          correct: 0,
+          explanation: "res/layout-land/ chứa layout cho landscape.",
+        },
+        {
+          id: 167,
+          category: "Khác",
+          question: "Phương thức nào được sử dụng để tắt một activity?",
+          options: ["finish()", "finishActivity()", "Dispose()", "Destroy()"],
+          correct: 0,
+          explanation: "finish() kết thúc Activity hiện tại.",
+        },
+        {
+          id: 168,
+          category: "Khác",
+          question: "Khái niệm descendant navigation là gì?",
+          options: [
+            "Điều hướng từ màn hình con sang màn hình cha",
+            "Điều hướng từ màn hình cha sang màn hình con",
+            "Điều hướng giữa các màn hình ngang cấp nhau",
+          ],
+          correct: 1,
+          explanation:
+            "Descendant: cha → con. Ancestral: con → cha. Lateral: cùng cấp.",
+        },
+        {
+          id: 169,
+          category: "Khác",
+          question: "Phát biểu nào đúng về nút Back của thiết bị Android?",
+          options: [
+            "Khi ấn Back thì chỉ quay lại được các activity trong ứng dụng của mình.",
+            "Hệ điều hành Android quản lý các ứng dụng trong back stack và xử lý khi người dùng nhấn nút Back.",
+            "Không thể viết chồng sự kiện xử lý cho nút Back.",
+            "Tất cả ứng dụng đều phải viết chồng sự kiện cho nút Back.",
+          ],
+          correct: 1,
+          explanation: "Android quản lý back stack tự động.",
+        },
+        {
+          id: 170,
+          category: "Khác",
+          question: "Đâu là ưu điểm của thiết bị Android so với iOS?",
+          options: [
+            "Kết nối được với nhiều thiết bị ngoại vi",
+            "Có thể cài đặt các phần mềm không phải từ chợ ứng dụng",
+            "Sao lưu dữ liệu dễ dàng với dịch vụ đám mây",
+            "Dữ liệu được bảo mật tốt hơn",
+          ],
+          correct: 1,
+          explanation: "Android cho phép sideload apps từ APK.",
+        },
+        {
+          id: 171,
+          category: "Khác",
+          question:
+            "Đâu là ưu điểm của việc phát triển ứng dụng Android so với iOS?",
+          options: [
+            "Có thể sử dụng các hệ điều hành khác nhau",
+            "Thử nghiệm trên thiết bị vật lý dễ dàng",
+            "Có thể sử dụng các công cụ IDE khác nhau",
+            "Tất cả các đáp án đều đúng",
+          ],
+          correct: 3,
+          explanation:
+            "Android development có thể trên Windows/macOS/Linux, test trên thiết bị thật không cần đăng ký developer.",
+        },
+        {
+          id: 172,
+          category: "Khác",
+          question:
+            "Làm thế nào để cho phép TextView hiển thị được nội dung dài quá kích thước màn hình ngang?",
+          options: [
+            'Thiết lập thuộc tính android:layout_height="wrap_content"',
+            'Thiết lập thuộc tính android:textContent="wrap_content"',
+            'Thiết lập thuộc tính android:inputType="textMultiLine"',
+            'Thiết lập thuộc tính android:scroll="auto"',
+          ],
+          correct: 0,
+          explanation:
+            'layout_height="wrap_content" cho phép TextView tự mở rộng chiều cao.',
+        },
+        {
+          id: 173,
+          category: "Khác",
+          question:
+            "Trong trường hợp activity có nhiều đối tượng nhập dữ liệu dẫn đến chiều cao vượt quá màn hình, đối tượng nào cho phép người dùng vẫn xem được toàn bộ nội dung?",
+          options: [
+            "ScrollView",
+            "HorizontalScrollView",
+            "VerticalScrollView",
+            "LinearLayout",
+          ],
+          correct: 0,
+          explanation: "ScrollView cho phép cuộn nội dung dọc.",
+        },
+      ];
+
+      // Quiz State
+      let currentQuestion = 0;
+      let score = 0;
+      let answers = [];
+      let selectedCategory = "all";
+      let filteredQuestions = [...questions];
+      let quizStarted = false;
+      let showingResults = false;
+      let questionLimit = 0; // 0 = all
+
+      // Get unique categories
+      function getCategories() {
+        return [...new Set(questions.map((q) => q.category))];
+      }
+
+      // Filter questions by category
+      function filterQuestions() {
+        if (selectedCategory === "all") {
+          filteredQuestions = [...questions];
+        } else {
+          filteredQuestions = questions.filter(
+            (q) => q.category === selectedCategory
+          );
+        }
+        // Shuffle questions
+        filteredQuestions = shuffleArray(filteredQuestions);
+        // Limit if set
+        if (questionLimit > 0 && questionLimit < filteredQuestions.length) {
+          filteredQuestions = filteredQuestions.slice(0, questionLimit);
+        }
+      }
+
+      // Shuffle array
+      function shuffleArray(array) {
+        const newArray = [...array];
+        for (let i = newArray.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+        }
+        return newArray;
+      }
+
+      // Show Start Screen
+      function showStartScreen() {
+        quizStarted = false;
+        showingResults = false;
+        const categories = getCategories();
+
+        document.getElementById("quizContainer").innerHTML = `
+                <div class="start-screen">
+                    <h2>🎯 Chào mừng đến với Android Quiz Master!</h2>
+                    <p>Ngân hàng câu hỏi ôn thi Android đầy đủ với <strong>${
+                      questions.length
+                    }</strong> câu hỏi được tổng hợp từ các đề thi.</p>
+                    
+                    <div class="stats-preview">
+                        <div class="stat-card">
+                            <div class="number">${questions.length}</div>
+                            <div class="label">Câu hỏi</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="number">${categories.length}</div>
+                            <div class="label">Chủ đề</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="number">∞</div>
+                            <div class="label">Lần thử</div>
+                        </div>
+                    </div>
+                    
+                    <div class="category-select">
+                        <label>📚 Chọn chủ đề:</label>
+                        <select id="categorySelect">
+                            <option value="all">Tất cả chủ đề (${
+                              questions.length
+                            } câu)</option>
+                            ${categories
+                              .map((cat) => {
+                                const count = questions.filter(
+                                  (q) => q.category === cat
+                                ).length;
+                                return `<option value="${cat}">${cat} (${count} câu)</option>`;
+                              })
+                              .join("")}
+                        </select>
+                    </div>
+                    
+                    <div class="category-select">
+                        <label>🔢 Số câu hỏi:</label>
+                        <select id="questionLimit">
+                            <option value="0">Tất cả câu hỏi</option>
+                            <option value="10">10 câu</option>
+                            <option value="20">20 câu</option>
+                            <option value="30">30 câu</option>
+                            <option value="50">50 câu</option>
+                            <option value="100">100 câu</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn btn-primary" onclick="startQuiz()" style="margin-top: 20px;">🚀 Bắt đầu Quiz</button>
+                </div>
+            `;
+      }
+
+      // Start Quiz
+      function startQuiz() {
+        selectedCategory = document.getElementById("categorySelect").value;
+        questionLimit = parseInt(
+          document.getElementById("questionLimit").value
+        );
+        filterQuestions();
+        currentQuestion = 0;
+        score = 0;
+        answers = new Array(filteredQuestions.length).fill(null);
+        quizStarted = true;
+        showingResults = false;
+        showQuestion();
+      }
+
+      // Show Question
+      function showQuestion() {
+        const q = filteredQuestions[currentQuestion];
+        const progress =
+          ((currentQuestion + 1) / filteredQuestions.length) * 100;
+        const answered = answers.filter((a) => a !== null).length;
+
+        document.getElementById("quizContainer").innerHTML = `
+                <div class="progress-bar">
+                    <div class="progress" style="width: ${progress}%"></div>
+                </div>
+                
+                <div class="question-info">
+                    <span class="question-number">Câu ${currentQuestion + 1}/${
+          filteredQuestions.length
+        }</span>
+                    <span class="category-tag">${q.category}</span>
+                    <span class="score-display">✓ ${score}/${answered}</span>
+                </div>
+                
+                <div class="question-text">${formatQuestion(q.question)}</div>
+                
+                <div class="options">
+                    ${q.options
+                      .map(
+                        (opt, i) => `
+                        <div class="option ${
+                          answers[currentQuestion] === i ? "selected" : ""
+                        }" 
+                             onclick="selectOption(${i})" data-index="${i}">
+                            <span class="option-letter">${String.fromCharCode(
+                              65 + i
+                            )}</span>
+                            <span class="option-text">${opt}</span>
+                        </div>
+                    `
+                      )
+                      .join("")}
+                </div>
+                
+                <div class="explanation" id="explanation">
+                    <h4>💡 Giải thích:</h4>
+                    <p>${q.explanation}</p>
+                </div>
+                
+                <div class="buttons">
+                    <button class="btn btn-secondary" onclick="prevQuestion()" ${
+                      currentQuestion === 0 ? "disabled" : ""
+                    }>
+                        ← Trước
+                    </button>
+                    <button class="btn btn-primary" onclick="checkAnswer()" id="checkBtn">
+                        Kiểm tra
+                    </button>
+                    <button class="btn btn-primary" onclick="nextQuestion()" id="nextBtn" style="display: none;">
+                        ${
+                          currentQuestion === filteredQuestions.length - 1
+                            ? "Xem kết quả"
+                            : "Tiếp theo →"
+                        }
+                    </button>
+                </div>
+                
+                <div class="question-nav">
+                    ${filteredQuestions
+                      .map((_, i) => {
+                        let className = "nav-btn";
+                        if (i === currentQuestion) className += " current";
+                        else if (answers[i] !== null) {
+                          className +=
+                            answers[i] === filteredQuestions[i].correct
+                              ? " answered"
+                              : " wrong";
+                        }
+                        return `<button class="${className}" onclick="goToQuestion(${i})">${
+                          i + 1
+                        }</button>`;
+                      })
+                      .join("")}
+                </div>
+            `;
+      }
+
+      // Format question (handle code blocks)
+      function formatQuestion(text) {
+        if (text.includes("\n")) {
+          const parts = text.split("\n");
+          const mainQuestion = parts[0];
+          const code = parts.slice(1).join("\n");
+          return `${mainQuestion}<pre class="code-block">${escapeHtml(
+            code
+          )}</pre>`;
+        }
+        return text;
+      }
+
+      function escapeHtml(text) {
+        return text
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+
+      // Select Option
+      function selectOption(index) {
+        answers[currentQuestion] = index;
+        document.querySelectorAll(".option").forEach((opt, i) => {
+          opt.classList.toggle("selected", i === index);
+        });
+      }
+
+      // Check Answer
+      function checkAnswer() {
+        if (answers[currentQuestion] === null) {
+          alert("Vui lòng chọn một đáp án!");
+          return;
+        }
+
+        const q = filteredQuestions[currentQuestion];
+        const selected = answers[currentQuestion];
+        const correct = q.correct;
+
+        if (selected === correct) score++;
+
+        document.querySelectorAll(".option").forEach((opt, i) => {
+          opt.onclick = null;
+          if (i === correct) opt.classList.add("correct");
+          else if (i === selected && selected !== correct)
+            opt.classList.add("incorrect");
+        });
+
+        document.getElementById("explanation").classList.add("show");
+        document.getElementById("checkBtn").style.display = "none";
+        document.getElementById("nextBtn").style.display = "inline-block";
+
+        const navBtns = document.querySelectorAll(".nav-btn");
+        navBtns[currentQuestion].classList.remove("current");
+        navBtns[currentQuestion].classList.add(
+          selected === correct ? "answered" : "wrong"
+        );
+      }
+
+      function nextQuestion() {
+        if (currentQuestion < filteredQuestions.length - 1) {
+          currentQuestion++;
+          showQuestion();
+        } else {
+          showResults();
+        }
+      }
+
+      function prevQuestion() {
+        if (currentQuestion > 0) {
+          currentQuestion--;
+          showQuestion();
+        }
+      }
+
+      function goToQuestion(index) {
+        currentQuestion = index;
+        showQuestion();
+      }
+
+      // Show Results
+      function showResults() {
+        showingResults = true;
+        const percentage = Math.round((score / filteredQuestions.length) * 100);
+        const incorrect = filteredQuestions.length - score;
+
+        let message, emoji;
+        if (percentage >= 90) {
+          message = "Xuất sắc! Bạn đã nắm vững kiến thức Android!";
+          emoji = "🏆";
+        } else if (percentage >= 70) {
+          message = "Tốt lắm! Tiếp tục cố gắng nhé!";
+          emoji = "🎉";
+        } else if (percentage >= 50) {
+          message = "Khá ổn! Cần ôn tập thêm một chút!";
+          emoji = "💪";
+        } else {
+          message = "Cần cố gắng nhiều hơn! Hãy ôn tập lại nhé!";
+          emoji = "📚";
+        }
+
+        document.getElementById("quizContainer").innerHTML = `
+                <div class="results-screen">
+                    <h2>${emoji} Kết quả của bạn</h2>
+                    <p>${message}</p>
+                    
+                    <div class="score-circle">
+                        <span class="percentage">${percentage}%</span>
+                        <span class="text">${score}/${
+          filteredQuestions.length
+        } câu</span>
+                    </div>
+                    
+                    <div class="results-stats">
+                        <div class="result-stat correct">
+                            <div class="number">${score}</div>
+                            <div>Đúng</div>
+                        </div>
+                        <div class="result-stat incorrect">
+                            <div class="number">${incorrect}</div>
+                            <div>Sai</div>
+                        </div>
+                        <div class="result-stat skipped">
+                            <div class="number">${
+                              answers.filter((a) => a === null).length
+                            }</div>
+                            <div>Bỏ qua</div>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" onclick="filterReview('all')">Tất cả</button>
+                        <button class="filter-btn" onclick="filterReview('incorrect')">Câu sai</button>
+                        <button class="filter-btn" onclick="filterReview('correct')">Câu đúng</button>
+                    </div>
+                    
+                    <div class="review-list" id="reviewList">
+                        ${generateReviewList("all")}
+                    </div>
+                    
+                    <div class="buttons" style="margin-top: 25px;">
+                        <button class="btn btn-secondary" onclick="showStartScreen()">← Về trang chủ</button>
+                        <button class="btn btn-primary" onclick="startQuiz()">🔄 Làm lại</button>
+                    </div>
+                </div>
+            `;
+      }
+
+      function generateReviewList(filter) {
+        let items = filteredQuestions
+          .map((q, i) => {
+            const isCorrect = answers[i] === q.correct;
+            const showItem =
+              filter === "all" ||
+              (filter === "correct" && isCorrect) ||
+              (filter === "incorrect" && !isCorrect);
+
+            if (!showItem) return "";
+
+            return `
+                    <div class="review-item ${
+                      isCorrect ? "correct" : "incorrect"
+                    }" onclick="reviewQuestion(${i})">
+                        <strong>Câu ${i + 1}:</strong> ${q.question.substring(
+              0,
+              70
+            )}${q.question.length > 70 ? "..." : ""}
+                        <br><small>${isCorrect ? "✓ Đúng" : "✗ Sai"} - ${
+              q.category
+            }</small>
+                    </div>
+                `;
+          })
+          .join("");
+
+        return (
+          items ||
+          '<p style="text-align: center; color: #666; padding: 20px;">Không có câu hỏi nào.</p>'
+        );
+      }
+
+      function filterReview(filter) {
+        document
+          .querySelectorAll(".filter-btn")
+          .forEach((btn) => btn.classList.remove("active"));
+        event.target.classList.add("active");
+        document.getElementById("reviewList").innerHTML =
+          generateReviewList(filter);
+      }
+
+      function reviewQuestion(index) {
+        const q = filteredQuestions[index];
+        const selected = answers[index];
+        const correct = q.correct;
+
+        alert(
+          `Câu ${index + 1}: ${q.question}\n\n` +
+            `Đáp án của bạn: ${
+              selected !== null ? q.options[selected] : "Chưa trả lời"
+            }\n` +
+            `Đáp án đúng: ${q.options[correct]}\n\n` +
+            `Giải thích: ${q.explanation}`
+        );
+      }
+
+      // Initialize
+      showStartScreen();
+    </script>
+  </body>
+</html>

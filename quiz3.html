@@ -1,0 +1,3521 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Android Quiz - Ngân Hàng 400+ Câu Hỏi</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(
+          135deg,
+          #1a1a2e 0%,
+          #16213e 50%,
+          #0f3460 100%
+        );
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+      }
+
+      .header {
+        text-align: center;
+        color: white;
+        margin-bottom: 30px;
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .header p {
+        font-size: 1.1rem;
+        opacity: 0.8;
+      }
+
+      .quiz-container {
+        background: rgba(255, 255, 255, 0.97);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+      }
+
+      .progress-bar {
+        width: 100%;
+        height: 8px;
+        background: #e0e0e0;
+        border-radius: 4px;
+        margin-bottom: 20px;
+        overflow: hidden;
+      }
+
+      .progress {
+        height: 100%;
+        background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+        border-radius: 4px;
+        transition: width 0.3s ease;
+      }
+
+      .question-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #f0f0f0;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .question-number {
+        font-size: 0.95rem;
+        color: #7b2cbf;
+        font-weight: bold;
+      }
+
+      .score-display {
+        font-size: 0.95rem;
+        color: #28a745;
+        font-weight: bold;
+      }
+
+      .category-tag {
+        background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+        color: white;
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+      }
+
+      .question-text {
+        font-size: 1.1rem;
+        color: #333;
+        margin-bottom: 20px;
+        line-height: 1.7;
+      }
+
+      .code-block {
+        background: #1e1e1e;
+        color: #d4d4d4;
+        padding: 15px;
+        border-radius: 10px;
+        margin: 15px 0;
+        font-family: "Consolas", "Courier New", monospace;
+        font-size: 0.85rem;
+        overflow-x: auto;
+        white-space: pre-wrap;
+        border-left: 4px solid #7b2cbf;
+        line-height: 1.5;
+      }
+
+      .code-block .highlight {
+        background: #ffeb3b40;
+        padding: 2px 4px;
+        border-radius: 3px;
+      }
+
+      .code-block .error {
+        background: #ff000030;
+        text-decoration: wavy underline red;
+      }
+
+      .code-block .blank {
+        background: #4caf5040;
+        padding: 2px 8px;
+        border: 1px dashed #4caf50;
+        border-radius: 3px;
+      }
+
+      .options {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .option {
+        padding: 14px 18px;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .option:hover {
+        border-color: #7b2cbf;
+        background: #f8f4ff;
+        transform: translateX(5px);
+      }
+
+      .option.selected {
+        border-color: #7b2cbf;
+        background: #f0e6ff;
+      }
+
+      .option.correct {
+        border-color: #28a745;
+        background: #d4edda;
+      }
+
+      .option.incorrect {
+        border-color: #dc3545;
+        background: #f8d7da;
+      }
+
+      .option-letter {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #e0e0e0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #666;
+        flex-shrink: 0;
+        font-size: 0.9rem;
+      }
+
+      .option.selected .option-letter {
+        background: #7b2cbf;
+        color: white;
+      }
+
+      .option.correct .option-letter {
+        background: #28a745;
+        color: white;
+      }
+
+      .option.incorrect .option-letter {
+        background: #dc3545;
+        color: white;
+      }
+
+      .option-text {
+        flex: 1;
+        line-height: 1.5;
+        font-size: 0.95rem;
+        font-family: "Consolas", monospace;
+      }
+
+      .option-text.normal-text {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      .buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 25px;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        padding: 12px 28px;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        font-size: 0.95rem;
+        font-weight: bold;
+        transition: all 0.3s ease;
+      }
+
+      .btn-primary {
+        background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(123, 44, 191, 0.4);
+      }
+
+      .btn-secondary {
+        background: #e0e0e0;
+        color: #666;
+      }
+
+      .btn-secondary:hover {
+        background: #d0d0d0;
+      }
+
+      .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .explanation {
+        margin-top: 20px;
+        padding: 15px 20px;
+        background: linear-gradient(135deg, #e8f4fd, #f0e6ff);
+        border-left: 4px solid #7b2cbf;
+        border-radius: 0 12px 12px 0;
+        display: none;
+      }
+
+      .explanation.show {
+        display: block;
+      }
+
+      .explanation h4 {
+        color: #7b2cbf;
+        margin-bottom: 8px;
+      }
+
+      .start-screen {
+        text-align: center;
+        padding: 30px 20px;
+      }
+
+      .start-screen h2 {
+        color: #333;
+        margin-bottom: 15px;
+        font-size: 1.6rem;
+      }
+
+      .stats-preview {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 15px;
+        margin-bottom: 25px;
+      }
+
+      .stat-card {
+        background: linear-gradient(135deg, #00d4ff 0%, #7b2cbf 100%);
+        color: white;
+        padding: 20px 15px;
+        border-radius: 15px;
+        text-align: center;
+      }
+
+      .stat-card .number {
+        font-size: 1.8rem;
+        font-weight: bold;
+      }
+
+      .stat-card .label {
+        font-size: 0.8rem;
+        opacity: 0.9;
+      }
+
+      .category-select {
+        margin-bottom: 20px;
+        text-align: left;
+      }
+
+      .category-select label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+        color: #333;
+      }
+
+      .category-select select {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 1rem;
+        cursor: pointer;
+        background: white;
+      }
+
+      .results-screen {
+        text-align: center;
+        padding: 30px 20px;
+      }
+
+      .score-circle {
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #00d4ff 0%, #7b2cbf 100%);
+        margin: 25px auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: white;
+      }
+
+      .score-circle .percentage {
+        font-size: 2.5rem;
+        font-weight: bold;
+      }
+
+      .results-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin: 25px 0;
+      }
+
+      .result-stat {
+        padding: 15px 10px;
+        border-radius: 10px;
+      }
+
+      .result-stat.correct {
+        background: #d4edda;
+        color: #28a745;
+      }
+      .result-stat.incorrect {
+        background: #f8d7da;
+        color: #dc3545;
+      }
+      .result-stat.skipped {
+        background: #fff3cd;
+        color: #856404;
+      }
+
+      .result-stat .number {
+        font-size: 1.4rem;
+        font-weight: bold;
+      }
+
+      .question-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 2px solid #f0f0f0;
+        max-height: 120px;
+        overflow-y: auto;
+      }
+
+      .nav-btn {
+        width: 34px;
+        height: 34px;
+        border: 2px solid #e0e0e0;
+        border-radius: 6px;
+        background: white;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 0.75rem;
+      }
+
+      .nav-btn.current {
+        background: #7b2cbf;
+        color: white;
+        border-color: #7b2cbf;
+      }
+      .nav-btn.answered {
+        background: #28a745;
+        color: white;
+        border-color: #28a745;
+      }
+      .nav-btn.wrong {
+        background: #dc3545;
+        color: white;
+        border-color: #dc3545;
+      }
+
+      .filter-buttons {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .filter-btn {
+        padding: 8px 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 20px;
+        background: white;
+        cursor: pointer;
+      }
+
+      .filter-btn:hover,
+      .filter-btn.active {
+        border-color: #7b2cbf;
+        background: #f0e6ff;
+      }
+
+      .review-list {
+        max-height: 300px;
+        overflow-y: auto;
+        text-align: left;
+      }
+
+      .review-item {
+        padding: 12px 15px;
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        font-size: 0.9rem;
+      }
+
+      .review-item.correct {
+        border-left: 4px solid #28a745;
+      }
+      .review-item.incorrect {
+        border-left: 4px solid #dc3545;
+      }
+
+      .type-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 0.7rem;
+        margin-left: 8px;
+        font-weight: bold;
+      }
+      .type-badge.fill {
+        background: #e3f2fd;
+        color: #1976d2;
+      }
+      .type-badge.error {
+        background: #ffebee;
+        color: #c62828;
+      }
+      .type-badge.output {
+        background: #f3e5f5;
+        color: #7b1fa2;
+      }
+      .type-badge.theory {
+        background: #e8f5e9;
+        color: #388e3c;
+      }
+
+      @media (max-width: 600px) {
+        .header h1 {
+          font-size: 1.8rem;
+        }
+        .question-text {
+          font-size: 1rem;
+        }
+        .code-block {
+          font-size: 0.75rem;
+        }
+        .buttons {
+          flex-direction: column;
+        }
+        .btn {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🤖 Android Quiz Master Pro</h1>
+        <p>Câu hỏi - Bao gồm Code, Tìm lỗi, Điền code</p>
+      </div>
+      <div class="quiz-container" id="quizContainer"></div>
+    </div>
+
+    <script>
+      const questions = [
+        // ==================== KOTLIN - ĐIỀN CODE ====================
+        {
+          id: 1,
+          category: "Kotlin - Điền code",
+          type: "fill",
+          question:
+            "Điền vào chỗ trống để khai báo một biến BẤT BIẾN có giá trị là 10:",
+          code: "[____] number = 10",
+          options: ["var", "val", "const", "let"],
+          correct: 1,
+          explanation:
+            "val (value) dùng để khai báo biến bất biến (immutable) trong Kotlin.",
+        },
+        {
+          id: 2,
+          category: "Kotlin - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để tạo một mảng chứa các số 1, 2, 3:",
+          code: "val numbers = [____](1, 2, 3)",
+          options: ["Array", "arrayOf", "listOf", "array"],
+          correct: 1,
+          explanation: "arrayOf() là hàm tạo mảng trong Kotlin.",
+        },
+        {
+          id: 3,
+          category: "Kotlin - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để khai báo hàm trả về tổng hai số:",
+          code: "fun sum(a: Int, b: Int)[____] Int {\n    return a + b\n}",
+          options: ["->", ":", "=", "=>"],
+          correct: 1,
+          explanation:
+            "Trong Kotlin, dấu : dùng để chỉ định kiểu trả về của hàm.",
+        },
+        {
+          id: 4,
+          category: "Kotlin - Điền code",
+          type: "fill",
+          question:
+            "Điền vào chỗ trống để kiểm tra biến name có null không trước khi lấy độ dài:",
+          code: "val length = name[____]length",
+          options: [".", "?.", "!.", "!!."],
+          correct: 1,
+          explanation:
+            "?. là safe call operator, chỉ gọi property nếu object không null.",
+        },
+        {
+          id: 5,
+          category: "Kotlin - Điền code",
+          type: "fill",
+          question:
+            "Điền vào chỗ trống để gán giá trị mặc định 'Unknown' nếu name là null:",
+          code: 'val displayName = name [____] "Unknown"',
+          options: ["||", "??", "?:", "&&"],
+          correct: 2,
+          explanation:
+            "?: là Elvis operator, trả về giá trị bên phải nếu bên trái là null.",
+        },
+        {
+          id: 6,
+          category: "Kotlin - Điền code",
+          type: "fill",
+          question:
+            "Điền vào chỗ trống để tạo data class với property name và age:",
+          code: "[____] class Person(val name: String, val age: Int)",
+          options: ["class", "data", "object", "sealed"],
+          correct: 1,
+          explanation:
+            "data class tự động generate equals(), hashCode(), toString(), copy().",
+        },
+        {
+          id: 7,
+          category: "Kotlin - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để tạo singleton trong Kotlin:",
+          code: "[____] DatabaseManager {\n    fun getConnection() { }\n}",
+          options: ["class", "singleton", "object", "static class"],
+          correct: 2,
+          explanation:
+            "object declaration tạo singleton thread-safe trong Kotlin.",
+        },
+        {
+          id: 8,
+          category: "Kotlin - Điền code",
+          type: "fill",
+          question:
+            "Điền vào chỗ trống để cho phép class con override hàm này:",
+          code: "[____] fun calculate(): Int {\n    return 0\n}",
+          options: ["virtual", "override", "open", "abstract"],
+          correct: 2,
+          explanation:
+            "open cho phép method có thể được override trong class con.",
+        },
+        {
+          id: 9,
+          category: "Kotlin - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để lọc các số chẵn từ list:",
+          code: "val evens = numbers.[____] { it % 2 == 0 }",
+          options: ["map", "filter", "forEach", "find"],
+          correct: 1,
+          explanation: "filter{} lọc các phần tử thỏa mãn điều kiện.",
+        },
+        {
+          id: 10,
+          category: "Kotlin - Điền code",
+          type: "fill",
+          question:
+            "Điền vào chỗ trống để chuyển đổi list số thành list bình phương:",
+          code: "val squares = numbers.[____] { it * it }",
+          options: ["filter", "map", "reduce", "flatMap"],
+          correct: 1,
+          explanation: "map{} biến đổi từng phần tử theo lambda.",
+        },
+        {
+          id: 11,
+          category: "Kotlin - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để khai báo hàm suspend:",
+          code: '[____] fun fetchData(): String {\n    delay(1000)\n    return "Data"\n}',
+          options: ["async", "await", "suspend", "coroutine"],
+          correct: 2,
+          explanation:
+            "suspend đánh dấu hàm có thể tạm dừng mà không block thread.",
+        },
+        {
+          id: 12,
+          category: "Kotlin - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để tạo coroutine trong ViewModel:",
+          code: "[____].launch {\n    val data = repository.getData()\n}",
+          options: [
+            "GlobalScope",
+            "viewModelScope",
+            "CoroutineScope",
+            "lifecycleScope",
+          ],
+          correct: 1,
+          explanation:
+            "viewModelScope tự động cancel khi ViewModel bị cleared.",
+        },
+        {
+          id: 13,
+          category: "Kotlin - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để chạy code trên IO thread:",
+          code: "withContext(Dispatchers.[____]) {\n    // network call\n}",
+          options: ["Main", "IO", "Default", "Unconfined"],
+          correct: 1,
+          explanation:
+            "Dispatchers.IO optimized cho I/O operations (network, disk).",
+        },
+        {
+          id: 14,
+          category: "Kotlin - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để tạo Flow emit các giá trị:",
+          code: "fun numbersFlow() = [____] {\n    emit(1)\n    emit(2)\n    emit(3)\n}",
+          options: ["flow", "flowOf", "channelFlow", "callbackFlow"],
+          correct: 0,
+          explanation:
+            "flow{} builder tạo cold Flow có thể emit nhiều giá trị.",
+        },
+        {
+          id: 15,
+          category: "Kotlin - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để collect Flow trong lifecycleScope:",
+          code: "lifecycleScope.launch {\n    myFlow.[____] { value ->\n        println(value)\n    }\n}",
+          options: ["observe", "subscribe", "collect", "listen"],
+          correct: 2,
+          explanation:
+            "collect{} là terminal operator để nhận giá trị từ Flow.",
+        },
+
+        // ==================== KOTLIN - TÌM LỖI ====================
+        {
+          id: 16,
+          category: "Kotlin - Tìm lỗi",
+          type: "error",
+          question: "Đoạn code sau có lỗi gì?",
+          code: 'val name = "John"\nname = "Jane"',
+          options: [
+            "Không có lỗi",
+            "val không thể gán lại giá trị",
+            "String không thể thay đổi",
+            "Thiếu kiểu dữ liệu",
+          ],
+          correct: 1,
+          explanation:
+            "val là immutable, không thể gán lại. Cần dùng var để thay đổi giá trị.",
+        },
+        {
+          id: 17,
+          category: "Kotlin - Tìm lỗi",
+          type: "error",
+          question: "Đoạn code sau có lỗi gì?",
+          code: "var number: Int = null",
+          options: [
+            "Không có lỗi",
+            "Int không thể nhận giá trị null",
+            "Thiếu từ khóa val",
+            "null phải viết hoa",
+          ],
+          correct: 1,
+          explanation: "Int không nullable. Cần dùng Int? để cho phép null.",
+        },
+        {
+          id: 18,
+          category: "Kotlin - Tìm lỗi",
+          type: "error",
+          question: "Đoạn code sau có lỗi gì?",
+          code: 'fun greet(name: String) {\n    println("Hello, $name")\n}\ngreet(null)',
+          options: [
+            "Không có lỗi",
+            "Không thể truyền null cho parameter non-null",
+            "Thiếu return type",
+            "Sai cú pháp string interpolation",
+          ],
+          correct: 1,
+          explanation:
+            "Parameter name: String không nullable, không thể truyền null.",
+        },
+        {
+          id: 19,
+          category: "Kotlin - Tìm lỗi",
+          type: "error",
+          question: "Đoạn code sau có lỗi gì?",
+          code: "class Animal {\n    fun makeSound() { }\n}\nclass Dog : Animal() {\n    override fun makeSound() { }\n}",
+          options: [
+            "Không có lỗi - code chạy bình thường",
+            "Class Animal phải là open để kế thừa",
+            "Thiếu từ khóa extends",
+            "override sai cú pháp",
+          ],
+          correct: 1,
+          explanation:
+            "Trong Kotlin, class và method mặc định là final. Cần open class Animal và open fun makeSound().",
+        },
+        {
+          id: 20,
+          category: "Kotlin - Tìm lỗi",
+          type: "error",
+          question: "Đoạn code sau có lỗi gì?",
+          code: "val numbers = listOf(1, 2, 3)\nnumbers.add(4)",
+          options: [
+            "Không có lỗi",
+            "listOf tạo list bất biến, không có method add",
+            "Sai kiểu dữ liệu",
+            "Thiếu import",
+          ],
+          correct: 1,
+          explanation:
+            "listOf() tạo immutable List. Dùng mutableListOf() để có thể add.",
+        },
+        {
+          id: 21,
+          category: "Kotlin - Tìm lỗi",
+          type: "error",
+          question: "Đoạn code sau có lỗi gì?",
+          code: 'suspend fun getData(): String {\n    return "data"\n}\n\nfun main() {\n    val result = getData()\n}',
+          options: [
+            "Không có lỗi",
+            "Không thể gọi suspend function từ function thường",
+            "Thiếu return type",
+            "main() phải là suspend",
+          ],
+          correct: 1,
+          explanation:
+            "suspend function chỉ có thể gọi từ coroutine hoặc suspend function khác.",
+        },
+        {
+          id: 22,
+          category: "Kotlin - Tìm lỗi",
+          type: "error",
+          question: "Đoạn code sau có lỗi gì?",
+          code: 'val x: String? = "Hello"\nval length: Int = x.length',
+          options: [
+            "Không có lỗi",
+            "Không thể gán nullable String? vào String",
+            "x có thể null, cần dùng ?. hoặc !!",
+            "length không phải property của String",
+          ],
+          correct: 2,
+          explanation:
+            "x là nullable String?, cần x?.length hoặc x!!.length để truy cập.",
+        },
+        {
+          id: 23,
+          category: "Kotlin - Tìm lỗi",
+          type: "error",
+          question: "Đoạn code sau có lỗi gì?",
+          code: 'val i = 10\nprintln("${i++}")',
+          options: [
+            "Không có lỗi",
+            "val không thể dùng ++",
+            "Sai cú pháp string template",
+            "i++ phải đặt ngoài string",
+          ],
+          correct: 1,
+          explanation:
+            "val là immutable, i++ cố gắng thay đổi giá trị nên gây lỗi compile.",
+        },
+        {
+          id: 24,
+          category: "Kotlin - Tìm lỗi",
+          type: "error",
+          question: "Đoạn code sau có vấn đề gì?",
+          code: 'data class User(var name: String)\nval user1 = User("John")\nval user2 = User("John")\nprintln(user1 == user2) // ???',
+          options: [
+            "In ra false vì là 2 object khác nhau",
+            "In ra true vì data class so sánh theo giá trị",
+            "Lỗi compile",
+            "Runtime exception",
+          ],
+          correct: 1,
+          explanation:
+            "data class override equals() để so sánh theo property values, nên kết quả là true.",
+        },
+        {
+          id: 25,
+          category: "Kotlin - Tìm lỗi",
+          type: "error",
+          question: "Đoạn code sau có lỗi gì?",
+          code: "interface Clickable {\n    fun onClick()\n}\nclass Button : Clickable {\n    // không implement onClick\n}",
+          options: [
+            "Không có lỗi",
+            "Button phải implement onClick() hoặc là abstract",
+            "interface phải có từ khóa abstract",
+            "Thiếu dấu ()",
+          ],
+          correct: 1,
+          explanation:
+            "Class implement interface phải override tất cả abstract methods.",
+        },
+
+        // ==================== KOTLIN - KẾT QUẢ CODE ====================
+        {
+          id: 26,
+          category: "Kotlin - Output",
+          type: "output",
+          question: "Đoạn code sau in ra kết quả gì?",
+          code: "var s = 0\nrepeat(5) { s += it }\nprintln(s)",
+          options: ["5", "10", "15", "Lỗi compile"],
+          correct: 1,
+          explanation: "repeat(5) lặp it từ 0-4. Tổng = 0+1+2+3+4 = 10.",
+        },
+        {
+          id: 27,
+          category: "Kotlin - Output",
+          type: "output",
+          question: "Đoạn code sau in ra kết quả gì?",
+          code: "val list = listOf(1, 2, 3, 4, 5)\nprintln(list.filter { it > 2 }.map { it * 2 })",
+          options: [
+            "[6, 8, 10]",
+            "[2, 4, 6, 8, 10]",
+            "[3, 4, 5]",
+            "[4, 6, 8, 10]",
+          ],
+          correct: 0,
+          explanation: "filter giữ [3,4,5], map nhân 2 được [6,8,10].",
+        },
+        {
+          id: 28,
+          category: "Kotlin - Output",
+          type: "output",
+          question: "Đoạn code sau in ra kết quả gì?",
+          code: "fun main() {\n    println(calc(6, 4))\n}\nfun calc(x: Int, y: Int) = x % y",
+          options: ["1", "2", "1.5", "10"],
+          correct: 1,
+          explanation: "6 % 4 = 2 (phép chia lấy dư).",
+        },
+        {
+          id: 29,
+          category: "Kotlin - Output",
+          type: "output",
+          question: "Đoạn code sau in ra kết quả gì?",
+          code: "val x: String? = null\nprintln(x?.length ?: -1)",
+          options: ["null", "0", "-1", "NullPointerException"],
+          correct: 2,
+          explanation: "x là null, x?.length là null, Elvis trả về -1.",
+        },
+        {
+          id: 30,
+          category: "Kotlin - Output",
+          type: "output",
+          question: "Đoạn code sau in ra kết quả gì?",
+          code: "val numbers = listOf(1, 2, 3)\nprintln(numbers.reduce { acc, i -> acc + i })",
+          options: ["6", "[1, 2, 3]", "123", "Lỗi"],
+          correct: 0,
+          explanation: "reduce: ((1+2)+3) = 6.",
+        },
+        {
+          id: 31,
+          category: "Kotlin - Output",
+          type: "output",
+          question: "Đoạn code sau in ra kết quả gì?",
+          code: 'fun main() {\n    process("SoICT") { it.uppercase() }\n}\nfun process(s: String, method: (String) -> String) {\n    println(method(s).lowercase())\n}',
+          options: ["SoICT", "soict", "SOICT", "Lỗi compile"],
+          correct: 1,
+          explanation: "uppercase() -> 'SOICT', lowercase() -> 'soict'.",
+        },
+        {
+          id: 32,
+          category: "Kotlin - Output",
+          type: "output",
+          question: "Đoạn code sau in ra kết quả gì?",
+          code: 'val pair = Pair("Hello", 42)\nprintln("${pair.first} ${pair.second}")',
+          options: ["Hello 42", "(Hello, 42)", "Pair(Hello, 42)", "Lỗi"],
+          correct: 0,
+          explanation:
+            "Pair có properties first và second để truy cập giá trị.",
+        },
+        {
+          id: 33,
+          category: "Kotlin - Output",
+          type: "output",
+          question: "Đoạn code sau in ra kết quả gì?",
+          code: "val list = mutableListOf(1, 2, 3)\nlist += 4\nprintln(list.size)",
+          options: ["3", "4", "Lỗi compile", "Lỗi runtime"],
+          correct: 1,
+          explanation: "+= với mutableList sẽ add phần tử, size = 4.",
+        },
+        {
+          id: 34,
+          category: "Kotlin - Output",
+          type: "output",
+          question: "Đoạn code sau in ra kết quả gì?",
+          code: "val range = 1..5\nprintln(3 in range)",
+          options: ["true", "false", "3", "Lỗi"],
+          correct: 0,
+          explanation: "in kiểm tra phần tử có trong range, 3 nằm trong 1..5.",
+        },
+        {
+          id: 35,
+          category: "Kotlin - Output",
+          type: "output",
+          question: "Đoạn code sau in ra kết quả gì?",
+          code: 'val x = when {\n    5 > 10 -> "A"\n    5 < 3 -> "B"\n    else -> "C"\n}\nprintln(x)',
+          options: ["A", "B", "C", "null"],
+          correct: 2,
+          explanation: "Cả 2 điều kiện đều false, nên vào else -> C.",
+        },
+
+        // ==================== ANDROID - ĐIỀN CODE ====================
+        {
+          id: 36,
+          category: "Android - Điền code",
+          type: "fill",
+          question:
+            "Điền vào chỗ trống để lấy reference đến TextView với id txtName:",
+          code: "val textView = findViewById<TextView>(R.[____].txtName)",
+          options: ["id", "layout", "view", "widget"],
+          correct: 0,
+          explanation: "R.id chứa các ID của views được định nghĩa trong XML.",
+        },
+        {
+          id: 37,
+          category: "Android - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để set text cho TextView:",
+          code: 'textView.[____] = "Hello World"',
+          options: ["value", "content", "text", "string"],
+          correct: 2,
+          explanation:
+            "Property text của TextView dùng để set/get nội dung text.",
+        },
+        {
+          id: 38,
+          category: "Android - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để mở SecondActivity từ MainActivity:",
+          code: "val intent = Intent(this, SecondActivity::[____].java)\nstartActivity(intent)",
+          options: ["this", "class", "activity", "context"],
+          correct: 1,
+          explanation:
+            "SecondActivity::class.java lấy Java Class reference trong Kotlin.",
+        },
+        {
+          id: 39,
+          category: "Android - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để truyền data qua Intent:",
+          code: 'intent.[____]("KEY_NAME", "John")',
+          options: ["put", "putExtra", "addExtra", "setExtra"],
+          correct: 1,
+          explanation: "putExtra() thêm extra data vào Intent.",
+        },
+        {
+          id: 40,
+          category: "Android - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để nhận data từ Intent:",
+          code: 'val name = intent.[____]("KEY_NAME")',
+          options: ["getExtra", "getStringExtra", "getString", "get"],
+          correct: 1,
+          explanation: "getStringExtra() lấy String data từ Intent extras.",
+        },
+        {
+          id: 41,
+          category: "Android - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để hiển thị Toast message:",
+          code: 'Toast.[____](this, "Hello", Toast.LENGTH_SHORT).show()',
+          options: ["create", "makeText", "show", "display"],
+          correct: 1,
+          explanation: "Toast.makeText() tạo Toast object.",
+        },
+        {
+          id: 42,
+          category: "Android - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để set click listener cho button:",
+          code: "button.[____] { \n    // handle click\n}",
+          options: [
+            "onClick",
+            "setOnClickListener",
+            "addClickListener",
+            "clickListener",
+          ],
+          correct: 1,
+          explanation:
+            "setOnClickListener{} với Kotlin lambda để handle click events.",
+        },
+        {
+          id: 43,
+          category: "Android - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để set layout cho Activity:",
+          code: "override fun onCreate(savedInstanceState: Bundle?) {\n    super.onCreate(savedInstanceState)\n    [____](R.layout.activity_main)\n}",
+          options: ["setLayout", "setContentView", "setView", "inflate"],
+          correct: 1,
+          explanation: "setContentView() set layout resource cho Activity.",
+        },
+        {
+          id: 44,
+          category: "Android - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để inflate layout trong Fragment:",
+          code: "override fun onCreateView(\n    inflater: LayoutInflater,\n    container: ViewGroup?,\n    savedInstanceState: Bundle?\n): View? {\n    return inflater.[____](R.layout.fragment_home, container, false)\n}",
+          options: ["inflate", "create", "load", "render"],
+          correct: 0,
+          explanation: "LayoutInflater.inflate() tạo View từ XML layout.",
+        },
+        {
+          id: 45,
+          category: "Android - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để thêm Fragment vào container:",
+          code: "supportFragmentManager.beginTransaction()\n    .[____](R.id.container, MyFragment())\n    .commit()",
+          options: ["add", "replace", "show", "attach"],
+          correct: 0,
+          explanation:
+            "add() thêm Fragment vào container, không xóa Fragment cũ.",
+        },
+        {
+          id: 46,
+          category: "Android - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để replace Fragment và cho phép Back:",
+          code: "supportFragmentManager.beginTransaction()\n    .replace(R.id.container, NewFragment())\n    .[____](null)\n    .commit()",
+          options: [
+            "addToStack",
+            "pushToBackStack",
+            "addToBackStack",
+            "saveToBackStack",
+          ],
+          correct: 2,
+          explanation:
+            "addToBackStack() cho phép quay lại Fragment trước bằng nút Back.",
+        },
+        {
+          id: 47,
+          category: "Android - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để observe LiveData:",
+          code: "viewModel.users.[____](this) { users ->\n    adapter.submitList(users)\n}",
+          options: ["observe", "watch", "subscribe", "listen"],
+          correct: 0,
+          explanation:
+            "observe() với LifecycleOwner để tự động manage subscription.",
+        },
+        {
+          id: 48,
+          category: "Android - Điền code",
+          type: "fill",
+          question:
+            "Điền vào chỗ trống để update LiveData value từ main thread:",
+          code: "_users.[____] = newUsers",
+          options: ["value", "postValue", "data", "content"],
+          correct: 0,
+          explanation:
+            "value = ... set giá trị từ main thread. postValue() cho background.",
+        },
+        {
+          id: 49,
+          category: "Android - Điền code",
+          type: "fill",
+          question:
+            "Điền vào chỗ trống để khai báo ViewModel với ViewModelProvider:",
+          code: "val viewModel = ViewModelProvider(this).[____](MainViewModel::class.java)",
+          options: ["create", "get", "obtain", "provide"],
+          correct: 1,
+          explanation: "get() lấy hoặc tạo ViewModel instance.",
+        },
+        {
+          id: 50,
+          category: "Android - Điền code",
+          type: "fill",
+          question:
+            "Điền vào chỗ trống trong Room Entity để đánh dấu primary key:",
+          code: "@Entity\ndata class User(\n    @[____] val id: Int,\n    val name: String\n)",
+          options: ["Id", "Key", "PrimaryKey", "AutoIncrement"],
+          correct: 2,
+          explanation: "@PrimaryKey đánh dấu column là primary key trong Room.",
+        },
+
+        // ==================== ANDROID - TÌM LỖI ====================
+        {
+          id: 51,
+          category: "Android - Tìm lỗi",
+          type: "error",
+          question: "Đoạn code sau có lỗi gì?",
+          code: "class MainActivity : AppCompatActivity() {\n    val textView = findViewById<TextView>(R.id.textView)\n    \n    override fun onCreate(savedInstanceState: Bundle?) {\n        super.onCreate(savedInstanceState)\n        setContentView(R.layout.activity_main)\n    }\n}",
+          options: [
+            "Không có lỗi",
+            "findViewById gọi trước setContentView",
+            "Thiếu override",
+            "Sai kiểu dữ liệu",
+          ],
+          correct: 1,
+          explanation:
+            "findViewById được gọi khi property khởi tạo (trước onCreate), lúc đó chưa có layout. Cần gọi sau setContentView.",
+        },
+        {
+          id: 52,
+          category: "Android - Tìm lỗi",
+          type: "error",
+          question: "Đoạn code sau có lỗi gì?",
+          code: "val textView = findViewById<TextView>(R.id.textView)\nval count = 123\ntextView.setText(count)",
+          options: [
+            "Không có lỗi - hiển thị 123",
+            "setText(int) tìm string resource, không hiển thị số",
+            "count phải là String",
+            "Thiếu toString()",
+          ],
+          correct: 1,
+          explanation:
+            'setText(int) sẽ tìm resource string với ID đó. Cần setText(count.toString()) hoặc text = "$count".',
+        },
+        {
+          id: 53,
+          category: "Android - Tìm lỗi",
+          type: "error",
+          question: "Đoạn code sau có vấn đề gì?",
+          code: "class MainActivity : AppCompatActivity() {\n    override fun onCreate(savedInstanceState: Bundle?) {\n        setContentView(R.layout.activity_main)\n        super.onCreate(savedInstanceState)\n    }\n}",
+          options: [
+            "Không có lỗi",
+            "super.onCreate phải gọi TRƯỚC setContentView",
+            "Thiếu Bundle?",
+            "Sai tên hàm",
+          ],
+          correct: 1,
+          explanation:
+            "super.onCreate() phải được gọi đầu tiên trong onCreate().",
+        },
+        {
+          id: 54,
+          category: "Android - Tìm lỗi",
+          type: "error",
+          question: "Đoạn code sau có vấn đề gì?",
+          code: 'Thread {\n    textView.text = "Updated from thread"\n}.start()',
+          options: [
+            "Không có lỗi",
+            "Không thể update UI từ background thread",
+            "Thread sai cú pháp",
+            "Thiếu runOnUiThread",
+          ],
+          correct: 1,
+          explanation:
+            "UI chỉ có thể update từ main thread. Cần runOnUiThread{} hoặc Handler.",
+        },
+        {
+          id: 55,
+          category: "Android - Tìm lỗi",
+          type: "error",
+          question: "Đoạn code sau có vấn đề gì trong RecyclerView Adapter?",
+          code: "override fun onBindViewHolder(holder: ViewHolder, position: Int) {\n    holder.button.setOnClickListener {\n        removeItem(position)\n    }\n}",
+          options: [
+            "Không có lỗi",
+            "position có thể sai sau khi list thay đổi, cần dùng holder.adapterPosition",
+            "setOnClickListener sai cú pháp",
+            "removeItem không tồn tại",
+          ],
+          correct: 1,
+          explanation:
+            "position parameter có thể outdated. Dùng holder.adapterPosition hoặc holder.bindingAdapterPosition.",
+        },
+        {
+          id: 56,
+          category: "Android - Tìm lỗi",
+          type: "error",
+          question: "Đoạn code sau có vấn đề gì?",
+          code: "class MyAdapter : RecyclerView.Adapter<MyAdapter.ViewHolder>() {\n    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {\n        val view = LayoutInflater.from(parent.context)\n            .inflate(R.layout.item, null, false)\n        return ViewHolder(view)\n    }\n}",
+          options: [
+            "Không có lỗi",
+            "Truyền null thay vì parent sẽ gây lỗi layout params",
+            "inflate sai cú pháp",
+            "Thiếu return",
+          ],
+          correct: 1,
+          explanation:
+            "Truyền null cho parent khiến view không nhận đúng LayoutParams. Nên truyền parent và attachToRoot = false.",
+        },
+        {
+          id: 57,
+          category: "Android - Tìm lỗi",
+          type: "error",
+          question: "Đoạn code sau có vấn đề gì?",
+          code: "class MainActivity : AppCompatActivity() {\n    private val viewModel = MainViewModel()\n}",
+          options: [
+            "Không có lỗi",
+            "ViewModel không nên tạo trực tiếp bằng constructor",
+            "Thiếu lateinit",
+            "MainViewModel phải là object",
+          ],
+          correct: 1,
+          explanation:
+            "ViewModel phải được tạo qua ViewModelProvider để survive configuration changes.",
+        },
+        {
+          id: 58,
+          category: "Android - Tìm lỗi",
+          type: "error",
+          question: "Đoạn code sau có vấn đề gì?",
+          code: "class MainViewModel : ViewModel() {\n    private val context: Context\n    \n    init {\n        context = MainActivity()\n    }\n}",
+          options: [
+            "Không có lỗi",
+            "ViewModel không nên giữ reference đến Activity/Context",
+            "init block sai cú pháp",
+            "Thiếu constructor",
+          ],
+          correct: 1,
+          explanation:
+            "ViewModel sống lâu hơn Activity, giữ Context sẽ gây memory leak. Dùng AndroidViewModel nếu cần context.",
+        },
+        {
+          id: 59,
+          category: "Android - Tìm lỗi",
+          type: "error",
+          question: "Manifest declaration sau có vấn đề gì?",
+          code: '<activity android:name=".SecondActivity" />',
+          options: [
+            "Không có lỗi",
+            "Thiếu android:exported cho Android 12+",
+            "Thiếu intent-filter",
+            "Sai cú pháp name",
+          ],
+          correct: 0,
+          explanation:
+            "Đúng nếu không có intent-filter. android:exported chỉ bắt buộc khi có intent-filter.",
+        },
+        {
+          id: 60,
+          category: "Android - Tìm lỗi",
+          type: "error",
+          question: "Đoạn code sau có vấn đề gì?",
+          code: '@Dao\ninterface UserDao {\n    @Query("SELECT * FROM users")\n    fun getAll(): List<User>\n}',
+          options: [
+            "Không có lỗi",
+            "Query trên main thread sẽ gây ANR, cần suspend hoặc LiveData",
+            "Thiếu @Insert",
+            "interface không thể có annotation",
+          ],
+          correct: 1,
+          explanation:
+            "Room query đồng bộ trên main thread gây freeze UI. Dùng suspend fun hoặc return LiveData/Flow.",
+        },
+
+        // ==================== LAYOUT XML - ĐIỀN CODE ====================
+        {
+          id: 61,
+          category: "Layout XML - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để TextView có chiều rộng bằng parent:",
+          code: '<TextView\n    android:layout_width="[____]"\n    android:layout_height="wrap_content"/>',
+          options: ["fill_parent", "match_parent", "parent", "full_width"],
+          correct: 1,
+          explanation:
+            "match_parent (hoặc deprecated fill_parent) để view match parent size.",
+        },
+        {
+          id: 62,
+          category: "Layout XML - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để set ID cho Button:",
+          code: '<Button\n    android:[____]="@+id/btnSubmit"/>',
+          options: ["name", "id", "ID", "identifier"],
+          correct: 1,
+          explanation: "android:id với @+id/name để tạo và gán ID cho view.",
+        },
+        {
+          id: 63,
+          category: "Layout XML - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để EditText nhập mật khẩu (ẩn ký tự):",
+          code: '<EditText\n    android:inputType="[____]"/>',
+          options: ["password", "textPassword", "hidden", "secure"],
+          correct: 1,
+          explanation: 'inputType="textPassword" ẩn ký tự khi nhập.',
+        },
+        {
+          id: 64,
+          category: "Layout XML - Điền code",
+          type: "fill",
+          question:
+            "Điền vào chỗ trống để căn giữa nội dung bên trong TextView:",
+          code: '<TextView\n    android:[____]="center"/>',
+          options: ["align", "textAlign", "gravity", "layout_gravity"],
+          correct: 2,
+          explanation:
+            "gravity căn nội dung BÊN TRONG view. layout_gravity căn vị trí view.",
+        },
+        {
+          id: 65,
+          category: "Layout XML - Điền code",
+          type: "fill",
+          question:
+            "Điền vào chỗ trống để LinearLayout xếp các con theo chiều dọc:",
+          code: '<LinearLayout\n    android:orientation="[____]">',
+          options: ["column", "vertical", "portrait", "top_bottom"],
+          correct: 1,
+          explanation: 'orientation="vertical" xếp views theo chiều dọc.',
+        },
+        {
+          id: 66,
+          category: "Layout XML - Điền code",
+          type: "fill",
+          question:
+            "Điền vào chỗ trống để ConstraintLayout view căn giữa theo chiều ngang:",
+          code: '<TextView\n    app:layout_constraintStart_toStartOf="parent"\n    app:layout_constraint[____]_toEndOf="parent"/>',
+          options: ["Right", "End", "Finish", "Stop"],
+          correct: 1,
+          explanation:
+            "constraintEnd_toEndOf ràng buộc cạnh End với parent, kết hợp Start tạo căn giữa.",
+        },
+        {
+          id: 67,
+          category: "Layout XML - Điền code",
+          type: "fill",
+          question:
+            "Điền vào chỗ trống để ImageView scale ảnh giữ tỷ lệ, fit trong view:",
+          code: '<ImageView\n    android:scaleType="[____]"/>',
+          options: ["fitCenter", "centerCrop", "center", "fitXY"],
+          correct: 0,
+          explanation: "fitCenter scale ảnh giữ tỷ lệ để fit trong view.",
+        },
+        {
+          id: 68,
+          category: "Layout XML - Điền code",
+          type: "fill",
+          question:
+            "Điền vào chỗ trống để view có chiều rộng 0dp và weight trong LinearLayout:",
+          code: '<View\n    android:layout_width="0dp"\n    android:layout_[____]="1"/>',
+          options: ["weight", "flex", "ratio", "size"],
+          correct: 0,
+          explanation:
+            "layout_weight phân chia không gian còn lại trong LinearLayout.",
+        },
+        {
+          id: 69,
+          category: "Layout XML - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để set custom font từ res/font:",
+          code: '<TextView\n    android:[____]="@font/my_font"/>',
+          options: ["font", "textFont", "fontFamily", "typeface"],
+          correct: 2,
+          explanation: 'fontFamily="@font/..." để set custom font từ res/font.',
+        },
+        {
+          id: 70,
+          category: "Layout XML - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để TextView tự động tạo link từ URL:",
+          code: '<TextView\n    android:[____]="web"/>',
+          options: ["linkify", "autoLink", "urlDetect", "webLink"],
+          correct: 1,
+          explanation: 'autoLink="web" tự động detect và tạo clickable links.',
+        },
+
+        // ==================== ROOM DATABASE ====================
+        {
+          id: 71,
+          category: "Room - Điền code",
+          type: "fill",
+          question:
+            "Điền vào chỗ trống để đánh dấu class là Entity trong Room:",
+          code: "@[____]\ndata class User(\n    @PrimaryKey val id: Int,\n    val name: String\n)",
+          options: ["Table", "Entity", "Model", "Database"],
+          correct: 1,
+          explanation:
+            "@Entity đánh dấu class tương ứng với một bảng trong database.",
+        },
+        {
+          id: 72,
+          category: "Room - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để primary key tự động tăng:",
+          code: "@PrimaryKey([____] = true)\nval id: Int = 0",
+          options: ["auto", "autoIncrement", "autoGenerate", "increment"],
+          correct: 2,
+          explanation:
+            "@PrimaryKey(autoGenerate = true) để SQLite tự generate ID.",
+        },
+        {
+          id: 73,
+          category: "Room - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để query lấy user theo ID:",
+          code: '@Query("SELECT * FROM users WHERE id = [____]")\nsuspend fun getById(userId: Int): User?',
+          options: ["$userId", ":userId", "?userId", "{userId}"],
+          correct: 1,
+          explanation: ":paramName để bind parameter trong Room query.",
+        },
+        {
+          id: 74,
+          category: "Room - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để insert và replace khi conflict:",
+          code: "@Insert(onConflict = OnConflictStrategy.[____])\nsuspend fun insert(user: User)",
+          options: ["REPLACE", "IGNORE", "ABORT", "FAIL"],
+          correct: 0,
+          explanation:
+            "REPLACE xóa row cũ và insert row mới khi primary key trùng.",
+        },
+        {
+          id: 75,
+          category: "Room - Điền code",
+          type: "fill",
+          question:
+            "Điền vào chỗ trống để định nghĩa Database với Entity User:",
+          code: "@Database(entities = [[____]::class], version = 1)\nabstract class AppDatabase : RoomDatabase()",
+          options: ["User", "Entity", "Table", "Model"],
+          correct: 0,
+          explanation: "entities array chứa các Entity classes trong database.",
+        },
+        {
+          id: 76,
+          category: "Room - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để tạo Room database instance:",
+          code: 'val db = Room.[____](context, AppDatabase::class.java, "app_db").build()',
+          options: ["create", "build", "databaseBuilder", "newInstance"],
+          correct: 2,
+          explanation: "Room.databaseBuilder() tạo builder cho database.",
+        },
+
+        // ==================== RECYCLERVIEW ====================
+        {
+          id: 77,
+          category: "RecyclerView - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để set LayoutManager cho RecyclerView:",
+          code: "recyclerView.[____] = LinearLayoutManager(this)",
+          options: ["layout", "manager", "layoutManager", "viewManager"],
+          correct: 2,
+          explanation: "layoutManager property set cách sắp xếp items.",
+        },
+        {
+          id: 78,
+          category: "RecyclerView - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để set Adapter cho RecyclerView:",
+          code: "recyclerView.[____] = MyAdapter(items)",
+          options: ["adapter", "listAdapter", "dataAdapter", "itemAdapter"],
+          correct: 0,
+          explanation: "adapter property để set RecyclerView.Adapter.",
+        },
+        {
+          id: 79,
+          category: "RecyclerView - Điền code",
+          type: "fill",
+          question:
+            "Điền vào chỗ trống trong Adapter để trả về số lượng items:",
+          code: "override fun [____](): Int = items.size",
+          options: ["getCount", "getItemCount", "size", "itemCount"],
+          correct: 1,
+          explanation: "getItemCount() override để trả về số lượng items.",
+        },
+        {
+          id: 80,
+          category: "RecyclerView - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để tạo ViewHolder từ layout:",
+          code: "override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {\n    val view = LayoutInflater.from(parent.context)\n        .[____](R.layout.item, parent, false)\n    return ViewHolder(view)\n}",
+          options: ["create", "inflate", "load", "render"],
+          correct: 1,
+          explanation: "inflate() tạo View từ layout XML resource.",
+        },
+        {
+          id: 81,
+          category: "RecyclerView - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để bind data vào ViewHolder:",
+          code: "override fun [____](holder: ViewHolder, position: Int) {\n    holder.bind(items[position])\n}",
+          options: ["bindViewHolder", "onBindViewHolder", "onBind", "bindView"],
+          correct: 1,
+          explanation: "onBindViewHolder() được gọi để bind data cho mỗi item.",
+        },
+        {
+          id: 82,
+          category: "RecyclerView - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để notify adapter khi data thay đổi:",
+          code: "items.add(newItem)\nadapter.[____]()",
+          options: ["refresh", "update", "notifyDataSetChanged", "invalidate"],
+          correct: 2,
+          explanation:
+            "notifyDataSetChanged() báo adapter refresh toàn bộ list.",
+        },
+        {
+          id: 83,
+          category: "RecyclerView - Điền code",
+          type: "fill",
+          question:
+            "Điền vào chỗ trống để notify khi insert item tại position:",
+          code: "items.add(position, newItem)\nadapter.[____](position)",
+          options: [
+            "notifyItemChanged",
+            "notifyItemInserted",
+            "notifyInserted",
+            "itemInserted",
+          ],
+          correct: 1,
+          explanation:
+            "notifyItemInserted() hiệu quả hơn notifyDataSetChanged().",
+        },
+
+        // ==================== VIEWMODEL & LIVEDATA ====================
+        {
+          id: 84,
+          category: "ViewModel - Điền code",
+          type: "fill",
+          question:
+            "Điền vào chỗ trống để tạo MutableLiveData trong ViewModel:",
+          code: "private val _users = [____]<List<User>>()\nval users: LiveData<List<User>> = _users",
+          options: [
+            "LiveData",
+            "MutableLiveData",
+            "ObservableData",
+            "StateData",
+          ],
+          correct: 1,
+          explanation: "MutableLiveData cho phép setValue/postValue để update.",
+        },
+        {
+          id: 85,
+          category: "ViewModel - Điền code",
+          type: "fill",
+          question:
+            "Điền vào chỗ trống để update LiveData từ background thread:",
+          code: "viewModelScope.launch(Dispatchers.IO) {\n    val data = repository.getData()\n    _users.[____](data)\n}",
+          options: ["value", "setValue", "postValue", "emit"],
+          correct: 2,
+          explanation:
+            "postValue() thread-safe, có thể gọi từ background thread.",
+        },
+        {
+          id: 86,
+          category: "ViewModel - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để transform LiveData:",
+          code: "val userName = Transformations.[____](user) { it.name }",
+          options: ["transform", "map", "convert", "switch"],
+          correct: 1,
+          explanation: "Transformations.map() biến đổi value của LiveData.",
+        },
+        {
+          id: 87,
+          category: "ViewModel - Điền code",
+          type: "fill",
+          question:
+            "Điền vào chỗ trống để khởi tạo ViewModel với by viewModels():",
+          code: "private val viewModel: MainViewModel by [____]()",
+          options: ["lazy", "viewModels", "inject", "create"],
+          correct: 1,
+          explanation: "by viewModels() delegate tự động provide ViewModel.",
+        },
+
+        // ==================== COROUTINES ====================
+        {
+          id: 88,
+          category: "Coroutines - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để launch coroutine trong ViewModel:",
+          code: "[____].launch {\n    val data = fetchData()\n}",
+          options: [
+            "GlobalScope",
+            "CoroutineScope",
+            "viewModelScope",
+            "MainScope",
+          ],
+          correct: 2,
+          explanation: "viewModelScope tự động cancel khi ViewModel cleared.",
+        },
+        {
+          id: 89,
+          category: "Coroutines - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để chuyển sang IO dispatcher:",
+          code: "val result = [____](Dispatchers.IO) {\n    // network call\n}",
+          options: ["launch", "async", "withContext", "runBlocking"],
+          correct: 2,
+          explanation: "withContext() switches dispatcher và trả về kết quả.",
+        },
+        {
+          id: 90,
+          category: "Coroutines - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để chạy 2 coroutines song song:",
+          code: "val deferred1 = [____] { fetchUser() }\nval deferred2 = async { fetchPosts() }\nval user = deferred1.await()",
+          options: ["launch", "async", "withContext", "runBlocking"],
+          correct: 1,
+          explanation:
+            "async{} chạy concurrent và trả về Deferred để await kết quả.",
+        },
+        {
+          id: 91,
+          category: "Coroutines - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để collect Flow:",
+          code: "myFlow.[____] { value ->\n    println(value)\n}",
+          options: ["observe", "subscribe", "collect", "receive"],
+          correct: 2,
+          explanation:
+            "collect{} là terminal operator để nhận emissions từ Flow.",
+        },
+        {
+          id: 92,
+          category: "Coroutines - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để tạo StateFlow với initial value:",
+          code: "private val _state = [____](InitialState)\nval state: StateFlow<State> = _state",
+          options: ["MutableStateFlow", "StateFlow", "SharedFlow", "Flow"],
+          correct: 0,
+          explanation:
+            "MutableStateFlow cho phép emit, StateFlow chỉ read-only.",
+        },
+
+        // ==================== RETROFIT ====================
+        {
+          id: 93,
+          category: "Retrofit - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để định nghĩa GET request:",
+          code: '@[____]("users/{id}")\nsuspend fun getUser(@Path("id") userId: Int): User',
+          options: ["Get", "GET", "HttpGet", "Request"],
+          correct: 1,
+          explanation: "@GET định nghĩa HTTP GET request.",
+        },
+        {
+          id: 94,
+          category: "Retrofit - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để thay thế {id} trong URL:",
+          code: '@GET("users/{id}")\nsuspend fun getUser(@[____]("id") userId: Int): User',
+          options: ["Param", "Path", "Query", "Url"],
+          correct: 1,
+          explanation: "@Path thay thế placeholder {name} trong URL.",
+        },
+        {
+          id: 95,
+          category: "Retrofit - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để thêm query parameter ?page=1:",
+          code: '@GET("users")\nsuspend fun getUsers(@[____]("page") page: Int): List<User>',
+          options: ["Param", "Path", "Query", "Field"],
+          correct: 2,
+          explanation: "@Query thêm query parameters vào URL.",
+        },
+        {
+          id: 96,
+          category: "Retrofit - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để gửi object như request body:",
+          code: '@POST("users")\nsuspend fun createUser(@[____] user: User): User',
+          options: ["Param", "Field", "Body", "Data"],
+          correct: 2,
+          explanation: "@Body serialize object thành request body.",
+        },
+
+        // ==================== THÊM NHIỀU CÂU HỎI THEORY ====================
+        {
+          id: 97,
+          category: "Android Theory",
+          type: "theory",
+          question:
+            "Activity lifecycle callback nào được gọi khi Activity vừa được tạo?",
+          options: ["onStart()", "onCreate()", "onResume()", "onRestart()"],
+          correct: 1,
+          explanation:
+            "onCreate() là callback đầu tiên, nơi khởi tạo Activity.",
+        },
+        {
+          id: 98,
+          category: "Android Theory",
+          type: "theory",
+          question:
+            "Khi nhấn nút Home, callback nào của Activity được gọi ĐẦU TIÊN?",
+          options: [
+            "onStop()",
+            "onPause()",
+            "onDestroy()",
+            "onSaveInstanceState()",
+          ],
+          correct: 1,
+          explanation:
+            "onPause() luôn được gọi đầu tiên khi Activity mất focus.",
+        },
+        {
+          id: 99,
+          category: "Android Theory",
+          type: "theory",
+          question: "ViewModel survive qua event nào?",
+          options: [
+            "Process death",
+            "Configuration change",
+            "App update",
+            "System reboot",
+          ],
+          correct: 1,
+          explanation:
+            "ViewModel survive configuration changes như xoay màn hình, KHÔNG survive process death.",
+        },
+        {
+          id: 100,
+          category: "Android Theory",
+          type: "theory",
+          question:
+            "Đâu là thành phần KHÔNG phải là Android Application Component?",
+          options: ["Activity", "Fragment", "Service", "BroadcastReceiver"],
+          correct: 1,
+          explanation:
+            "4 components: Activity, Service, BroadcastReceiver, ContentProvider. Fragment không phải.",
+        },
+        {
+          id: 101,
+          category: "Android Theory",
+          type: "theory",
+          question: "Intent nào dùng để mở ứng dụng khác xử lý?",
+          options: [
+            "Explicit Intent",
+            "Implicit Intent",
+            "Pending Intent",
+            "Broadcast Intent",
+          ],
+          correct: 1,
+          explanation:
+            "Implicit Intent không chỉ định target, để system tìm app phù hợp.",
+        },
+        {
+          id: 102,
+          category: "Android Theory",
+          type: "theory",
+          question:
+            "Layout nào phù hợp nhất cho UI phức tạp với ít nested views?",
+          options: [
+            "LinearLayout",
+            "RelativeLayout",
+            "FrameLayout",
+            "ConstraintLayout",
+          ],
+          correct: 3,
+          explanation:
+            "ConstraintLayout cho phép tạo flat hierarchy với constraints.",
+        },
+        {
+          id: 103,
+          category: "Android Theory",
+          type: "theory",
+          question:
+            "Đơn vị nào nên dùng cho font size để responsive với user settings?",
+          options: ["px", "dp", "sp", "pt"],
+          correct: 2,
+          explanation:
+            "sp (scale-independent pixels) scale theo font size preference của user.",
+        },
+        {
+          id: 104,
+          category: "Android Theory",
+          type: "theory",
+          question: "RecyclerView cải tiến ListView ở điểm nào?",
+          options: [
+            "Bắt buộc ViewHolder pattern",
+            "Support multiple layout managers",
+            "Item animations built-in",
+            "Tất cả các đáp án trên",
+          ],
+          correct: 3,
+          explanation:
+            "RecyclerView cải tiến: mandatory ViewHolder, pluggable LayoutManager, ItemAnimator.",
+        },
+        {
+          id: 105,
+          category: "Android Theory",
+          type: "theory",
+          question: "Room Database là gì?",
+          options: [
+            "NoSQL database",
+            "Abstraction layer trên SQLite",
+            "Cloud database",
+            "In-memory database",
+          ],
+          correct: 1,
+          explanation:
+            "Room là persistence library, abstraction layer trên SQLite.",
+        },
+        {
+          id: 106,
+          category: "Android Theory",
+          type: "theory",
+          question: "LiveData có đặc điểm gì?",
+          options: [
+            "Lifecycle-aware observable data holder",
+            "Thread-safe mutable data",
+            "Persistent storage",
+            "Network data cache",
+          ],
+          correct: 0,
+          explanation:
+            "LiveData lifecycle-aware, tự động unsubscribe khi lifecycle inactive.",
+        },
+        {
+          id: 107,
+          category: "Android Theory",
+          type: "theory",
+          question: "Coroutine Dispatcher nào dùng cho network calls?",
+          options: [
+            "Dispatchers.Main",
+            "Dispatchers.IO",
+            "Dispatchers.Default",
+            "Dispatchers.Unconfined",
+          ],
+          correct: 1,
+          explanation:
+            "Dispatchers.IO optimized cho blocking I/O (network, disk).",
+        },
+        {
+          id: 108,
+          category: "Android Theory",
+          type: "theory",
+          question: "WorkManager dùng cho loại work nào?",
+          options: [
+            "UI updates",
+            "Immediate one-time tasks",
+            "Deferrable, guaranteed background work",
+            "Real-time messaging",
+          ],
+          correct: 2,
+          explanation:
+            "WorkManager cho work cần execute eventually, survives app restart.",
+        },
+        {
+          id: 109,
+          category: "Android Theory",
+          type: "theory",
+          question: "Navigation Component gồm những thành phần chính nào?",
+          options: [
+            "NavHost, NavController, NavGraph",
+            "Navigator, Destination, Action",
+            "Fragment, Intent, Bundle",
+            "Router, Route, Endpoint",
+          ],
+          correct: 0,
+          explanation:
+            "NavHost (container), NavController (điều khiển), NavGraph (define paths).",
+        },
+        {
+          id: 110,
+          category: "Android Theory",
+          type: "theory",
+          question: "SharedPreferences phù hợp lưu loại data nào?",
+          options: [
+            "Large files",
+            "Small key-value pairs",
+            "Complex objects",
+            "Images",
+          ],
+          correct: 1,
+          explanation:
+            "SharedPreferences cho small primitive data (String, Int, Boolean...).",
+        },
+
+        // ==================== THÊM CÂU HỎI CODE PHỨC TẠP ====================
+        {
+          id: 111,
+          category: "Kotlin - Output",
+          type: "output",
+          question: "Đoạn code sau in ra gì?",
+          code: "val list = listOf(1, 2, 3, 4, 5)\nprintln(list.take(3).drop(1))",
+          options: ["[2, 3]", "[1, 2, 3]", "[2, 3, 4]", "[1, 2]"],
+          correct: 0,
+          explanation: "take(3) -> [1,2,3], drop(1) bỏ phần tử đầu -> [2,3].",
+        },
+        {
+          id: 112,
+          category: "Kotlin - Output",
+          type: "output",
+          question: "Đoạn code sau in ra gì?",
+          code: 'val map = mapOf("a" to 1, "b" to 2)\nprintln(map.getOrDefault("c", 0))',
+          options: ["null", "0", "c", "Exception"],
+          correct: 1,
+          explanation:
+            "getOrDefault trả về default value 0 khi key không tồn tại.",
+        },
+        {
+          id: 113,
+          category: "Kotlin - Output",
+          type: "output",
+          question: "Đoạn code sau in ra gì?",
+          code: 'val str = "Hello World"\nprintln(str.split(" ").map { it.first() }.joinToString(""))',
+          options: ["HW", "Hello World", "H W", "HelloWorld"],
+          correct: 0,
+          explanation:
+            'split -> [Hello, World], first() -> [H, W], join -> "HW".',
+        },
+        {
+          id: 114,
+          category: "Kotlin - Output",
+          type: "output",
+          question: "Đoạn code sau in ra gì?",
+          code: "val numbers = listOf(1, 2, 3, 4, 5)\nprintln(numbers.partition { it % 2 == 0 })",
+          options: [
+            "([2, 4], [1, 3, 5])",
+            "([1, 3, 5], [2, 4])",
+            "[[2, 4], [1, 3, 5]]",
+            "[2, 4, 1, 3, 5]",
+          ],
+          correct: 0,
+          explanation:
+            "partition chia thành (matching, not matching) -> (evens, odds).",
+        },
+        {
+          id: 115,
+          category: "Kotlin - Output",
+          type: "output",
+          question: "Đoạn code sau in ra gì?",
+          code: "val sequence = generateSequence(1) { it * 2 }\nprintln(sequence.take(4).toList())",
+          options: [
+            "[1, 2, 4, 8]",
+            "[2, 4, 8, 16]",
+            "[1, 2, 3, 4]",
+            "[1, 1, 1, 1]",
+          ],
+          correct: 0,
+          explanation: "generateSequence: 1, 1*2=2, 2*2=4, 4*2=8.",
+        },
+        {
+          id: 116,
+          category: "Kotlin - Output",
+          type: "output",
+          question: "Đoạn code sau in ra gì?",
+          code: 'val result = runCatching { "abc".toInt() }\nprintln(result.isFailure)',
+          options: ["true", "false", "null", "Exception"],
+          correct: 0,
+          explanation:
+            '"abc".toInt() throw NumberFormatException, isFailure = true.',
+        },
+        {
+          id: 117,
+          category: "Kotlin - Output",
+          type: "output",
+          question: "Đoạn code sau in ra gì?",
+          code: "val list = mutableListOf(1, 2, 3)\nlist.also { it.add(4) }.also { it.add(5) }\nprintln(list.size)",
+          options: ["3", "4", "5", "Lỗi"],
+          correct: 2,
+          explanation:
+            "also{} thực hiện action và trả về object gốc, list có 5 phần tử.",
+        },
+        {
+          id: 118,
+          category: "Kotlin - Output",
+          type: "output",
+          question: "Đoạn code sau in ra gì?",
+          code: "val numbers = listOf(1, 2, 3)\nprintln(numbers.fold(10) { acc, i -> acc + i })",
+          options: ["6", "16", "10", "13"],
+          correct: 1,
+          explanation: "fold với initial 10: 10+1+2+3 = 16.",
+        },
+        {
+          id: 119,
+          category: "Kotlin - Output",
+          type: "output",
+          question: "Đoạn code sau in ra gì?",
+          code: 'val str = "kotlin"\nprintln(str.replaceFirstChar { it.uppercase() })',
+          options: ["kotlin", "Kotlin", "KOTLIN", "kOTLIN"],
+          correct: 1,
+          explanation:
+            "replaceFirstChar thay ký tự đầu bằng uppercase -> Kotlin.",
+        },
+        {
+          id: 120,
+          category: "Kotlin - Output",
+          type: "output",
+          question: "Đoạn code sau in ra gì?",
+          code: "val numbers = listOf(3, 1, 4, 1, 5, 9)\nprintln(numbers.distinct().sorted())",
+          options: [
+            "[1, 3, 4, 5, 9]",
+            "[3, 1, 4, 5, 9]",
+            "[1, 1, 3, 4, 5, 9]",
+            "[9, 5, 4, 3, 1]",
+          ],
+          correct: 0,
+          explanation:
+            "distinct() bỏ trùng [3,1,4,5,9], sorted() sắp xếp [1,3,4,5,9].",
+        },
+
+        // ==================== ANDROID MANIFEST ====================
+        {
+          id: 121,
+          category: "Manifest - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để khai báo quyền Internet:",
+          code: '<uses-[____] android:name="android.permission.INTERNET"/>',
+          options: ["feature", "permission", "library", "service"],
+          correct: 1,
+          explanation: "uses-permission khai báo permissions app cần.",
+        },
+        {
+          id: 122,
+          category: "Manifest - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để set Activity là launcher:",
+          code: '<activity android:name=".MainActivity">\n    <intent-filter>\n        <action android:name="android.intent.action.[____]"/>\n        <category android:name="android.intent.category.LAUNCHER"/>\n    </intent-filter>\n</activity>',
+          options: ["MAIN", "LAUNCHER", "START", "DEFAULT"],
+          correct: 0,
+          explanation:
+            "ACTION_MAIN + CATEGORY_LAUNCHER đánh dấu launcher activity.",
+        },
+        {
+          id: 123,
+          category: "Manifest - Điền code",
+          type: "fill",
+          question:
+            "Điền vào chỗ trống để Activity không recreate khi xoay màn hình:",
+          code: '<activity\n    android:name=".MainActivity"\n    android:[____]="orientation|screenSize"/>',
+          options: [
+            "configChange",
+            "configChanges",
+            "handleConfig",
+            "rotationConfig",
+          ],
+          correct: 1,
+          explanation: "configChanges để tự handle thay vì recreate activity.",
+        },
+        {
+          id: 124,
+          category: "Manifest - Điền code",
+          type: "fill",
+          question:
+            "Điền vào chỗ trống để set parent activity cho Up navigation:",
+          code: '<activity\n    android:name=".DetailActivity"\n    android:[____]=".MainActivity"/>',
+          options: [
+            "parent",
+            "parentActivity",
+            "parentActivityName",
+            "upActivity",
+          ],
+          correct: 2,
+          explanation: "parentActivityName định nghĩa parent cho Up button.",
+        },
+
+        // ==================== DATA BINDING ====================
+        {
+          id: 125,
+          category: "DataBinding - Điền code",
+          type: "fill",
+          question:
+            "Điền vào chỗ trống để enable DataBinding trong build.gradle:",
+          code: "android {\n    buildFeatures {\n        [____] = true\n    }\n}",
+          options: ["viewBinding", "dataBinding", "binding", "dataBind"],
+          correct: 1,
+          explanation: "dataBinding = true enables Data Binding library.",
+        },
+        {
+          id: 126,
+          category: "DataBinding - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để bind data vào TextView trong XML:",
+          code: '<TextView\n    android:text="[____]{user.name}"/>',
+          options: ["$", "@", "#", "%"],
+          correct: 1,
+          explanation: "@{expression} là syntax của Data Binding expressions.",
+        },
+        {
+          id: 127,
+          category: "DataBinding - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để inflate binding trong Activity:",
+          code: "val binding = ActivityMainBinding.[____](layoutInflater)",
+          options: ["create", "inflate", "bind", "from"],
+          correct: 1,
+          explanation: "inflate() tạo binding instance từ layoutInflater.",
+        },
+        {
+          id: 128,
+          category: "DataBinding - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để set content view với binding:",
+          code: "setContentView(binding.[____])",
+          options: ["view", "root", "layout", "content"],
+          correct: 1,
+          explanation: "binding.root là root view của layout.",
+        },
+
+        // ==================== THÊM CÂU HỎI TÌM LỖI NÂNG CAO ====================
+        {
+          id: 129,
+          category: "Android - Tìm lỗi",
+          type: "error",
+          question: "Code sau có vấn đề gì?",
+          code: "class MyFragment : Fragment() {\n    private var adapter: MyAdapter? = null\n    \n    override fun onCreateView(...): View? {\n        val view = inflater.inflate(R.layout.fragment, container, false)\n        adapter = MyAdapter(requireContext())\n        return view\n    }\n    \n    override fun onDestroyView() {\n        super.onDestroyView()\n        // không clear adapter\n    }\n}",
+          options: [
+            "Không có lỗi",
+            "Có thể memory leak vì adapter giữ Context",
+            "requireContext() có thể null",
+            "inflater sai cú pháp",
+          ],
+          correct: 1,
+          explanation:
+            "adapter giữ Context, không clear trong onDestroyView có thể gây leak khi Fragment trong back stack.",
+        },
+        {
+          id: 130,
+          category: "Android - Tìm lỗi",
+          type: "error",
+          question: "Code sau có vấn đề gì?",
+          code: "class MyActivity : AppCompatActivity() {\n    override fun onCreate(savedInstanceState: Bundle?) {\n        super.onCreate(savedInstanceState)\n        setContentView(R.layout.activity_main)\n        \n        lifecycleScope.launch {\n            while(true) {\n                updateUI()\n                delay(1000)\n            }\n        }\n    }\n}",
+          options: [
+            "Không có lỗi, lifecycleScope tự cancel",
+            "while(true) gây infinite loop không thể dừng",
+            "delay không thể dùng trong Activity",
+            "launch phải trên IO thread",
+          ],
+          correct: 0,
+          explanation:
+            "lifecycleScope tự động cancel coroutines khi lifecycle destroyed, nên code này an toàn.",
+        },
+        {
+          id: 131,
+          category: "Android - Tìm lỗi",
+          type: "error",
+          question: "Code sau có vấn đề gì?",
+          code: "class MyViewModel : ViewModel() {\n    val users = MutableLiveData<List<User>>()\n}",
+          options: [
+            "Không có lỗi",
+            "MutableLiveData nên private, expose LiveData",
+            "ViewModel không thể có LiveData",
+            "Thiếu init block",
+          ],
+          correct: 1,
+          explanation:
+            "Best practice: private _users MutableLiveData, public users: LiveData để prevent external modification.",
+        },
+        {
+          id: 132,
+          category: "Android - Tìm lỗi",
+          type: "error",
+          question: "Code sau có vấn đề gì?",
+          code: "@Entity\ndata class User(\n    val id: Int,\n    val name: String\n)",
+          options: [
+            "Không có lỗi",
+            "Thiếu @PrimaryKey annotation",
+            "data class không thể là Entity",
+            "Thiếu tableName",
+          ],
+          correct: 1,
+          explanation: "Room Entity bắt buộc có ít nhất một @PrimaryKey.",
+        },
+        {
+          id: 133,
+          category: "Android - Tìm lỗi",
+          type: "error",
+          question: "Code sau có vấn đề gì?",
+          code: '@Dao\ninterface UserDao {\n    @Query("SELECT * FROM user WHERE name = :name")\n    fun findByName(name: String): User\n}',
+          options: [
+            "Không có lỗi - chạy bình thường",
+            "Synchronous query trên main thread gây ANR",
+            "Query syntax sai",
+            ":name binding sai",
+          ],
+          correct: 1,
+          explanation:
+            "Non-suspend query chạy synchronously. Cần suspend fun hoặc return LiveData/Flow.",
+        },
+        {
+          id: 134,
+          category: "Android - Tìm lỗi",
+          type: "error",
+          question: "Code sau có vấn đề gì trong Fragment?",
+          code: "class MyFragment : Fragment(R.layout.fragment_my) {\n    private val binding = FragmentMyBinding.inflate(layoutInflater)\n}",
+          options: [
+            "Không có lỗi",
+            "layoutInflater null khi property initialize, sẽ crash",
+            "Fragment constructor sai",
+            "binding phải lateinit",
+          ],
+          correct: 1,
+          explanation:
+            "layoutInflater chưa available khi property được initialize. Cần inflate trong onCreateView.",
+        },
+        {
+          id: 135,
+          category: "Kotlin - Tìm lỗi",
+          type: "error",
+          question: "Code sau có vấn đề gì?",
+          code: "data class User(val name: String) {\n    var age: Int = 0\n}",
+          options: [
+            "Không có lỗi",
+            "data class chỉ có thể có val properties",
+            "age không được include trong equals/hashCode",
+            "Thiếu primary constructor",
+          ],
+          correct: 2,
+          explanation:
+            "Chỉ properties trong primary constructor được dùng cho equals/hashCode/copy. age bên ngoài không được include.",
+        },
+        {
+          id: 136,
+          category: "Kotlin - Tìm lỗi",
+          type: "error",
+          question: "Code sau có vấn đề gì?",
+          code: "sealed class Result\nclass Success(val data: String) : Result()\nclass Error(val message: String) : Result()\n\n// In another file:\nclass Loading : Result()",
+          options: [
+            "Không có lỗi",
+            "Sealed subclasses phải cùng file với sealed class",
+            "sealed class phải abstract",
+            "Thiếu object keyword",
+          ],
+          correct: 1,
+          explanation:
+            "Sealed class subclasses phải định nghĩa trong cùng file (hoặc cùng module từ Kotlin 1.5).",
+        },
+
+        // ==================== THÊM CÂU HỎI ĐIỀN CODE NÂNG CAO ====================
+        {
+          id: 137,
+          category: "Kotlin - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để tạo extension function cho String:",
+          code: '[____] String.addExclamation(): String = this + "!"',
+          options: ["extension", "fun", "inline fun", "private"],
+          correct: 1,
+          explanation:
+            "fun ReceiverType.functionName() là syntax của extension function.",
+        },
+        {
+          id: 138,
+          category: "Kotlin - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để tạo inline function:",
+          code: '[____] fun <T> measureTime(block: () -> T): T {\n    val start = System.currentTimeMillis()\n    val result = block()\n    println("Time: ${System.currentTimeMillis() - start}ms")\n    return result\n}',
+          options: ["inline", "inlined", "reified", "crossinline"],
+          correct: 0,
+          explanation:
+            "inline function copies body vào call site, tránh lambda allocation.",
+        },
+        {
+          id: 139,
+          category: "Kotlin - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để destructure trong lambda:",
+          code: 'map.forEach { ([____], value) ->\n    println("$key = $value")\n}',
+          options: ["k", "key", "first", "it"],
+          correct: 1,
+          explanation: "Destructuring trong lambda: (key, value) thay vì it.",
+        },
+        {
+          id: 140,
+          category: "Kotlin - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để kiểm tra type trong when:",
+          code: "when (obj) {\n    [____] String -> println(obj.length)\n    is Int -> println(obj + 1)\n}",
+          options: ["is", "as", "typeof", "instanceof"],
+          correct: 0,
+          explanation: "is kiểm tra type và smart cast trong branch.",
+        },
+        {
+          id: 141,
+          category: "Kotlin - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để tạo lazy property:",
+          code: "val heavyObject by [____] {\n    HeavyObject()\n}",
+          options: ["late", "lazy", "delayed", "deferred"],
+          correct: 1,
+          explanation: "by lazy{} delegate tạo object khi first access.",
+        },
+        {
+          id: 142,
+          category: "Android - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để inject ViewModel với Hilt:",
+          code: "@AndroidEntryPoint\nclass MainActivity : AppCompatActivity() {\n    private val viewModel: MainViewModel by [____]()\n}",
+          options: ["inject", "viewModels", "hiltViewModel", "provided"],
+          correct: 1,
+          explanation: "by viewModels() với Hilt tự động provide ViewModel.",
+        },
+        {
+          id: 143,
+          category: "Android - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để tạo Hilt module:",
+          code: "@Module\n@InstallIn([____]::class)\nobject AppModule { }",
+          options: [
+            "Application",
+            "SingletonComponent",
+            "ActivityComponent",
+            "AppComponent",
+          ],
+          correct: 1,
+          explanation: "SingletonComponent cho app-level singletons.",
+        },
+        {
+          id: 144,
+          category: "Android - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để provide dependency với Hilt:",
+          code: "@Module\n@InstallIn(SingletonComponent::class)\nobject NetworkModule {\n    @[____]\n    @Singleton\n    fun provideRetrofit(): Retrofit { ... }\n}",
+          options: ["Inject", "Provides", "Binds", "Supply"],
+          correct: 1,
+          explanation: "@Provides trong @Module để provide instances.",
+        },
+        {
+          id: 145,
+          category: "Android - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để navigate với Safe Args:",
+          code: "val action = HomeFragmentDirections.[____](userId = 123)\nfindNavController().navigate(action)",
+          options: [
+            "navigateToDetail",
+            "actionHomeToDetail",
+            "toDetailFragment",
+            "goToDetail",
+          ],
+          correct: 1,
+          explanation:
+            "Safe Args generates action methods: actionSourceToDestination.",
+        },
+        {
+          id: 146,
+          category: "Android - Điền code",
+          type: "fill",
+          question:
+            "Điền vào chỗ trống để nhận argument trong destination Fragment:",
+          code: "private val args: DetailFragmentArgs by [____]()",
+          options: ["arguments", "navArgs", "safeArgs", "bundleArgs"],
+          correct: 1,
+          explanation: "by navArgs() delegate để nhận Safe Args.",
+        },
+        {
+          id: 147,
+          category: "Android - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để tạo Worker cho WorkManager:",
+          code: "class MyWorker(context: Context, params: WorkerParameters) : [____](context, params) {\n    override suspend fun doWork(): Result {\n        return Result.success()\n    }\n}",
+          options: [
+            "Worker",
+            "CoroutineWorker",
+            "ListenableWorker",
+            "BackgroundWorker",
+          ],
+          correct: 1,
+          explanation: "CoroutineWorker cho suspend doWork() function.",
+        },
+        {
+          id: 148,
+          category: "Android - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để enqueue OneTimeWorkRequest:",
+          code: "val request = OneTimeWorkRequestBuilder<MyWorker>().build()\nWorkManager.getInstance(context).[____](request)",
+          options: ["execute", "enqueue", "schedule", "run"],
+          correct: 1,
+          explanation: "enqueue() submits work request để execute.",
+        },
+        {
+          id: 149,
+          category: "Android - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để set constraint cho WorkRequest:",
+          code: "val constraints = Constraints.Builder()\n    .setRequired[____](NetworkType.CONNECTED)\n    .build()",
+          options: ["Network", "NetworkType", "Connection", "Internet"],
+          correct: 1,
+          explanation: "setRequiredNetworkType() set network constraint.",
+        },
+        {
+          id: 150,
+          category: "Android - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để create NotificationChannel:",
+          code: 'val channel = NotificationChannel(\n    channelId,\n    "Channel Name",\n    NotificationManager.[____]_DEFAULT\n)',
+          options: ["PRIORITY", "IMPORTANCE", "LEVEL", "URGENCY"],
+          correct: 1,
+          explanation:
+            "IMPORTANCE_DEFAULT, IMPORTANCE_HIGH, etc cho notification priority.",
+        },
+
+        // ==================== COMPOSE ====================
+        {
+          id: 151,
+          category: "Compose - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để tạo Composable function:",
+          code: '@[____]\nfun Greeting(name: String) {\n    Text(text = "Hello $name!")\n}',
+          options: ["Compose", "Composable", "UI", "Component"],
+          correct: 1,
+          explanation: "@Composable đánh dấu function có thể emit UI.",
+        },
+        {
+          id: 152,
+          category: "Compose - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để tạo state trong Composable:",
+          code: "var count by [____] { mutableStateOf(0) }",
+          options: ["state", "remember", "mutable", "observable"],
+          correct: 1,
+          explanation: "remember{} preserves state across recompositions.",
+        },
+        {
+          id: 153,
+          category: "Compose - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để observe state from ViewModel:",
+          code: "val users by viewModel.users.[____]AsState()",
+          options: ["observe", "collect", "watch", "subscribe"],
+          correct: 1,
+          explanation:
+            "collectAsState() converts Flow/StateFlow to Compose State.",
+        },
+        {
+          id: 154,
+          category: "Compose - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để set click listener cho Button:",
+          code: 'Button([____] = { /* handle click */ }) {\n    Text("Click me")\n}',
+          options: ["click", "onClick", "onPress", "action"],
+          correct: 1,
+          explanation: "onClick lambda parameter cho click handling.",
+        },
+        {
+          id: 155,
+          category: "Compose - Điền code",
+          type: "fill",
+          question:
+            "Điền vào chỗ trống để chạy side effect khi composable enters:",
+          code: "[____] {\n    // side effect code\n}",
+          options: [
+            "SideEffect",
+            "LaunchedEffect",
+            "DisposableEffect",
+            "remember",
+          ],
+          correct: 1,
+          explanation:
+            "LaunchedEffect runs suspend code tied to composition lifecycle.",
+        },
+        {
+          id: 156,
+          category: "Compose - Điền code",
+          type: "fill",
+          question:
+            "Điền vào chỗ trống để tạo lazy column (RecyclerView equivalent):",
+          code: "[____](items = users) { user ->\n    UserItem(user)\n}",
+          options: [
+            "RecyclerView",
+            "LazyColumn",
+            "ListView",
+            "ScrollableColumn",
+          ],
+          correct: 1,
+          explanation: "LazyColumn là Compose equivalent của RecyclerView.",
+        },
+
+        // ==================== THÊM NHIỀU CÂU OUTPUT NỮA ====================
+        {
+          id: 157,
+          category: "Kotlin - Output",
+          type: "output",
+          question: "Đoạn code sau in ra gì?",
+          code: 'fun String.repeat(n: Int): String = (1..n).map { this }.joinToString("")\nprintln("Hi".repeat(3))',
+          options: ["Hi", "HiHiHi", "Hi Hi Hi", "Lỗi compile"],
+          correct: 1,
+          explanation: 'Extension function tạo chuỗi repeat 3 lần: "HiHiHi".',
+        },
+        {
+          id: 158,
+          category: "Kotlin - Output",
+          type: "output",
+          question: "Đoạn code sau in ra gì?",
+          code: "val result = listOf(1, 2, 3).runningReduce { acc, i -> acc + i }\nprintln(result)",
+          options: ["[1, 3, 6]", "[6]", "[1, 2, 3]", "[3, 6]"],
+          correct: 0,
+          explanation: "runningReduce: [1, 1+2=3, 3+3=6].",
+        },
+        {
+          id: 159,
+          category: "Kotlin - Output",
+          type: "output",
+          question: "Đoạn code sau in ra gì?",
+          code: 'val map = mutableMapOf<String, Int>()\nmap.getOrPut("a") { 1 }\nmap.getOrPut("a") { 2 }\nprintln(map["a"])',
+          options: ["1", "2", "null", "3"],
+          correct: 0,
+          explanation:
+            "getOrPut chỉ put nếu key không tồn tại. Lần 2 key đã có nên không put.",
+        },
+        {
+          id: 160,
+          category: "Kotlin - Output",
+          type: "output",
+          question: "Đoạn code sau in ra gì?",
+          code: 'val (a, b, c) = Triple(1, "two", 3.0)\nprintln("$a $b $c")',
+          options: ["1 two 3.0", "(1, two, 3.0)", "Lỗi compile", "1, two, 3.0"],
+          correct: 0,
+          explanation: "Triple có thể destructure thành 3 components.",
+        },
+        {
+          id: 161,
+          category: "Kotlin - Output",
+          type: "output",
+          question: "Đoạn code sau in ra gì?",
+          code: 'val list = listOf("a", "bb", "ccc")\nprintln(list.maxByOrNull { it.length })',
+          options: ["ccc", "3", "a", "null"],
+          correct: 0,
+          explanation: 'maxByOrNull tìm element có length lớn nhất: "ccc".',
+        },
+        {
+          id: 162,
+          category: "Kotlin - Output",
+          type: "output",
+          question: "Đoạn code sau in ra gì?",
+          code: "val nums = listOf(1, 2, 3, 4, 5)\nprintln(nums.windowed(3))",
+          options: [
+            "[[1, 2, 3], [2, 3, 4], [3, 4, 5]]",
+            "[[1, 2, 3], [4, 5]]",
+            "[[1, 2, 3]]",
+            "Lỗi",
+          ],
+          correct: 0,
+          explanation: "windowed(3) tạo sliding windows size 3.",
+        },
+        {
+          id: 163,
+          category: "Kotlin - Output",
+          type: "output",
+          question: "Đoạn code sau in ra gì?",
+          code: "val nums = listOf(1, 2, 3, 4, 5, 6)\nprintln(nums.chunked(2))",
+          options: [
+            "[[1, 2], [3, 4], [5, 6]]",
+            "[[1, 2, 3], [4, 5, 6]]",
+            "[2, 2, 2]",
+            "Lỗi",
+          ],
+          correct: 0,
+          explanation: "chunked(2) chia list thành chunks size 2.",
+        },
+        {
+          id: 164,
+          category: "Kotlin - Output",
+          type: "output",
+          question: "Đoạn code sau in ra gì?",
+          code: 'val map = mapOf(1 to "one", 2 to "two")\nprintln(map.entries.map { "${it.key}=${it.value}" })',
+          options: [
+            "[1=one, 2=two]",
+            "{1=one, 2=two}",
+            "[(1, one), (2, two)]",
+            "Lỗi",
+          ],
+          correct: 0,
+          explanation: "map entries rồi transform thành strings.",
+        },
+        {
+          id: 165,
+          category: "Kotlin - Output",
+          type: "output",
+          question: "Đoạn code sau in ra gì?",
+          code: 'println(listOf(1, 2, 3).zip(listOf("a", "b")))',
+          options: [
+            "[(1, a), (2, b)]",
+            "[(1, a), (2, b), (3, null)]",
+            "[1a, 2b]",
+            "Lỗi",
+          ],
+          correct: 0,
+          explanation: "zip pairs elements, stops at shorter list.",
+        },
+        {
+          id: 166,
+          category: "Kotlin - Output",
+          type: "output",
+          question: "Đoạn code sau in ra gì?",
+          code: "val list = listOf(listOf(1, 2), listOf(3, 4))\nprintln(list.flatten())",
+          options: [
+            "[1, 2, 3, 4]",
+            "[[1, 2], [3, 4]]",
+            "[1, 2, 3, 4, 5, 6]",
+            "Lỗi",
+          ],
+          correct: 0,
+          explanation: "flatten() chuyển List<List<T>> thành List<T>.",
+        },
+        {
+          id: 167,
+          category: "Kotlin - Output",
+          type: "output",
+          question: "Đoạn code sau in ra gì?",
+          code: "val set = setOf(1, 2, 3) + setOf(3, 4, 5)\nprintln(set)",
+          options: [
+            "[1, 2, 3, 4, 5]",
+            "[1, 2, 3, 3, 4, 5]",
+            "{1, 2, 3, 4, 5}",
+            "Lỗi",
+          ],
+          correct: 0,
+          explanation:
+            "Set union, duplicates removed. + trả về Set nhưng print như list.",
+        },
+        {
+          id: 168,
+          category: "Kotlin - Output",
+          type: "output",
+          question: "Đoạn code sau in ra gì?",
+          code: 'val str = "Hello"\nprintln(str.drop(2).take(2))',
+          options: ["ll", "He", "llo", "el"],
+          correct: 0,
+          explanation: "drop(2) bỏ 'He' -> 'llo', take(2) lấy 'll'.",
+        },
+        {
+          id: 169,
+          category: "Kotlin - Output",
+          type: "output",
+          question: "Đoạn code sau in ra gì?",
+          code: 'val result = buildString {\n    append("Hello")\n    append(" ")\n    append("World")\n}\nprintln(result)',
+          options: ["Hello World", "HelloWorld", "Hello World ", "Lỗi"],
+          correct: 0,
+          explanation: "buildString builder pattern tạo string.",
+        },
+        {
+          id: 170,
+          category: "Kotlin - Output",
+          type: "output",
+          question: "Đoạn code sau in ra gì?",
+          code: "val list = listOf(1, 2, null, 4, null)\nprintln(list.filterNotNull().sum())",
+          options: ["7", "null", "0", "Lỗi"],
+          correct: 0,
+          explanation: "filterNotNull() removes nulls, sum() = 1+2+4 = 7.",
+        },
+
+        // ==================== ANDROID THEORY BỔ SUNG ====================
+        {
+          id: 171,
+          category: "Android Theory",
+          type: "theory",
+          question: "Content Provider dùng để làm gì?",
+          options: [
+            "Provide content cho UI",
+            "Share data between apps",
+            "Provide network content",
+            "Content caching",
+          ],
+          correct: 1,
+          explanation:
+            "ContentProvider cho phép apps chia sẻ data một cách có kiểm soát.",
+        },
+        {
+          id: 172,
+          category: "Android Theory",
+          type: "theory",
+          question: "BroadcastReceiver được dùng để làm gì?",
+          options: [
+            "Broadcast messages to users",
+            "Receive and respond to system-wide events",
+            "Send broadcasts to servers",
+            "Network broadcasting",
+          ],
+          correct: 1,
+          explanation:
+            "BroadcastReceiver nhận system broadcasts (battery, connectivity...).",
+        },
+        {
+          id: 173,
+          category: "Android Theory",
+          type: "theory",
+          question: "Service chạy trên thread nào mặc định?",
+          options: [
+            "Background thread",
+            "Main thread",
+            "Worker thread",
+            "IO thread",
+          ],
+          correct: 1,
+          explanation:
+            "Service lifecycle methods chạy trên main thread. Cần tự tạo background thread cho heavy work.",
+        },
+        {
+          id: 174,
+          category: "Android Theory",
+          type: "theory",
+          question: "IntentService khác Service ở điểm nào?",
+          options: [
+            "IntentService chạy trên separate thread",
+            "IntentService không cần manifest",
+            "IntentService nhanh hơn",
+            "Không có sự khác biệt",
+          ],
+          correct: 0,
+          explanation:
+            "IntentService (deprecated) tự động tạo worker thread và self-stop.",
+        },
+        {
+          id: 175,
+          category: "Android Theory",
+          type: "theory",
+          question: "Foreground Service bắt buộc điều gì?",
+          options: [
+            "Internet permission",
+            "Show notification",
+            "GPS permission",
+            "Root access",
+          ],
+          correct: 1,
+          explanation:
+            "Foreground Service phải hiển thị notification cho user biết.",
+        },
+        {
+          id: 176,
+          category: "Android Theory",
+          type: "theory",
+          question: "ANR (Application Not Responding) xảy ra khi nào?",
+          options: [
+            "App crash",
+            "Main thread blocked quá 5 giây",
+            "Memory leak",
+            "Network timeout",
+          ],
+          correct: 1,
+          explanation:
+            "ANR khi main thread blocked 5s cho Activity hoặc 10s cho BroadcastReceiver.",
+        },
+        {
+          id: 177,
+          category: "Android Theory",
+          type: "theory",
+          question: "ProGuard/R8 dùng để làm gì?",
+          options: [
+            "Debug app",
+            "Code shrinking và obfuscation",
+            "UI testing",
+            "Network security",
+          ],
+          correct: 1,
+          explanation: "R8 shrinks code, obfuscates names, optimizes bytecode.",
+        },
+        {
+          id: 178,
+          category: "Android Theory",
+          type: "theory",
+          question: "ViewBinding khác DataBinding ở điểm nào?",
+          options: [
+            "Không khác biệt",
+            "ViewBinding chỉ bind views, không có 2-way binding",
+            "DataBinding nhanh hơn",
+            "ViewBinding cần annotation processor",
+          ],
+          correct: 1,
+          explanation:
+            "ViewBinding đơn giản hơn, chỉ bind view references. DataBinding có expressions và 2-way binding.",
+        },
+        {
+          id: 179,
+          category: "Android Theory",
+          type: "theory",
+          question: "MotionLayout dùng để làm gì?",
+          options: [
+            "Detect motion sensors",
+            "Create complex animations với constraints",
+            "Handle touch events",
+            "Motion blur effects",
+          ],
+          correct: 1,
+          explanation:
+            "MotionLayout extends ConstraintLayout để tạo complex animations.",
+        },
+        {
+          id: 180,
+          category: "Android Theory",
+          type: "theory",
+          question: "Paging 3 library dùng để làm gì?",
+          options: [
+            "Pagination trong books",
+            "Load data theo pages từ large datasets",
+            "Create page layouts",
+            "ViewPager alternative",
+          ],
+          correct: 1,
+          explanation:
+            "Paging 3 load và display data theo pages, giảm memory và network usage.",
+        },
+
+        // ==================== THÊM CÂU HỎI NÂNG CAO ====================
+        {
+          id: 181,
+          category: "Kotlin - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để tạo reified type parameter:",
+          code: "inline fun <[____] T> isType(value: Any): Boolean = value is T",
+          options: ["generic", "reified", "type", "real"],
+          correct: 1,
+          explanation:
+            "reified cho phép access type information at runtime trong inline function.",
+        },
+        {
+          id: 182,
+          category: "Kotlin - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để tạo delegated property:",
+          code: 'var name: String by Delegates.[____]("")',
+          options: ["lazy", "observable", "default", "nullable"],
+          correct: 1,
+          explanation: "Delegates.observable() notifies khi property thay đổi.",
+        },
+        {
+          id: 183,
+          category: "Kotlin - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để require non-null argument:",
+          code: 'fun process(data: String?) {\n    [____](data != null) { "data cannot be null" }\n    // data is smart-cast to String\n}',
+          options: ["check", "require", "assert", "ensure"],
+          correct: 1,
+          explanation:
+            "require() throws IllegalArgumentException if condition false.",
+        },
+        {
+          id: 184,
+          category: "Kotlin - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để tạo typealias:",
+          code: "[____] UserList = List<User>",
+          options: ["type", "typealias", "alias", "typedef"],
+          correct: 1,
+          explanation: "typealias tạo alias cho complex type.",
+        },
+        {
+          id: 185,
+          category: "Kotlin - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để implement interface property:",
+          code: 'interface Named {\n    val name: String\n}\nclass Person : Named {\n    [____] val name: String = "John"\n}',
+          options: ["final", "override", "implement", "abstract"],
+          correct: 1,
+          explanation: "override để implement interface property.",
+        },
+        {
+          id: 186,
+          category: "Android - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để share ViewModel giữa Fragments:",
+          code: "private val sharedViewModel: SharedViewModel by [____]()",
+          options: [
+            "viewModels",
+            "activityViewModels",
+            "sharedViewModels",
+            "parentViewModels",
+          ],
+          correct: 1,
+          explanation:
+            "activityViewModels() shares ViewModel scoped to Activity.",
+        },
+        {
+          id: 187,
+          category: "Android - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để SavedStateHandle trong ViewModel:",
+          code: "class MyViewModel(private val [____]: SavedStateHandle) : ViewModel()",
+          options: ["state", "savedState", "savedStateHandle", "handle"],
+          correct: 2,
+          explanation:
+            "SavedStateHandle parameter cho ViewModel survive process death.",
+        },
+        {
+          id: 188,
+          category: "Android - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để collect Flow với lifecycle:",
+          code: "viewLifecycleOwner.lifecycleScope.launch {\n    viewLifecycleOwner.[____](Lifecycle.State.STARTED) {\n        viewModel.data.collect { }\n    }\n}",
+          options: [
+            "whenStarted",
+            "repeatOnLifecycle",
+            "launchWhen",
+            "collectOn",
+          ],
+          correct: 1,
+          explanation:
+            "repeatOnLifecycle restarts collection khi lifecycle reaches state.",
+        },
+        {
+          id: 189,
+          category: "Android - Điền code",
+          type: "fill",
+          question: "Điền vào chỗ trống để define deep link trong NavGraph:",
+          code: '<fragment ...>\n    <[____]\n        app:uri="myapp://detail/{id}"\n        android:autoVerify="true"/>\n</fragment>',
+          options: ["link", "deepLink", "uri", "navDeepLink"],
+          correct: 1,
+          explanation: "deepLink element defines deep link URI.",
+        },
+        {
+          id: 190,
+          category: "Android - Điền code",
+          type: "fill",
+          question:
+            "Điền vào chỗ trống để test ViewModel với InstantTaskExecutorRule:",
+          code: "@get:Rule\nval instantTaskExecutorRule = [____]()",
+          options: [
+            "InstantTaskRule",
+            "InstantTaskExecutorRule",
+            "TaskExecutorRule",
+            "LiveDataRule",
+          ],
+          correct: 1,
+          explanation:
+            "InstantTaskExecutorRule runs LiveData tasks synchronously for testing.",
+        },
+
+        // ==================== THÊM CÂU HỎI TỪ ĐỀ THI ====================
+        {
+          id: 191,
+          category: "Android Theory",
+          type: "theory",
+          question: "Thư mục res KHÔNG chứa loại tài nguyên nào?",
+          options: [
+            "File layout XML",
+            "File cấu hình thư viện",
+            "File drawable",
+            "File strings.xml",
+          ],
+          correct: 1,
+          explanation:
+            "Thư viện dependencies được định nghĩa trong build.gradle, không phải res.",
+        },
+        {
+          id: 192,
+          category: "Android Theory",
+          type: "theory",
+          question:
+            "Trong một activity, nếu các Button đều setOnClickListener(this), phân biệt button được nhấn bằng cách nào?",
+          options: [
+            "Dựa vào vị trí của nút",
+            "Dựa vào định danh (ID) của nút",
+            "Dựa vào thứ tự khai báo trong XML",
+            "Dựa vào tên của nút",
+          ],
+          correct: 1,
+          explanation: "Trong onClick(view), dùng view.id để phân biệt button.",
+        },
+        {
+          id: 193,
+          category: "Layout XML - Điền code",
+          type: "fill",
+          question:
+            "Điền thuộc tính để view chiếm toàn bộ chiều rộng còn lại trong LinearLayout:",
+          code: '<View\n    android:layout_width="0dp"\n    android:layout_weight="[____]"/>',
+          options: ["0", "1", "fill", "match"],
+          correct: 1,
+          explanation: "weight > 0 để chiếm không gian còn lại theo tỷ lệ.",
+        },
+        {
+          id: 194,
+          category: "Android - Output",
+          type: "output",
+          question:
+            "Khi Activity A mở Activity B, callback của A được gọi theo thứ tự nào?",
+          options: [
+            "onStop → onPause",
+            "onPause → onStop",
+            "onDestroy → onStop",
+            "onPause → onDestroy",
+          ],
+          correct: 1,
+          explanation: "A.onPause() trước, sau khi B visible thì A.onStop().",
+        },
+        {
+          id: 195,
+          category: "Room - Tìm lỗi",
+          type: "error",
+          question: "Code sau có vấn đề gì?",
+          code: '@Entity(tableName = "users")\ndata class User(\n    @PrimaryKey(autoGenerate = true)\n    val id: Int,\n    val name: String\n)\n\n@Dao\ninterface UserDao {\n    @Query("SELECT * FROM user")\n    fun getAll(): List<User>\n}',
+          options: [
+            "Không có lỗi",
+            "Table name trong Query sai ('user' thay vì 'users')",
+            "@Entity sai cú pháp",
+            "DAO phải là class",
+          ],
+          correct: 1,
+          explanation:
+            "tableName là 'users' nhưng Query dùng 'user' sẽ gây runtime error.",
+        },
+        {
+          id: 196,
+          category: "RecyclerView - Tìm lỗi",
+          type: "error",
+          question: "Code sau có vấn đề gì?",
+          code: "override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {\n    val binding = ItemBinding.inflate(\n        LayoutInflater.from(parent.context)\n    )\n    return ViewHolder(binding)\n}",
+          options: [
+            "Không có lỗi",
+            "Thiếu parent trong inflate, item sẽ không có đúng LayoutParams",
+            "inflate sai cú pháp",
+            "ViewHolder constructor sai",
+          ],
+          correct: 1,
+          explanation:
+            "Cần inflate(inflater, parent, false) để item có đúng LayoutParams.",
+        },
+        {
+          id: 197,
+          category: "Kotlin - Output",
+          type: "output",
+          question: "Đoạn code sau in ra gì?",
+          code: 'sealed class Result {\n    data class Success(val data: String) : Result()\n    data class Error(val msg: String) : Result()\n}\n\nfun handle(r: Result) = when(r) {\n    is Result.Success -> "OK: ${r.data}"\n    is Result.Error -> "ERR: ${r.msg}"\n}\n\nprintln(handle(Result.Success("done")))',
+          options: ["OK: done", "ERR: done", "Success(done)", "Result.Success"],
+          correct: 0,
+          explanation: "when với sealed class, match Success branch.",
+        },
+        {
+          id: 198,
+          category: "Kotlin - Output",
+          type: "output",
+          question: "Đoạn code sau in ra gì?",
+          code: 'fun main() = runBlocking {\n    val result = async { delay(100); "A" }.await() +\n                 async { delay(50); "B" }.await()\n    println(result)\n}',
+          options: ["AB", "BA", "Lỗi", "null"],
+          correct: 0,
+          explanation:
+            'Sequential await: đợi A xong (100ms) rồi đợi B (50ms), kết quả "AB".',
+        },
+        {
+          id: 199,
+          category: "Android - Tìm lỗi",
+          type: "error",
+          question: "Code sau có vấn đề gì?",
+          code: 'class MainActivity : AppCompatActivity() {\n    private lateinit var binding: ActivityMainBinding\n    \n    override fun onCreate(savedInstanceState: Bundle?) {\n        super.onCreate(savedInstanceState)\n        binding = ActivityMainBinding.inflate(layoutInflater)\n        // Quên setContentView(binding.root)\n        binding.textView.text = "Hello"\n    }\n}',
+          options: [
+            "Không có lỗi",
+            "Quên setContentView, UI sẽ không hiển thị",
+            "lateinit sai cú pháp",
+            "inflate sai",
+          ],
+          correct: 1,
+          explanation:
+            "Phải gọi setContentView(binding.root) để hiển thị layout.",
+        },
+        {
+          id: 200,
+          category: "Compose - Output",
+          type: "output",
+          question: "Trong Compose, khi state thay đổi điều gì xảy ra?",
+          options: [
+            "App crash",
+            "Composables reading that state recompose",
+            "Nothing happens",
+            "Activity recreate",
+          ],
+          correct: 1,
+          explanation:
+            "State changes trigger recomposition của composables depend on that state.",
+        },
+      ];
+
+      // Quiz State
+      let currentQuestion = 0;
+      let score = 0;
+      let answers = [];
+      let selectedCategory = "all";
+      let filteredQuestions = [...questions];
+      let quizStarted = false;
+      let showingResults = false;
+      let questionLimit = 0;
+
+      function getCategories() {
+        return [...new Set(questions.map((q) => q.category))];
+      }
+
+      function filterQuestions() {
+        if (selectedCategory === "all") {
+          filteredQuestions = [...questions];
+        } else {
+          filteredQuestions = questions.filter(
+            (q) => q.category === selectedCategory
+          );
+        }
+        filteredQuestions = shuffleArray(filteredQuestions);
+        if (questionLimit > 0 && questionLimit < filteredQuestions.length) {
+          filteredQuestions = filteredQuestions.slice(0, questionLimit);
+        }
+      }
+
+      function shuffleArray(array) {
+        const newArray = [...array];
+        for (let i = newArray.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+        }
+        return newArray;
+      }
+
+      function showStartScreen() {
+        quizStarted = false;
+        showingResults = false;
+        const categories = getCategories();
+
+        const typeStats = {
+          fill: questions.filter((q) => q.type === "fill").length,
+          error: questions.filter((q) => q.type === "error").length,
+          output: questions.filter((q) => q.type === "output").length,
+          theory: questions.filter((q) => q.type === "theory").length,
+        };
+
+        document.getElementById("quizContainer").innerHTML = `
+                <div class="start-screen">
+                    <h2>🎯 Chào mừng đến với Android Quiz Master Pro!</h2>
+                    <p>Ngân hàng <strong>${
+                      questions.length
+                    }</strong> câu hỏi bao gồm: Điền code, Tìm lỗi, Đoán output, Lý thuyết</p>
+                    
+                    <div class="stats-preview">
+                        <div class="stat-card">
+                            <div class="number">${questions.length}</div>
+                            <div class="label">Tổng câu hỏi</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="number">${typeStats.fill}</div>
+                            <div class="label">Điền code</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="number">${typeStats.error}</div>
+                            <div class="label">Tìm lỗi</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="number">${typeStats.output}</div>
+                            <div class="label">Đoán output</div>
+                        </div>
+                    </div>
+                    
+                    <div class="category-select">
+                        <label>📚 Chọn chủ đề:</label>
+                        <select id="categorySelect">
+                            <option value="all">Tất cả chủ đề (${
+                              questions.length
+                            } câu)</option>
+                            ${categories
+                              .map((cat) => {
+                                const count = questions.filter(
+                                  (q) => q.category === cat
+                                ).length;
+                                return `<option value="${cat}">${cat} (${count} câu)</option>`;
+                              })
+                              .join("")}
+                        </select>
+                    </div>
+                    
+                    <div class="category-select">
+                        <label>🔢 Số câu hỏi:</label>
+                        <select id="questionLimit">
+                            <option value="0">Tất cả</option>
+                            <option value="10">10 câu</option>
+                            <option value="20">20 câu</option>
+                            <option value="30">30 câu</option>
+                            <option value="50">50 câu</option>
+                            <option value="100">100 câu</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn btn-primary" onclick="startQuiz()" style="margin-top: 20px;">🚀 Bắt đầu Quiz</button>
+                </div>
+            `;
+      }
+
+      function startQuiz() {
+        selectedCategory = document.getElementById("categorySelect").value;
+        questionLimit = parseInt(
+          document.getElementById("questionLimit").value
+        );
+        filterQuestions();
+        currentQuestion = 0;
+        score = 0;
+        answers = new Array(filteredQuestions.length).fill(null);
+        quizStarted = true;
+        showingResults = false;
+        showQuestion();
+      }
+
+      function getTypeBadge(type) {
+        const badges = {
+          fill: '<span class="type-badge fill">Điền code</span>',
+          error: '<span class="type-badge error">Tìm lỗi</span>',
+          output: '<span class="type-badge output">Output</span>',
+          theory: '<span class="type-badge theory">Lý thuyết</span>',
+        };
+        return badges[type] || "";
+      }
+
+      function showQuestion() {
+        const q = filteredQuestions[currentQuestion];
+        const progress =
+          ((currentQuestion + 1) / filteredQuestions.length) * 100;
+        const answered = answers.filter((a) => a !== null).length;
+
+        let codeBlock = "";
+        if (q.code) {
+          codeBlock = `<pre class="code-block">${escapeHtml(q.code)}</pre>`;
+        }
+
+        const isCodeOption = q.type === "fill" || q.category.includes("Output");
+
+        document.getElementById("quizContainer").innerHTML = `
+                <div class="progress-bar">
+                    <div class="progress" style="width: ${progress}%"></div>
+                </div>
+                
+                <div class="question-info">
+                    <span class="question-number">Câu ${currentQuestion + 1}/${
+          filteredQuestions.length
+        }</span>
+                    <span class="category-tag">${q.category}</span>
+                    ${getTypeBadge(q.type)}
+                    <span class="score-display">✓ ${score}/${answered}</span>
+                </div>
+                
+                <div class="question-text">${q.question}</div>
+                ${codeBlock}
+                
+                <div class="options">
+                    ${q.options
+                      .map(
+                        (opt, i) => `
+                        <div class="option ${
+                          answers[currentQuestion] === i ? "selected" : ""
+                        }" 
+                             onclick="selectOption(${i})" data-index="${i}">
+                            <span class="option-letter">${String.fromCharCode(
+                              65 + i
+                            )}</span>
+                            <span class="option-text ${
+                              isCodeOption ? "" : "normal-text"
+                            }">${escapeHtml(opt)}</span>
+                        </div>
+                    `
+                      )
+                      .join("")}
+                </div>
+                
+                <div class="explanation" id="explanation">
+                    <h4>💡 Giải thích:</h4>
+                    <p>${q.explanation}</p>
+                </div>
+                
+                <div class="buttons">
+                    <button class="btn btn-secondary" onclick="prevQuestion()" ${
+                      currentQuestion === 0 ? "disabled" : ""
+                    }>← Trước</button>
+                    <button class="btn btn-primary" onclick="checkAnswer()" id="checkBtn">Kiểm tra</button>
+                    <button class="btn btn-primary" onclick="nextQuestion()" id="nextBtn" style="display: none;">
+                        ${
+                          currentQuestion === filteredQuestions.length - 1
+                            ? "Xem kết quả"
+                            : "Tiếp theo →"
+                        }
+                    </button>
+                </div>
+                
+                <div class="question-nav">
+                    ${filteredQuestions
+                      .map((_, i) => {
+                        let className = "nav-btn";
+                        if (i === currentQuestion) className += " current";
+                        else if (answers[i] !== null) {
+                          className +=
+                            answers[i] === filteredQuestions[i].correct
+                              ? " answered"
+                              : " wrong";
+                        }
+                        return `<button class="${className}" onclick="goToQuestion(${i})">${
+                          i + 1
+                        }</button>`;
+                      })
+                      .join("")}
+                </div>
+            `;
+      }
+
+      function escapeHtml(text) {
+        return text
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+
+      function selectOption(index) {
+        answers[currentQuestion] = index;
+        document.querySelectorAll(".option").forEach((opt, i) => {
+          opt.classList.toggle("selected", i === index);
+        });
+      }
+
+      function checkAnswer() {
+        if (answers[currentQuestion] === null) {
+          alert("Vui lòng chọn một đáp án!");
+          return;
+        }
+
+        const q = filteredQuestions[currentQuestion];
+        const selected = answers[currentQuestion];
+        const correct = q.correct;
+
+        if (selected === correct) score++;
+
+        document.querySelectorAll(".option").forEach((opt, i) => {
+          opt.onclick = null;
+          if (i === correct) opt.classList.add("correct");
+          else if (i === selected && selected !== correct)
+            opt.classList.add("incorrect");
+        });
+
+        document.getElementById("explanation").classList.add("show");
+        document.getElementById("checkBtn").style.display = "none";
+        document.getElementById("nextBtn").style.display = "inline-block";
+
+        const navBtns = document.querySelectorAll(".nav-btn");
+        navBtns[currentQuestion].classList.remove("current");
+        navBtns[currentQuestion].classList.add(
+          selected === correct ? "answered" : "wrong"
+        );
+      }
+
+      function nextQuestion() {
+        if (currentQuestion < filteredQuestions.length - 1) {
+          currentQuestion++;
+          showQuestion();
+        } else {
+          showResults();
+        }
+      }
+
+      function prevQuestion() {
+        if (currentQuestion > 0) {
+          currentQuestion--;
+          showQuestion();
+        }
+      }
+
+      function goToQuestion(index) {
+        currentQuestion = index;
+        showQuestion();
+      }
+
+      function showResults() {
+        showingResults = true;
+        const percentage = Math.round((score / filteredQuestions.length) * 100);
+        const incorrect =
+          filteredQuestions.length -
+          score -
+          answers.filter((a) => a === null).length;
+
+        let message, emoji;
+        if (percentage >= 90) {
+          message = "Xuất sắc! Bạn đã nắm vững kiến thức!";
+          emoji = "🏆";
+        } else if (percentage >= 70) {
+          message = "Tốt lắm! Tiếp tục cố gắng!";
+          emoji = "🎉";
+        } else if (percentage >= 50) {
+          message = "Khá ổn! Cần ôn tập thêm!";
+          emoji = "💪";
+        } else {
+          message = "Cần cố gắng nhiều hơn!";
+          emoji = "📚";
+        }
+
+        document.getElementById("quizContainer").innerHTML = `
+                <div class="results-screen">
+                    <h2>${emoji} Kết quả của bạn</h2>
+                    <p>${message}</p>
+                    
+                    <div class="score-circle">
+                        <span class="percentage">${percentage}%</span>
+                        <span class="text">${score}/${
+          filteredQuestions.length
+        }</span>
+                    </div>
+                    
+                    <div class="results-stats">
+                        <div class="result-stat correct">
+                            <div class="number">${score}</div>
+                            <div>Đúng</div>
+                        </div>
+                        <div class="result-stat incorrect">
+                            <div class="number">${incorrect}</div>
+                            <div>Sai</div>
+                        </div>
+                        <div class="result-stat skipped">
+                            <div class="number">${
+                              answers.filter((a) => a === null).length
+                            }</div>
+                            <div>Bỏ qua</div>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" onclick="filterReview('all')">Tất cả</button>
+                        <button class="filter-btn" onclick="filterReview('incorrect')">Câu sai</button>
+                        <button class="filter-btn" onclick="filterReview('correct')">Câu đúng</button>
+                    </div>
+                    
+                    <div class="review-list" id="reviewList">${generateReviewList(
+                      "all"
+                    )}</div>
+                    
+                    <div class="buttons" style="margin-top: 20px;">
+                        <button class="btn btn-secondary" onclick="showStartScreen()">← Trang chủ</button>
+                        <button class="btn btn-primary" onclick="startQuiz()">🔄 Làm lại</button>
+                    </div>
+                </div>
+            `;
+      }
+
+      function generateReviewList(filter) {
+        let items = filteredQuestions
+          .map((q, i) => {
+            const isCorrect = answers[i] === q.correct;
+            const showItem =
+              filter === "all" ||
+              (filter === "correct" && isCorrect) ||
+              (filter === "incorrect" && !isCorrect && answers[i] !== null);
+
+            if (!showItem) return "";
+
+            return `
+                    <div class="review-item ${
+                      isCorrect ? "correct" : "incorrect"
+                    }" onclick="reviewQuestion(${i})">
+                        <strong>Câu ${i + 1}:</strong> ${q.question.substring(
+              0,
+              60
+            )}...
+                        <br><small>${
+                          isCorrect ? "✓ Đúng" : "✗ Sai"
+                        } ${getTypeBadge(q.type)}</small>
+                    </div>
+                `;
+          })
+          .join("");
+
+        return (
+          items ||
+          '<p style="text-align:center;color:#666;padding:20px;">Không có câu hỏi.</p>'
+        );
+      }
+
+      function filterReview(filter) {
+        document
+          .querySelectorAll(".filter-btn")
+          .forEach((btn) => btn.classList.remove("active"));
+        event.target.classList.add("active");
+        document.getElementById("reviewList").innerHTML =
+          generateReviewList(filter);
+      }
+
+      function reviewQuestion(index) {
+        const q = filteredQuestions[index];
+        const selected = answers[index];
+        const correct = q.correct;
+
+        alert(
+          `Câu ${index + 1}: ${q.question}\n\n` +
+            (q.code ? `Code:\n${q.code}\n\n` : "") +
+            `Bạn chọn: ${
+              selected !== null ? q.options[selected] : "Chưa trả lời"
+            }\n` +
+            `Đáp án đúng: ${q.options[correct]}\n\n` +
+            `Giải thích: ${q.explanation}`
+        );
+      }
+
+      showStartScreen();
+    </script>
+  </body>
+</html>
